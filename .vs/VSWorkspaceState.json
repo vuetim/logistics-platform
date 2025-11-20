@@ -1,0 +1,12 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\Backend",
+    "\\Backend\\LogisticsPlatform",
+    "\\Backend\\LogisticsPlatform.Application",
+    "\\Backend\\LogisticsPlatform.Domain",
+    "\\Backend\\LogisticsPlatform.Infrastructure",
+    "\\Backend\\LogisticsPlatform\\LogisticsPlatform.Api"
+  ],
+  "PreviewInSolutionExplorer": false
+}

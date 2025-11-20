@@ -1,0 +1,25 @@
+# ===== .NET Ignore =====
+bin/
+obj/
+.vs/
+*.user
+*.suo
+*.cache
+*.pdb
+*.mdb
+*.opendb
+*.tmp
+*.log
+
+# Visual Studio
+*.userosscache
+*.sln.ide
+*.sln.docstates
+
+# Build outputs
+**/Debug/
+**/Release/
+
+# Rider / ReSharper
+.idea/
+*.DotSettings.user
