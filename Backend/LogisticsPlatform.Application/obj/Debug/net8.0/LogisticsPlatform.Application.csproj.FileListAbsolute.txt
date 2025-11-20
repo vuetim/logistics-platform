@@ -1,0 +1,15 @@
+C:\Users\38344\OneDrive\Desktop\Logistics\logistics-platform\Backend\LogisticsPlatform.Application\bin\Debug\net8.0\LogisticsPlatform.Application.deps.json
+C:\Users\38344\OneDrive\Desktop\Logistics\logistics-platform\Backend\LogisticsPlatform.Application\bin\Debug\net8.0\LogisticsPlatform.Application.dll
+C:\Users\38344\OneDrive\Desktop\Logistics\logistics-platform\Backend\LogisticsPlatform.Application\bin\Debug\net8.0\LogisticsPlatform.Application.pdb
+C:\Users\38344\OneDrive\Desktop\Logistics\logistics-platform\Backend\LogisticsPlatform.Application\bin\Debug\net8.0\LogisticsPlatform.Domain.dll
+C:\Users\38344\OneDrive\Desktop\Logistics\logistics-platform\Backend\LogisticsPlatform.Application\bin\Debug\net8.0\LogisticsPlatform.Domain.pdb
+C:\Users\38344\OneDrive\Desktop\Logistics\logistics-platform\Backend\LogisticsPlatform.Application\obj\Debug\net8.0\LogisticsPlatform.Application.csproj.AssemblyReference.cache
+C:\Users\38344\OneDrive\Desktop\Logistics\logistics-platform\Backend\LogisticsPlatform.Application\obj\Debug\net8.0\LogisticsPlatform.Application.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\38344\OneDrive\Desktop\Logistics\logistics-platform\Backend\LogisticsPlatform.Application\obj\Debug\net8.0\LogisticsPlatform.Application.AssemblyInfoInputs.cache
+C:\Users\38344\OneDrive\Desktop\Logistics\logistics-platform\Backend\LogisticsPlatform.Application\obj\Debug\net8.0\LogisticsPlatform.Application.AssemblyInfo.cs
+C:\Users\38344\OneDrive\Desktop\Logistics\logistics-platform\Backend\LogisticsPlatform.Application\obj\Debug\net8.0\LogisticsPlatform.Application.csproj.CoreCompileInputs.cache
+C:\Users\38344\OneDrive\Desktop\Logistics\logistics-platform\Backend\LogisticsPlatform.Application\obj\Debug\net8.0\Logistic.0F7160EB.Up2Date
+C:\Users\38344\OneDrive\Desktop\Logistics\logistics-platform\Backend\LogisticsPlatform.Application\obj\Debug\net8.0\LogisticsPlatform.Application.dll
+C:\Users\38344\OneDrive\Desktop\Logistics\logistics-platform\Backend\LogisticsPlatform.Application\obj\Debug\net8.0\refint\LogisticsPlatform.Application.dll
+C:\Users\38344\OneDrive\Desktop\Logistics\logistics-platform\Backend\LogisticsPlatform.Application\obj\Debug\net8.0\LogisticsPlatform.Application.pdb
+C:\Users\38344\OneDrive\Desktop\Logistics\logistics-platform\Backend\LogisticsPlatform.Application\obj\Debug\net8.0\ref\LogisticsPlatform.Application.dll

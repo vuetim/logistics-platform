@@ -1,0 +1,56 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v8.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v8.0": {
+      "LogisticsPlatform.Infrastructure/1.0.0": {
+        "dependencies": {
+          "LogisticsPlatform.Application": "1.0.0",
+          "LogisticsPlatform.Domain": "1.0.0"
+        },
+        "runtime": {
+          "LogisticsPlatform.Infrastructure.dll": {}
+        }
+      },
+      "LogisticsPlatform.Application/1.0.0": {
+        "dependencies": {
+          "LogisticsPlatform.Domain": "1.0.0"
+        },
+        "runtime": {
+          "LogisticsPlatform.Application.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "LogisticsPlatform.Domain/1.0.0": {
+        "runtime": {
+          "LogisticsPlatform.Domain.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "LogisticsPlatform.Infrastructure/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "LogisticsPlatform.Application/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "LogisticsPlatform.Domain/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}
