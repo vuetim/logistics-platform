@@ -1,25 +1,12 @@
-# ===== .NET Ignore =====
 bin/
 obj/
 .vs/
 *.user
 *.suo
-*.cache
-*.pdb
-*.mdb
-*.opendb
+*.swp
 *.tmp
 *.log
-
-# Visual Studio
-*.userosscache
-*.sln.ide
-*.sln.docstates
-
-# Build outputs
-**/Debug/
-**/Release/
-
-# Rider / ReSharper
-.idea/
-*.DotSettings.user
+*.db
+*.sqlite
+appsettings.Development.json
+appsettings.Local.json
