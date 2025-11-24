@@ -26,6 +26,8 @@ builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<IUserRoleRepository, UserRoleRepository>();
+builder.Services.AddScoped<ICustomerContactRepository, CustomerContactRepository>();
+builder.Services.AddScoped<ICustomerContactService, CustomerContactService>();
 
 // 4. Services
 builder.Services.AddScoped<ICustomerService, CustomerService>();
