@@ -12,6 +12,8 @@ namespace LogisticsPlatform.Application.Interfaces
         Task<User?> GetByEmailAsync(string email);
         Task AddAsync(User user);
         Task SaveChangesAsync();
+        Task<User?> GetByIdAsync(Guid id);
+
     }
 }
  

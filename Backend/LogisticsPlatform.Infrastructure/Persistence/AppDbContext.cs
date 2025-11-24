@@ -12,6 +12,7 @@ public class AppDbContext : DbContext
     public DbSet<User> Users => Set<User>();
     public DbSet<Role> Roles => Set<Role>();
     public DbSet<UserRole> UserRoles => Set<UserRole>();
+    public DbSet<Customer> Customers => Set<Customer>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -20,12 +21,12 @@ public class AppDbContext : DbContext
 
         modelBuilder.Entity<UserRole>()
             .HasOne(ur => ur.User)
-            .WithMany(u => u.Roles)
+            .WithMany(u => u.UserRoles)   // ✔ navigation property in User
             .HasForeignKey(ur => ur.UserId);
 
         modelBuilder.Entity<UserRole>()
             .HasOne(ur => ur.Role)
-            .WithMany(r => r.Users)
+            .WithMany(r => r.UserRoles)   // ✔ navigation property in Role
             .HasForeignKey(ur => ur.RoleId);
     }
 }

@@ -8,6 +8,5 @@ public class User : BaseEntity
     public string Email { get; set; } = string.Empty;
     public string PasswordHash { get; set; } = string.Empty;
 
-    // Navigation
-    public List<UserRole> Roles { get; set; } = new();
+    public ICollection<UserRole>? UserRoles { get; set; }
 }

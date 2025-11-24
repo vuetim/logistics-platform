@@ -1,5 +1,6 @@
 ﻿using LogisticsPlatform.Application.DTOs.Auth;
 using LogisticsPlatform.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LogisticsPlatform.Api.Controllers
@@ -21,5 +22,41 @@ namespace LogisticsPlatform.Api.Controllers
             await _auth.RegisterAsync(dto);
             return Ok("Registered successfully");
         }
+        [HttpPost("login")]
+        public async Task<IActionResult> Login(LoginDto dto)
+        {
+            try
+            {
+                var token = await _auth.LoginAsync(dto);
+                return Ok(new { token });
+            }
+            catch (Exception ex)
+            {
+                return Unauthorized(new { error = ex.Message });
+            }
+        }
+
+        [HttpPost("assign-role")]
+        public async Task<IActionResult> AssignRole(AssignRoleDto dto)
+        {
+            try
+            {
+                await _auth.AssignRoleAsync(dto);
+                return Ok("Role assigned successfully");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpGet("test-admin")]
+        public IActionResult TestAdmin()
+        {
+            return Ok("You are ADMIN!");
+        }
+
     }
+
 }

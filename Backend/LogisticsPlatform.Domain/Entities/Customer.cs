@@ -1,0 +1,15 @@
+﻿using LogisticsPlatform.Domain.Common;
+
+namespace LogisticsPlatform.Domain.Entities
+{
+    public class Customer : BaseEntity
+    {
+        public string Name { get; set; } = string.Empty;
+        public string? Email { get; set; }
+        public string? Phone { get; set; }
+        public string? Address { get; set; }
+
+        
+        // public List<Load>? Loads { get; set; }
+    }
+}
