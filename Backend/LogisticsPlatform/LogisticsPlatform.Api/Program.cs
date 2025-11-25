@@ -27,11 +27,16 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<IUserRoleRepository, UserRoleRepository>();
 builder.Services.AddScoped<ICustomerContactRepository, CustomerContactRepository>();
-builder.Services.AddScoped<ICustomerContactService, CustomerContactService>();
+builder.Services.AddScoped<ICustomerNoteRepository, CustomerNoteRepository>();
+
 
 // 4. Services
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ICustomerNoteService, CustomerNoteService>();
+builder.Services.AddScoped<ICustomerContactService, CustomerContactService>();
+
+
 
 // 5. JWT Authentication
 var key = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]);

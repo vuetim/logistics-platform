@@ -14,6 +14,8 @@ public class AppDbContext : DbContext
     public DbSet<UserRole> UserRoles => Set<UserRole>();
     public DbSet<Customer> Customers => Set<Customer>();
     public DbSet<CustomerContact> CustomerContacts => Set<CustomerContact>();
+    public DbSet<CustomerNote> CustomerNotes => Set<CustomerNote>();
+
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
