@@ -30,6 +30,8 @@ builder.Services.AddScoped<ICustomerContactRepository, CustomerContactRepository
 builder.Services.AddScoped<ICustomerNoteRepository, CustomerNoteRepository>();
 builder.Services.AddScoped<ICustomerAddressRepository, CustomerAddressRepository>();
 builder.Services.AddScoped<ICarrierRepository, CarrierRepository>();
+builder.Services.AddScoped<ICarrierContactRepository, CarrierContactRepository>();
+
 
 
 
@@ -40,6 +42,8 @@ builder.Services.AddScoped<ICustomerNoteService, CustomerNoteService>();
 builder.Services.AddScoped<ICustomerContactService, CustomerContactService>();
 builder.Services.AddScoped<ICustomerAddressService, CustomerAddressService>();
 builder.Services.AddScoped<ICarrierService, CarrierService>();
+builder.Services.AddScoped<ICarrierContactService, CarrierContactService>();
+
 
 
 
