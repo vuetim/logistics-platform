@@ -9,7 +9,8 @@ namespace LogisticsPlatform.Domain.Entities
         public string? Phone { get; set; }
         public string? Address { get; set; }
 
-        
+        public ICollection<CustomerAddress> Addresses { get; set; } = new List<CustomerAddress>();
+
         // public List<Load>? Loads { get; set; }
     }
 }
