@@ -29,6 +29,7 @@ builder.Services.AddScoped<IUserRoleRepository, UserRoleRepository>();
 builder.Services.AddScoped<ICustomerContactRepository, CustomerContactRepository>();
 builder.Services.AddScoped<ICustomerNoteRepository, CustomerNoteRepository>();
 builder.Services.AddScoped<ICustomerAddressRepository, CustomerAddressRepository>();
+builder.Services.AddScoped<ICarrierRepository, CarrierRepository>();
 
 
 
@@ -38,6 +39,8 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ICustomerNoteService, CustomerNoteService>();
 builder.Services.AddScoped<ICustomerContactService, CustomerContactService>();
 builder.Services.AddScoped<ICustomerAddressService, CustomerAddressService>();
+builder.Services.AddScoped<ICarrierService, CarrierService>();
+
 
 
 
