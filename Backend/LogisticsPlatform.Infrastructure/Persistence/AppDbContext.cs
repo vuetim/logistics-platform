@@ -17,6 +17,7 @@ public class AppDbContext : DbContext
     public DbSet<CustomerNote> CustomerNotes => Set<CustomerNote>();
     public DbSet<CustomerAddress> CustomerAddresses => Set<CustomerAddress>();
     public DbSet<CarrierContact> CarrierContacts => Set<CarrierContact>();
+    public DbSet<CarrierAddress> CarrierAddresses => Set<CarrierAddress>();
 
 
     public DbSet<Carrier> Carriers => Set<Carrier>();

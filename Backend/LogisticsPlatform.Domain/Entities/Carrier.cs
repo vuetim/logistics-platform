@@ -18,7 +18,7 @@ namespace LogisticsPlatform.Domain.Entities
         // 1–5 rating (opsionale për tani)
         public int Rating { get; set; } = 0;
 
-        // public ICollection<CarrierContact> Contacts { get; set; } = new List<CarrierContact>();
+        public ICollection<CarrierContact> Contacts { get; set; } = new List<CarrierContact>();
         // public ICollection<CarrierNote> Notes { get; set; } = new List<CarrierNote>();
     }
 }
