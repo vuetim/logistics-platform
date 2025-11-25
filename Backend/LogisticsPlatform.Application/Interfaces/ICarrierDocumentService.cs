@@ -1,0 +1,13 @@
+﻿using LogisticsPlatform.Domain.Entities;
+using LogisticsPlatform.Application.DTOs.Carriers.Documents;
+
+namespace LogisticsPlatform.Application.Interfaces
+{
+    public interface ICarrierDocumentService
+    {
+        Task<IEnumerable<CarrierDocument>> GetByCarrierAsync(Guid carrierId);
+        Task<CarrierDocument> CreateAsync(Guid userId, CreateCarrierDocumentDto dto);
+        Task<CarrierDocument?> UpdateAsync(Guid id, UpdateCarrierDocumentDto dto);
+        Task<bool> DeleteAsync(Guid id);
+    }
+}
