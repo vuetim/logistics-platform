@@ -1,4 +1,5 @@
 ﻿using LogisticsPlatform.Domain.Common;
+using LogisticsPlatform.Domain.Enums;
 
 namespace LogisticsPlatform.Domain.Entities
 {
@@ -10,6 +11,6 @@ namespace LogisticsPlatform.Domain.Entities
         public string FullName { get; set; } = string.Empty;
         public string? Email { get; set; }
         public string? Phone { get; set; }
-        public string? Position { get; set; }
+        public string? Role { get; set; } = CarrierContactRoles.Other;
     }
 }

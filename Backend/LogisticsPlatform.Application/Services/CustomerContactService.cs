@@ -2,6 +2,7 @@
 using LogisticsPlatform.Application.Interfaces.Repositories;
 using LogisticsPlatform.Application.Interfaces.Services;
 using LogisticsPlatform.Domain.Entities;
+using LogisticsPlatform.Domain.Enums;
 
 namespace LogisticsPlatform.Application.Services
 {
@@ -24,6 +25,8 @@ namespace LogisticsPlatform.Application.Services
             var customer = await _customers.GetByIdAsync(dto.CustomerId);
             if (customer == null)
                 throw new Exception("Customer not found");
+            if (!CarrierContactRoles.All.Contains(dto.Position))
+                throw new Exception("Invalid role");
 
             var contact = new CustomerContact
             {
@@ -31,6 +34,7 @@ namespace LogisticsPlatform.Application.Services
                 FullName = dto.FullName,
                 Email = dto.Email,
                 Phone = dto.Phone,
+
                 Position = dto.Position
             };
 
@@ -48,8 +52,12 @@ namespace LogisticsPlatform.Application.Services
             contact.FullName = dto.FullName ?? contact.FullName;
             contact.Email = dto.Email ?? contact.Email;
             contact.Phone = dto.Phone ?? contact.Phone;
-            contact.Position = dto.Position ?? contact.Position;
-
+            if (dto.Position != null)
+            {
+                if (!CarrierContactRoles.All.Contains(dto.Position))
+                    throw new Exception("Invalid role");
+                contact.Position = dto.Position ?? contact.Position;
+            }
             await _contacts.UpdateAsync(contact);
             await _contacts.SaveChangesAsync();
 

@@ -1,5 +1,6 @@
 ﻿using LogisticsPlatform.Application.DTOs.Carriers.Contacts;
 using LogisticsPlatform.Application.Interfaces.Services;
+using LogisticsPlatform.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -43,6 +44,11 @@ namespace LogisticsPlatform.Api.Controllers
         public async Task<IActionResult> GetByCarrier(Guid carrierId)
         {
             return Ok(await _service.GetByCarrierAsync(carrierId));
+        }
+        [HttpGet("roles")]
+        public IActionResult GetContactRoles()
+        {
+            return Ok(CarrierContactRoles.All);
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using LogisticsPlatform.Domain.Common;
 using LogisticsPlatform.Domain.Entities;
+using LogisticsPlatform.Domain.Enums;
 
 public class CustomerContact : BaseEntity
 {
@@ -9,5 +10,5 @@ public class CustomerContact : BaseEntity
     public string FullName { get; set; }
     public string Email { get; set; }
     public string Phone { get; set; }
-    public string Position { get; set; }
+    public string Position { get; set; } = CustomerContactRoles.Other;
 }

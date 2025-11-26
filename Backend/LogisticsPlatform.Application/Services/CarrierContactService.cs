@@ -2,6 +2,7 @@
 using LogisticsPlatform.Application.Interfaces.Repositories;
 using LogisticsPlatform.Application.Interfaces.Services;
 using LogisticsPlatform.Domain.Entities;
+using LogisticsPlatform.Domain.Enums;
 
 namespace LogisticsPlatform.Application.Services
 {
@@ -20,9 +21,13 @@ namespace LogisticsPlatform.Application.Services
 
         public async Task<CarrierContact> CreateAsync(CreateCarrierContactDto dto)
         {
+            // Validate carrier exists
             var carrier = await _carriers.GetByIdAsync(dto.CarrierId);
             if (carrier == null)
                 throw new Exception("Carrier not found");
+
+            if (!CarrierContactRoles.All.Contains(dto.Role))
+                throw new Exception("Invalid role");
 
             var contact = new CarrierContact
             {
@@ -30,7 +35,7 @@ namespace LogisticsPlatform.Application.Services
                 FullName = dto.FullName,
                 Email = dto.Email,
                 Phone = dto.Phone,
-                Position = dto.Position
+                Role = dto.Role
             };
 
             await _contacts.AddAsync(contact);
@@ -42,12 +47,20 @@ namespace LogisticsPlatform.Application.Services
         public async Task<CarrierContact?> UpdateAsync(Guid id, UpdateCarrierContactDto dto)
         {
             var contact = await _contacts.GetByIdAsync(id);
-            if (contact == null) return null;
+            if (contact == null)
+                return null;
 
             contact.FullName = dto.FullName ?? contact.FullName;
             contact.Email = dto.Email ?? contact.Email;
             contact.Phone = dto.Phone ?? contact.Phone;
-            contact.Position = dto.Position ?? contact.Position;
+
+            if (dto.Role != null)
+            {
+                if (!CarrierContactRoles.All.Contains(dto.Role))
+                    throw new Exception("Invalid role");
+
+                contact.Role = dto.Role;
+            }
 
             contact.UpdatedAt = DateTime.UtcNow;
 
@@ -60,10 +73,12 @@ namespace LogisticsPlatform.Application.Services
         public async Task<bool> DeleteAsync(Guid id)
         {
             var contact = await _contacts.GetByIdAsync(id);
-            if (contact == null) return false;
+            if (contact == null)
+                return false;
 
             await _contacts.DeleteAsync(contact);
             await _contacts.SaveChangesAsync();
+
             return true;
         }
 
