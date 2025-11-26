@@ -1,7 +1,7 @@
 ﻿using LogisticsPlatform.Domain.Entities;
 using LogisticsPlatform.Application.DTOs.Carriers.Notes;
 
-namespace LogisticsPlatform.Application.Interfaces
+namespace LogisticsPlatform.Application.Interfaces.Services
 {
     public interface ICarrierNoteService
     {

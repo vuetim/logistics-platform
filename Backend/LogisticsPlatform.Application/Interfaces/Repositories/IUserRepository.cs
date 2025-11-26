@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LogisticsPlatform.Application.Interfaces
+namespace LogisticsPlatform.Application.Interfaces.Repositories
 {
     public interface IUserRepository
     {

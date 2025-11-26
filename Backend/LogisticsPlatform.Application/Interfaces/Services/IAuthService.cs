@@ -1,6 +1,6 @@
 ﻿using LogisticsPlatform.Application.DTOs.Auth;
 
-namespace LogisticsPlatform.Application.Interfaces
+namespace LogisticsPlatform.Application.Interfaces.Services
 {
     public interface IAuthService
     {

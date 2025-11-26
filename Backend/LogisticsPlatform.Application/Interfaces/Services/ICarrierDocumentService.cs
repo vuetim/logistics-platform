@@ -1,7 +1,7 @@
 ﻿using LogisticsPlatform.Domain.Entities;
 using LogisticsPlatform.Application.DTOs.Carriers.Documents;
 
-namespace LogisticsPlatform.Application.Interfaces
+namespace LogisticsPlatform.Application.Interfaces.Services
 {
     public interface ICarrierDocumentService
     {

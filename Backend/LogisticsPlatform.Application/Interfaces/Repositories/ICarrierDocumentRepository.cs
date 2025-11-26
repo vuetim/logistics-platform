@@ -1,6 +1,6 @@
 ﻿using LogisticsPlatform.Domain.Entities;
 
-namespace LogisticsPlatform.Application.Interfaces
+namespace LogisticsPlatform.Application.Interfaces.Repositories
 {
     public interface ICarrierDocumentRepository
     {

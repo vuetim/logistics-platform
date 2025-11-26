@@ -1,12 +1,13 @@
-using LogisticsPlatform.Infrastructure.Persistence;
-using LogisticsPlatform.Application.Interfaces;
-using LogisticsPlatform.Infrastructure.Repositories;
+using LogisticsPlatform.Application.Interfaces.Repositories;
+using LogisticsPlatform.Application.Interfaces.Services;
 using LogisticsPlatform.Application.Services;
+using LogisticsPlatform.Infrastructure.Persistence;
+using LogisticsPlatform.Infrastructure.Repositories;
 using LogisticsPlatform.Infrastructure.Services;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -34,6 +35,8 @@ builder.Services.AddScoped<ICarrierContactRepository, CarrierContactRepository>(
 builder.Services.AddScoped<ICarrierAddressRepository, CarrierAddressRepository>();
 builder.Services.AddScoped<ICarrierNoteRepository, CarrierNoteRepository>();
 builder.Services.AddScoped<ICarrierDocumentRepository, CarrierDocumentRepository>();
+builder.Services.AddScoped<ICustomerQueryRepository, CustomerQueryRepository>();
+
 
 
 
@@ -51,6 +54,8 @@ builder.Services.AddScoped<ICarrierContactService, CarrierContactService>();
 builder.Services.AddScoped<ICarrierAddressService, CarrierAddressService>();
 builder.Services.AddScoped<ICarrierNoteService, CarrierNoteService>();
 builder.Services.AddScoped<ICarrierDocumentService, CarrierDocumentService>();
+builder.Services.AddScoped<ICustomerQueryService, CustomerQueryService>();
+
 
 
 

@@ -1,5 +1,6 @@
 ﻿using LogisticsPlatform.Application.DTOs.Auth;
-using LogisticsPlatform.Application.Interfaces;
+using LogisticsPlatform.Application.Interfaces.Repositories;
+using LogisticsPlatform.Application.Interfaces.Services;
 using LogisticsPlatform.Domain.Entities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;

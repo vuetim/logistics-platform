@@ -1,4 +1,4 @@
-﻿using LogisticsPlatform.Application.Interfaces;
+﻿using LogisticsPlatform.Application.Interfaces.Repositories;
 using LogisticsPlatform.Domain.Entities;
 using LogisticsPlatform.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -43,5 +43,6 @@ namespace LogisticsPlatform.Infrastructure.Repositories
         {
             await _context.SaveChangesAsync();
         }
+
     }
 }

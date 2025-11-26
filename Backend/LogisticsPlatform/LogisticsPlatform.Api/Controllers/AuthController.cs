@@ -1,5 +1,5 @@
 ﻿using LogisticsPlatform.Application.DTOs.Auth;
-using LogisticsPlatform.Application.Interfaces;
+using LogisticsPlatform.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

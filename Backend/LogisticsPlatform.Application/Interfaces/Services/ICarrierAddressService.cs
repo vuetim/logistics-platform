@@ -1,7 +1,7 @@
 ﻿using LogisticsPlatform.Application.DTOs.Carriers.Addresses;
 using LogisticsPlatform.Domain.Entities;
 
-namespace LogisticsPlatform.Application.Interfaces
+namespace LogisticsPlatform.Application.Interfaces.Services
 {
     public interface ICarrierAddressService
     {

@@ -1,6 +1,7 @@
-﻿using LogisticsPlatform.Application.Interfaces;
-using LogisticsPlatform.Application.DTOs.Carriers.Notes;
+﻿using LogisticsPlatform.Application.DTOs.Carriers.Notes;
 using LogisticsPlatform.Domain.Entities;
+using LogisticsPlatform.Application.Interfaces.Repositories;
+using LogisticsPlatform.Application.Interfaces.Services;
 
 namespace LogisticsPlatform.Application.Services
 {
