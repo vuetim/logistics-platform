@@ -17,5 +17,10 @@ namespace LogisticsPlatform.Infrastructure.Repositories
         {
             await _context.UserRoles.AddAsync(entity);
         }
+        public async Task RemoveRangeAsync(IEnumerable<UserRole> roles)
+        {
+            _context.UserRoles.RemoveRange(roles);
+        }
+
     }
 }

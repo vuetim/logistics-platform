@@ -13,6 +13,10 @@ namespace LogisticsPlatform.Application.Interfaces.Repositories
         Task AddAsync(User user);
         Task SaveChangesAsync();
         Task<User?> GetByIdAsync(Guid id);
+        Task<List<User>> GetAllAsync();
+        Task<List<User>> GetByRoleAsync(string roleName);
+        Task DeleteAsync(User user);
+
 
     }
 }
