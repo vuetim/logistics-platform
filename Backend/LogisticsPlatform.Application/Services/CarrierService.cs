@@ -1,5 +1,6 @@
 ﻿using LogisticsPlatform.Application.DTOs.Carriers;
-using LogisticsPlatform.Application.Interfaces;
+using LogisticsPlatform.Application.Interfaces.Repositories;
+using LogisticsPlatform.Application.Interfaces.Services;
 using LogisticsPlatform.Domain.Entities;
 
 namespace LogisticsPlatform.Application.Services

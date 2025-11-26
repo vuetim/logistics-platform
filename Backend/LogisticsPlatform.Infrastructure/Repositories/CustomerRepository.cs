@@ -1,17 +1,23 @@
-﻿using LogisticsPlatform.Application.Interfaces;
+﻿using LogisticsPlatform.Application.DTOs.Pagination;
+using LogisticsPlatform.Application.Interfaces.Repositories;
 using LogisticsPlatform.Domain.Entities;
+using LogisticsPlatform.Infrastructure.Extensions;
 using LogisticsPlatform.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 
 namespace LogisticsPlatform.Infrastructure.Repositories
 {
     public class CustomerRepository : ICustomerRepository
     {
         private readonly AppDbContext _context;
+        private readonly DbSet<Customer> _set;
+
 
         public CustomerRepository(AppDbContext context)
         {
             _context = context;
+
         }
 
         public async Task<Customer?> GetByIdAsync(Guid id)
@@ -43,5 +49,8 @@ namespace LogisticsPlatform.Infrastructure.Repositories
         {
             await _context.SaveChangesAsync();
         }
-    }
+
+
+    
+}
 }

@@ -1,5 +1,6 @@
 ﻿using LogisticsPlatform.Application.DTOs.Customers;
-using LogisticsPlatform.Application.Interfaces;
+using LogisticsPlatform.Application.DTOs.Pagination;
+using LogisticsPlatform.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,10 +12,13 @@ namespace LogisticsPlatform.Api.Controllers
     public class CustomersController : ControllerBase
     {
         private readonly ICustomerService _customers;
+        private readonly ICustomerQueryService _queries;
 
-        public CustomersController(ICustomerService customers)
+
+        public CustomersController(ICustomerService customers, ICustomerQueryService queries)
         {
             _customers = customers;
+            _queries = queries;
         }
 
         // GET: api/customers
@@ -65,5 +69,15 @@ namespace LogisticsPlatform.Api.Controllers
 
             return Ok("Customer deleted");
         }
+
+        [HttpGet("paged")]
+        public async Task<IActionResult> GetPaged([FromQuery] QueryParameters parameters)
+        {
+            var result = await _queries.GetPagedAsync(parameters);
+            return Ok(result);
+        }
+
     }
 }
+
+

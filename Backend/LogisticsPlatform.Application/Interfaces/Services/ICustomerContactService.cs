@@ -1,6 +1,6 @@
 ﻿using LogisticsPlatform.Application.DTOs.Customers.Contacts;
 
-namespace LogisticsPlatform.Application.Interfaces
+namespace LogisticsPlatform.Application.Interfaces.Services
 {
     public interface ICustomerContactService
     {

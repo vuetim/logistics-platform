@@ -1,8 +1,8 @@
-﻿using LogisticsPlatform.Application.Interfaces;
-using LogisticsPlatform.Application.DTOs.Carriers.Notes;
+﻿using LogisticsPlatform.Application.DTOs.Carriers.Notes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using LogisticsPlatform.Application.Interfaces.Services;
 
 namespace LogisticsPlatform.Api.Controllers
 {
