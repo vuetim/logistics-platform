@@ -1,4 +1,5 @@
 ﻿using LogisticsPlatform.Application.DTOs.Carriers.Documents;
+using LogisticsPlatform.Application.DTOs.Pagination;
 using LogisticsPlatform.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,10 +13,12 @@ namespace LogisticsPlatform.Api.Controllers
     public class CarrierDocumentsController : ControllerBase
     {
         private readonly ICarrierDocumentService _service;
+        private readonly ICarrierDocumentQueryService _queries;
 
-        public CarrierDocumentsController(ICarrierDocumentService service)
+        public CarrierDocumentsController(ICarrierDocumentService service, ICarrierDocumentQueryService queries)
         {
             _service = service;
+            _queries = queries;
         }
 
         private Guid GetUserId() =>
@@ -48,6 +51,12 @@ namespace LogisticsPlatform.Api.Controllers
         {
             var deleted = await _service.DeleteAsync(id);
             return deleted ? Ok("Deleted") : NotFound();
+        }
+        [HttpGet("paged")]
+        public async Task<IActionResult> GetPaged([FromQuery] CarrierDocumentQueryParameters parameters)
+        {
+            var result = await _queries.GetPagedAsync(parameters);
+            return Ok(result);
         }
     }
 }
