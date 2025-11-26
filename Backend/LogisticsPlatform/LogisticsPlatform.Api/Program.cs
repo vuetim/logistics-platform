@@ -36,6 +36,7 @@ builder.Services.AddScoped<ICarrierAddressRepository, CarrierAddressRepository>(
 builder.Services.AddScoped<ICarrierNoteRepository, CarrierNoteRepository>();
 builder.Services.AddScoped<ICarrierDocumentRepository, CarrierDocumentRepository>();
 builder.Services.AddScoped<ICustomerQueryRepository, CustomerQueryRepository>();
+builder.Services.AddScoped<ICarrierQueryRepository, CarrierQueryRepository>();
 
 
 
@@ -55,6 +56,7 @@ builder.Services.AddScoped<ICarrierAddressService, CarrierAddressService>();
 builder.Services.AddScoped<ICarrierNoteService, CarrierNoteService>();
 builder.Services.AddScoped<ICarrierDocumentService, CarrierDocumentService>();
 builder.Services.AddScoped<ICustomerQueryService, CustomerQueryService>();
+builder.Services.AddScoped<ICarrierQueryService, CarrierQueryService>();
 
 
 
