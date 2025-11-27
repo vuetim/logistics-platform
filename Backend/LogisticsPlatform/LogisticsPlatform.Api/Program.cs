@@ -42,6 +42,8 @@ builder.Services.AddScoped<ILoadQueryRepository, LoadQueryRepository>();
 builder.Services.AddScoped<ILoadRepository, LoadRepository>();
 builder.Services.AddScoped<ILoadStopRepository, LoadStopRepository>();
 builder.Services.AddScoped<ILoadEquipmentRepository, LoadEquipmentRepository>();
+builder.Services.AddScoped<ILoadDocumentRepository, LoadDocumentRepository>();
+
 
 
 
@@ -68,6 +70,8 @@ builder.Services.AddScoped<ILoadQueryService, LoadQueryService>();
 builder.Services.AddScoped<ILoadService, LoadService>();
 builder.Services.AddScoped<ILoadStopService, LoadStopService>();
 builder.Services.AddScoped<ILoadEquipmentService, LoadEquipmentService>();
+builder.Services.AddScoped<ILoadDocumentService, LoadDocumentService>();
+
 
 
 
