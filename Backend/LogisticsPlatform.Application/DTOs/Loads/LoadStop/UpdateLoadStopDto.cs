@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LogisticsPlatform.Application.DTOs.LoadStop
+namespace LogisticsPlatform.Application.DTOs.Loads.LoadStop
 {
     public class UpdateLoadStopDto
     {

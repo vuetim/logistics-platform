@@ -1,4 +1,4 @@
-﻿using LogisticsPlatform.Application.DTOs.LoadStop;
+﻿using LogisticsPlatform.Application.DTOs.Loads.LoadStop;
 using System;
 using System.Collections.Generic;
 using System.Linq;

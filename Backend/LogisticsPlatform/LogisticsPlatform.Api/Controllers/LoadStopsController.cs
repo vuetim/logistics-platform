@@ -1,4 +1,4 @@
-﻿using LogisticsPlatform.Application.DTOs.LoadStop;
+﻿using LogisticsPlatform.Application.DTOs.Loads.LoadStop;
 using LogisticsPlatform.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
