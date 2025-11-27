@@ -38,6 +38,8 @@ builder.Services.AddScoped<ICarrierDocumentRepository, CarrierDocumentRepository
 builder.Services.AddScoped<ICustomerQueryRepository, CustomerQueryRepository>();
 builder.Services.AddScoped<ICarrierQueryRepository, CarrierQueryRepository>();
 builder.Services.AddScoped<ICarrierDocumentQueryRepository, CarrierDocumentQueryRepository>();
+builder.Services.AddScoped<ILoadQueryRepository, LoadQueryRepository>();
+builder.Services.AddScoped<ILoadRepository, LoadRepository>();
 
 
 
@@ -60,6 +62,10 @@ builder.Services.AddScoped<ICarrierDocumentService, CarrierDocumentService>();
 builder.Services.AddScoped<ICustomerQueryService, CustomerQueryService>();
 builder.Services.AddScoped<ICarrierQueryService, CarrierQueryService>();
 builder.Services.AddScoped<ICarrierDocumentQueryService, CarrierDocumentQueryService>();
+builder.Services.AddScoped<ILoadQueryService, LoadQueryService>();
+builder.Services.AddScoped<ILoadService, LoadService>();
+
+
 
 
 
@@ -104,8 +110,8 @@ builder.Services.AddSwaggerGen(c =>
         In = ParameterLocation.Header,
         Description = "Insert JWT token like: Bearer {token}",
         Name = "Authorization",
-        Type = SecuritySchemeType.Http,   
-        Scheme = "bearer"                 
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer"
     });
 
     c.AddSecurityRequirement(new OpenApiSecurityRequirement

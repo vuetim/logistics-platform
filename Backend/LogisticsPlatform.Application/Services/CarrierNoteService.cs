@@ -1,7 +1,7 @@
 ﻿using LogisticsPlatform.Application.DTOs.Carriers.Notes;
-using LogisticsPlatform.Domain.Entities;
 using LogisticsPlatform.Application.Interfaces.Repositories;
 using LogisticsPlatform.Application.Interfaces.Services;
+using LogisticsPlatform.Domain.Entities;
 
 namespace LogisticsPlatform.Application.Services
 {

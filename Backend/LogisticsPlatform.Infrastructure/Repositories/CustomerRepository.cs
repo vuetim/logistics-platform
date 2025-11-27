@@ -1,10 +1,7 @@
-﻿using LogisticsPlatform.Application.DTOs.Pagination;
-using LogisticsPlatform.Application.Interfaces.Repositories;
+﻿using LogisticsPlatform.Application.Interfaces.Repositories;
 using LogisticsPlatform.Domain.Entities;
-using LogisticsPlatform.Infrastructure.Extensions;
 using LogisticsPlatform.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
 
 namespace LogisticsPlatform.Infrastructure.Repositories
 {
@@ -51,6 +48,6 @@ namespace LogisticsPlatform.Infrastructure.Repositories
         }
 
 
-    
-}
+
+    }
 }

@@ -47,7 +47,7 @@ namespace LogisticsPlatform.Api.Controllers
             var deleted = await _service.DeleteAsync(id);
             return deleted ? Ok("Deleted") : NotFound();
         }
-      
+
         [HttpGet("positions")]
         public IActionResult GetContactPositions()
         {

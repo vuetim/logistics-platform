@@ -383,6 +383,265 @@ namespace LogisticsPlatform.Infrastructure.Migrations
                     b.ToTable("CustomerNotes");
                 });
 
+            modelBuilder.Entity("LogisticsPlatform.Domain.Entities.Load", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal?>("Accessorials")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<Guid?>("CarrierId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("CarrierRate")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("CreatedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CustomerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("CustomerRate")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Destination")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsArchived")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsTemperatureControlled")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("LoadNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Mode")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Origin")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CarrierId");
+
+                    b.HasIndex("CreatedByUserId");
+
+                    b.HasIndex("CustomerId");
+
+                    b.ToTable("Loads");
+                });
+
+            modelBuilder.Entity("LogisticsPlatform.Domain.Entities.LoadDocument", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("DocumentType")
+                        .HasColumnType("int");
+
+                    b.Property<string>("FileUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("LoadId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LoadId");
+
+                    b.ToTable("LoadDocuments");
+                });
+
+            modelBuilder.Entity("LogisticsPlatform.Domain.Entities.LoadEquipment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("EquipmentType")
+                        .HasColumnType("int");
+
+                    b.Property<decimal?>("Length")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<Guid>("LoadId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal?>("MaxTemp")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<decimal?>("MinTemp")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<int>("TempUnit")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal?>("Weight")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<int>("WeightUnit")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LoadId");
+
+                    b.ToTable("LoadEquipment");
+                });
+
+            modelBuilder.Entity("LogisticsPlatform.Domain.Entities.LoadNote", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("CreatedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("LoadId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LoadId");
+
+                    b.ToTable("LoadNotes");
+                });
+
+            modelBuilder.Entity("LogisticsPlatform.Domain.Entities.LoadOrder", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("LoadId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("PONumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LoadId");
+
+                    b.ToTable("LoadOrders");
+                });
+
+            modelBuilder.Entity("LogisticsPlatform.Domain.Entities.LoadStop", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("AppointmentFrom")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("AppointmentTo")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("HasTime")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("LoadId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("LocationName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("PlannedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Sequence")
+                        .HasColumnType("int");
+
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("StopType")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Zip")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LoadId");
+
+                    b.ToTable("LoadStops");
+                });
+
             modelBuilder.Entity("LogisticsPlatform.Domain.Entities.Role", b =>
                 {
                     b.Property<Guid>("Id")
@@ -407,31 +666,31 @@ namespace LogisticsPlatform.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa1"),
-                            CreatedAt = new DateTime(2025, 11, 26, 17, 52, 12, 262, DateTimeKind.Utc).AddTicks(2875),
+                            CreatedAt = new DateTime(2025, 11, 27, 1, 45, 15, 585, DateTimeKind.Utc).AddTicks(9194),
                             Name = "Admin"
                         },
                         new
                         {
                             Id = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa2"),
-                            CreatedAt = new DateTime(2025, 11, 26, 17, 52, 12, 262, DateTimeKind.Utc).AddTicks(2888),
+                            CreatedAt = new DateTime(2025, 11, 27, 1, 45, 15, 585, DateTimeKind.Utc).AddTicks(9213),
                             Name = "Broker"
                         },
                         new
                         {
                             Id = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa3"),
-                            CreatedAt = new DateTime(2025, 11, 26, 17, 52, 12, 262, DateTimeKind.Utc).AddTicks(2891),
+                            CreatedAt = new DateTime(2025, 11, 27, 1, 45, 15, 585, DateTimeKind.Utc).AddTicks(9217),
                             Name = "Operator"
                         },
                         new
                         {
                             Id = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa4"),
-                            CreatedAt = new DateTime(2025, 11, 26, 17, 52, 12, 262, DateTimeKind.Utc).AddTicks(2894),
+                            CreatedAt = new DateTime(2025, 11, 27, 1, 45, 15, 585, DateTimeKind.Utc).AddTicks(9219),
                             Name = "Dispatcher"
                         },
                         new
                         {
                             Id = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa5"),
-                            CreatedAt = new DateTime(2025, 11, 26, 17, 52, 12, 262, DateTimeKind.Utc).AddTicks(2897),
+                            CreatedAt = new DateTime(2025, 11, 27, 1, 45, 15, 585, DateTimeKind.Utc).AddTicks(9223),
                             Name = "Accounting"
                         });
                 });
@@ -581,6 +840,86 @@ namespace LogisticsPlatform.Infrastructure.Migrations
                     b.Navigation("Customer");
                 });
 
+            modelBuilder.Entity("LogisticsPlatform.Domain.Entities.Load", b =>
+                {
+                    b.HasOne("LogisticsPlatform.Domain.Entities.Carrier", "Carrier")
+                        .WithMany()
+                        .HasForeignKey("CarrierId");
+
+                    b.HasOne("LogisticsPlatform.Domain.Entities.User", "CreatedByUser")
+                        .WithMany()
+                        .HasForeignKey("CreatedByUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LogisticsPlatform.Domain.Entities.Customer", "Customer")
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Carrier");
+
+                    b.Navigation("CreatedByUser");
+
+                    b.Navigation("Customer");
+                });
+
+            modelBuilder.Entity("LogisticsPlatform.Domain.Entities.LoadDocument", b =>
+                {
+                    b.HasOne("LogisticsPlatform.Domain.Entities.Load", "Load")
+                        .WithMany("Documents")
+                        .HasForeignKey("LoadId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Load");
+                });
+
+            modelBuilder.Entity("LogisticsPlatform.Domain.Entities.LoadEquipment", b =>
+                {
+                    b.HasOne("LogisticsPlatform.Domain.Entities.Load", "Load")
+                        .WithMany("Equipment")
+                        .HasForeignKey("LoadId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Load");
+                });
+
+            modelBuilder.Entity("LogisticsPlatform.Domain.Entities.LoadNote", b =>
+                {
+                    b.HasOne("LogisticsPlatform.Domain.Entities.Load", "Load")
+                        .WithMany("Notes")
+                        .HasForeignKey("LoadId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Load");
+                });
+
+            modelBuilder.Entity("LogisticsPlatform.Domain.Entities.LoadOrder", b =>
+                {
+                    b.HasOne("LogisticsPlatform.Domain.Entities.Load", "Load")
+                        .WithMany("Orders")
+                        .HasForeignKey("LoadId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Load");
+                });
+
+            modelBuilder.Entity("LogisticsPlatform.Domain.Entities.LoadStop", b =>
+                {
+                    b.HasOne("LogisticsPlatform.Domain.Entities.Load", "Load")
+                        .WithMany("Stops")
+                        .HasForeignKey("LoadId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Load");
+                });
+
             modelBuilder.Entity("LogisticsPlatform.Domain.Entities.UserRole", b =>
                 {
                     b.HasOne("LogisticsPlatform.Domain.Entities.Role", "Role")
@@ -610,6 +949,19 @@ namespace LogisticsPlatform.Infrastructure.Migrations
             modelBuilder.Entity("LogisticsPlatform.Domain.Entities.Customer", b =>
                 {
                     b.Navigation("Addresses");
+                });
+
+            modelBuilder.Entity("LogisticsPlatform.Domain.Entities.Load", b =>
+                {
+                    b.Navigation("Documents");
+
+                    b.Navigation("Equipment");
+
+                    b.Navigation("Notes");
+
+                    b.Navigation("Orders");
+
+                    b.Navigation("Stops");
                 });
 
             modelBuilder.Entity("LogisticsPlatform.Domain.Entities.Role", b =>

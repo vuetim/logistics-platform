@@ -25,7 +25,7 @@
         await _repo.AddAsync(address);
         await _repo.SaveChangesAsync();
 
-        address.Customer = null; 
+        address.Customer = null;
         return address;
     }
 
@@ -34,7 +34,7 @@
         var addresses = await _repo.GetByCustomerAsync(customerId);
 
         foreach (var a in addresses)
-            a.Customer = null; 
+            a.Customer = null;
 
         return addresses;
     }
@@ -58,7 +58,7 @@
         await _repo.UpdateAsync(address);
         await _repo.SaveChangesAsync();
 
-        address.Customer = null; 
+        address.Customer = null;
         return address;
     }
 

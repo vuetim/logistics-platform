@@ -22,6 +22,12 @@ public class AppDbContext : DbContext
     public DbSet<CarrierNote> CarrierNotes => Set<CarrierNote>();
     public DbSet<CarrierDocument> CarrierDocuments => Set<CarrierDocument>();
 
+    public DbSet<Load> Loads => Set<Load>();
+    public DbSet<LoadStop> LoadStops => Set<LoadStop>();
+    public DbSet<LoadEquipment> LoadEquipment => Set<LoadEquipment>();
+    public DbSet<LoadOrder> LoadOrders => Set<LoadOrder>();
+    public DbSet<LoadNote> LoadNotes => Set<LoadNote>();
+    public DbSet<LoadDocument> LoadDocuments => Set<LoadDocument>();
 
 
     public DbSet<Carrier> Carriers => Set<Carrier>();
@@ -54,5 +60,35 @@ public class AppDbContext : DbContext
            new Role { Id = Guid.Parse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa4"), Name = RoleNames.Dispatcher },
            new Role { Id = Guid.Parse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa5"), Name = RoleNames.Accounting }
        );
+        modelBuilder.Entity<LoadEquipment>(entity =>
+        {
+            entity.Property(x => x.Weight)
+                  .HasPrecision(10, 2);
+
+            entity.Property(x => x.TempUnit)
+                  .HasPrecision(5, 2);
+            entity.Property(x => x.Weight)
+             .HasPrecision(10, 2);
+
+            entity.Property(x => x.Length)
+                  .HasPrecision(10, 2);
+
+            entity.Property(x => x.MinTemp)
+                  .HasPrecision(5, 2);
+
+            entity.Property(x => x.MaxTemp)
+                  .HasPrecision(5, 2);
+        });
+        modelBuilder.Entity<Load>(entity =>
+        {
+            entity.Property(x => x.CustomerRate)
+                  .HasPrecision(18, 2);
+
+            entity.Property(x => x.CarrierRate)
+                  .HasPrecision(18, 2);
+
+            entity.Property(x => x.Accessorials)
+                  .HasPrecision(18, 2);
+        });
     }
 }

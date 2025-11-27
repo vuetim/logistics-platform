@@ -8,7 +8,7 @@
         public string? Search { get; set; }
 
         public string? SortBy { get; set; }
-        public string SortDir { get; set; } = "asc";  
+        public string SortDir { get; set; } = "asc";
 
         public Dictionary<string, string>? Filters { get; set; }
     }

@@ -8,7 +8,7 @@ namespace LogisticsPlatform.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize] 
+    [Authorize]
     public class CustomersController : ControllerBase
     {
         private readonly ICustomerService _customers;

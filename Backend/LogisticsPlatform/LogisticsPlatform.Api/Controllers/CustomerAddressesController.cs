@@ -1,5 +1,4 @@
-﻿using LogisticsPlatform.Application.Interfaces;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
 [Route("api/customer-addresses")]

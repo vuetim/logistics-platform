@@ -1,6 +1,4 @@
-﻿using LogisticsPlatform.Domain.Entities;
-
-namespace LogisticsPlatform.Application.Interfaces.Repositories
+﻿namespace LogisticsPlatform.Application.Interfaces.Repositories
 {
     public interface ICustomerContactRepository
     {

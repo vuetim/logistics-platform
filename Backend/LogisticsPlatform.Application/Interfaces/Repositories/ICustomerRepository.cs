@@ -1,5 +1,4 @@
-﻿using LogisticsPlatform.Application.DTOs.Pagination;
-using LogisticsPlatform.Domain.Entities;
+﻿using LogisticsPlatform.Domain.Entities;
 
 namespace LogisticsPlatform.Application.Interfaces.Repositories
 {

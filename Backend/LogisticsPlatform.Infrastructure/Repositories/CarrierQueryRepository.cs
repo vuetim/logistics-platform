@@ -4,11 +4,6 @@ using LogisticsPlatform.Domain.Entities;
 using LogisticsPlatform.Infrastructure.Extensions;
 using LogisticsPlatform.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LogisticsPlatform.Infrastructure.Repositories
 {
