@@ -40,6 +40,7 @@ builder.Services.AddScoped<ICarrierQueryRepository, CarrierQueryRepository>();
 builder.Services.AddScoped<ICarrierDocumentQueryRepository, CarrierDocumentQueryRepository>();
 builder.Services.AddScoped<ILoadQueryRepository, LoadQueryRepository>();
 builder.Services.AddScoped<ILoadRepository, LoadRepository>();
+builder.Services.AddScoped<ILoadStopRepository, LoadStopRepository>();
 
 
 
@@ -64,6 +65,8 @@ builder.Services.AddScoped<ICarrierQueryService, CarrierQueryService>();
 builder.Services.AddScoped<ICarrierDocumentQueryService, CarrierDocumentQueryService>();
 builder.Services.AddScoped<ILoadQueryService, LoadQueryService>();
 builder.Services.AddScoped<ILoadService, LoadService>();
+builder.Services.AddScoped<ILoadStopService, LoadStopService>();
+
 
 
 
