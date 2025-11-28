@@ -10,6 +10,6 @@ obj/
 *.sqlite
 appsettings.Development.json
 appsettings.Local.json
-# Runtime uploads
-wwwroot/uploads/
-wwwroot/uploads/**
+# Runtime uploads (LogisticsPlatform.Api)
+LogisticsPlatform/LogisticsPlatform.Api/wwwroot/uploads/
+LogisticsPlatform/LogisticsPlatform.Api/wwwroot/uploads/**
