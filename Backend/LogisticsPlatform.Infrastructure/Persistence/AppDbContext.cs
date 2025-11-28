@@ -65,10 +65,7 @@ public class AppDbContext : DbContext
             entity.Property(x => x.Weight)
                   .HasPrecision(10, 2);
 
-            entity.Property(x => x.TempUnit)
-                  .HasPrecision(5, 2);
-            entity.Property(x => x.Weight)
-             .HasPrecision(10, 2);
+        
 
             entity.Property(x => x.Length)
                   .HasPrecision(10, 2);
@@ -90,5 +87,18 @@ public class AppDbContext : DbContext
             entity.Property(x => x.Accessorials)
                   .HasPrecision(18, 2);
         });
+        modelBuilder.Entity<LoadNote>(b =>
+        {
+            b.HasOne(n => n.Load)
+                .WithMany(l => l.Notes)
+                .HasForeignKey(n => n.LoadId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            b.HasOne(n => n.CreatedByUser)
+                .WithMany()
+                .HasForeignKey(n => n.CreatedByUserId)
+                .OnDelete(DeleteBehavior.NoAction);
+        });
+
     }
 }

@@ -9,5 +9,9 @@ namespace LogisticsPlatform.Domain.Entities
 
         public string Message { get; set; } = string.Empty;
         public Guid CreatedByUserId { get; set; }
+        public User CreatedByUser { get; set; } = null!;
+
+        public bool IsInternal { get; set; } = false; // internal vs customer visible
+
     }
 }
