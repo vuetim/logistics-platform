@@ -1,15 +1,37 @@
+# ======================
+# .NET / Visual Studio
+# ======================
+.vs/
+**/.vs/
+
 bin/
 obj/
-.vs/
+**/bin/
+**/obj/
+
+# ======================
+# User / IDE files
+# ======================
 *.user
 *.suo
-*.swp
+
+# ======================
+# Logs / temp
+# ======================
 *.tmp
 *.log
 *.db
 *.sqlite
+
+# ======================
+# Environment config
+# ======================
 appsettings.Development.json
-appsettings.Local.json
-# Runtime uploads (LogisticsPlatform.Api)
-LogisticsPlatform/LogisticsPlatform.Api/wwwroot/uploads/
-LogisticsPlatform/LogisticsPlatform.Api/wwwroot/uploads/**
+appsettings.json
+**/appsettings.Development.json
+**/appsettings.json
+
+# ======================
+# Runtime uploads
+# ======================
+**/wwwroot/uploads/
