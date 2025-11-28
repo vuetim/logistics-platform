@@ -10,3 +10,6 @@ obj/
 *.sqlite
 appsettings.Development.json
 appsettings.Local.json
+# Runtime uploads
+wwwroot/uploads/
+wwwroot/uploads/**

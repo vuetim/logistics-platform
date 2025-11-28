@@ -20,4 +20,8 @@
     <ProjectReference Include="..\..\LogisticsPlatform.Infrastructure\LogisticsPlatform.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\" />
+  </ItemGroup>
+
 </Project>
