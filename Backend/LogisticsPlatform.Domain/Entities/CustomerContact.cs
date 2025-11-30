@@ -11,4 +11,6 @@ public class CustomerContact : BaseEntity
     public string Email { get; set; }
     public string Phone { get; set; }
     public string Position { get; set; } = CustomerContactRoles.Other;
+    public bool IsPrimary { get; set; } = false;
+    public bool IsActive { get; set; } = true;
 }

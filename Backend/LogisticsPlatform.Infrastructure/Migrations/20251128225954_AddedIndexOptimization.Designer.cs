@@ -4,6 +4,7 @@ using LogisticsPlatform.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LogisticsPlatform.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251128225954_AddedIndexOptimization")]
+    partial class AddedIndexOptimization
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -49,9 +52,6 @@ namespace LogisticsPlatform.Infrastructure.Migrations
                     b.Property<Guid>("CustomerId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
                     b.Property<bool>("IsPrimary")
                         .HasColumnType("bit");
 
@@ -61,17 +61,16 @@ namespace LogisticsPlatform.Infrastructure.Migrations
                     b.Property<string>("State")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CustomerId", "IsActive");
-
-                    b.HasIndex("CustomerId", "IsPrimary");
+                    b.HasIndex("CustomerId");
 
                     b.ToTable("CustomerAddresses");
                 });
@@ -95,12 +94,6 @@ namespace LogisticsPlatform.Infrastructure.Migrations
                     b.Property<string>("FullName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsPrimary")
-                        .HasColumnType("bit");
 
                     b.Property<string>("Phone")
                         .IsRequired()
@@ -191,9 +184,6 @@ namespace LogisticsPlatform.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
                     b.Property<bool>("IsPrimary")
                         .HasColumnType("bit");
 
@@ -205,17 +195,16 @@ namespace LogisticsPlatform.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CarrierId", "IsActive");
-
-                    b.HasIndex("CarrierId", "IsPrimary");
+                    b.HasIndex("CarrierId");
 
                     b.ToTable("CarrierAddresses");
                 });
@@ -238,12 +227,6 @@ namespace LogisticsPlatform.Infrastructure.Migrations
                     b.Property<string>("FullName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsPrimary")
-                        .HasColumnType("bit");
 
                     b.Property<string>("Phone")
                         .HasColumnType("nvarchar(max)");
@@ -493,9 +476,6 @@ namespace LogisticsPlatform.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsInternal")
-                        .HasColumnType("bit");
-
                     b.Property<Guid>("LoadId")
                         .HasColumnType("uniqueidentifier");
 
@@ -699,31 +679,31 @@ namespace LogisticsPlatform.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa1"),
-                            CreatedAt = new DateTime(2025, 11, 30, 0, 31, 31, 692, DateTimeKind.Utc).AddTicks(3148),
+                            CreatedAt = new DateTime(2025, 11, 28, 22, 59, 53, 570, DateTimeKind.Utc).AddTicks(112),
                             Name = "Admin"
                         },
                         new
                         {
                             Id = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa2"),
-                            CreatedAt = new DateTime(2025, 11, 30, 0, 31, 31, 692, DateTimeKind.Utc).AddTicks(3183),
+                            CreatedAt = new DateTime(2025, 11, 28, 22, 59, 53, 570, DateTimeKind.Utc).AddTicks(137),
                             Name = "Broker"
                         },
                         new
                         {
                             Id = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa3"),
-                            CreatedAt = new DateTime(2025, 11, 30, 0, 31, 31, 692, DateTimeKind.Utc).AddTicks(3187),
+                            CreatedAt = new DateTime(2025, 11, 28, 22, 59, 53, 570, DateTimeKind.Utc).AddTicks(140),
                             Name = "Operator"
                         },
                         new
                         {
                             Id = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa4"),
-                            CreatedAt = new DateTime(2025, 11, 30, 0, 31, 31, 692, DateTimeKind.Utc).AddTicks(3191),
+                            CreatedAt = new DateTime(2025, 11, 28, 22, 59, 53, 570, DateTimeKind.Utc).AddTicks(142),
                             Name = "Dispatcher"
                         },
                         new
                         {
                             Id = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa5"),
-                            CreatedAt = new DateTime(2025, 11, 30, 0, 31, 31, 692, DateTimeKind.Utc).AddTicks(3195),
+                            CreatedAt = new DateTime(2025, 11, 28, 22, 59, 53, 570, DateTimeKind.Utc).AddTicks(144),
                             Name = "Accounting"
                         });
                 });

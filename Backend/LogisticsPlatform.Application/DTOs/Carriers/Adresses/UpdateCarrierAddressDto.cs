@@ -1,4 +1,6 @@
-﻿namespace LogisticsPlatform.Application.DTOs.Carriers.Addresses
+﻿using LogisticsPlatform.Domain.Enums;
+
+namespace LogisticsPlatform.Application.DTOs.Carriers.Addresses
 {
     public class UpdateCarrierAddressDto
     {
@@ -8,7 +10,8 @@
         public string? State { get; set; }
         public string? Country { get; set; }
         public string? PostalCode { get; set; }
-        public string? Type { get; set; }
+        public CarrierAddressType? Type { get; set; }
         public bool? IsPrimary { get; set; }
+        public bool? IsActive { get; set; }
     }
 }

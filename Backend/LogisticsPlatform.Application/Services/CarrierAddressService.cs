@@ -23,7 +23,16 @@ namespace LogisticsPlatform.Application.Services
             var carrier = await _carriers.GetByIdAsync(dto.CarrierId);
             if (carrier == null)
                 throw new Exception("Carrier not found");
+            if (dto.IsPrimary)
+            {
+                var existingPrimaries = await _addresses.GetPrimaryByCarrierAsync(dto.CarrierId);
 
+                foreach (var a in existingPrimaries)
+                {
+                    a.IsPrimary = false;
+                    await _addresses.UpdateAsync(a);
+                }
+            }
             var address = new CarrierAddress
             {
                 CarrierId = dto.CarrierId,
@@ -34,7 +43,9 @@ namespace LogisticsPlatform.Application.Services
                 Country = dto.Country,
                 PostalCode = dto.PostalCode,
                 Type = dto.Type,
-                IsPrimary = dto.IsPrimary
+                IsPrimary = dto.IsPrimary,
+                        IsActive = true
+
             };
 
             await _addresses.AddAsync(address);
@@ -47,6 +58,16 @@ namespace LogisticsPlatform.Application.Services
         {
             var address = await _addresses.GetByIdAsync(id);
             if (address == null) return null;
+            if (dto.IsPrimary == true)
+            {
+                var primaries = await _addresses.GetPrimaryByCarrierAsync(address.CarrierId);
+
+                foreach (var p in primaries)
+                {
+                    p.IsPrimary = false;
+                    await _addresses.UpdateAsync(p);
+                }
+            }
 
             address.AddressLine1 = dto.AddressLine1 ?? address.AddressLine1;
             address.AddressLine2 = dto.AddressLine2 ?? address.AddressLine2;
@@ -58,6 +79,8 @@ namespace LogisticsPlatform.Application.Services
 
             if (dto.IsPrimary.HasValue)
                 address.IsPrimary = dto.IsPrimary.Value;
+            if (dto.IsActive.HasValue)
+                address.IsActive = dto.IsActive.Value;
 
             address.UpdatedAt = DateTime.UtcNow;
 

@@ -1,74 +1,114 @@
-﻿public class CustomerAddressService : ICustomerAddressService
+﻿
+
+
+namespace LogisticsPlatform.Application.Services
 {
-    private readonly ICustomerAddressRepository _repo;
 
-    public CustomerAddressService(ICustomerAddressRepository repo)
-    {
-        _repo = repo;
-    }
 
-    public async Task<CustomerAddress> CreateAsync(CreateCustomerAddressDto dto)
+    public class CustomerAddressService : ICustomerAddressService
+
+
     {
-        var address = new CustomerAddress
+        private readonly ICustomerAddressRepository _repo;
+
+        public CustomerAddressService(ICustomerAddressRepository repo)
         {
-            CustomerId = dto.CustomerId,
-            AddressLine1 = dto.AddressLine1,
-            AddressLine2 = dto.AddressLine2,
-            City = dto.City,
-            State = dto.State,
-            Country = dto.Country,
-            PostalCode = dto.PostalCode,
-            Type = dto.Type,
-            IsPrimary = dto.IsPrimary
-        };
+            _repo = repo;
+        }
 
-        await _repo.AddAsync(address);
-        await _repo.SaveChangesAsync();
+        public async Task<CustomerAddress> CreateAsync(CreateCustomerAddressDto dto)
+        {
+            if (dto.IsPrimary)
+            {
+                var primaries = await _repo.GetPrimaryByCustomerAsync(dto.CustomerId);
 
-        address.Customer = null;
-        return address;
-    }
+                foreach (var a in primaries)
+                {
+                    a.IsPrimary = false;
+                    await _repo.UpdateAsync(a);
+                }
+            }
 
-    public async Task<IEnumerable<CustomerAddress>> GetByCustomerAsync(Guid customerId)
-    {
-        var addresses = await _repo.GetByCustomerAsync(customerId);
+            var address = new CustomerAddress
+            {
+                CustomerId = dto.CustomerId,
+                AddressLine1 = dto.AddressLine1,
+                AddressLine2 = dto.AddressLine2,
+                City = dto.City,
+                State = dto.State,
+                Country = dto.Country,
+                PostalCode = dto.PostalCode,
+                Type = dto.Type,
+                IsPrimary = dto.IsPrimary,
+                IsActive = true
 
-        foreach (var a in addresses)
-            a.Customer = null;
+            };
 
-        return addresses;
-    }
+            await _repo.AddAsync(address);
+            await _repo.SaveChangesAsync();
 
-    public async Task<CustomerAddress?> UpdateAsync(Guid id, UpdateCustomerAddressDto dto)
-    {
-        var address = await _repo.GetByIdAsync(id);
-        if (address == null) return null;
+            address.Customer = null;
+            return address;
+        }
 
-        address.AddressLine1 = dto.AddressLine1 ?? address.AddressLine1;
-        address.AddressLine2 = dto.AddressLine2 ?? address.AddressLine2;
-        address.City = dto.City ?? address.City;
-        address.State = dto.State ?? address.State;
-        address.Country = dto.Country ?? address.Country;
-        address.PostalCode = dto.PostalCode ?? address.PostalCode;
-        address.Type = dto.Type ?? address.Type;
+        public async Task<IEnumerable<CustomerAddress>> GetByCustomerAsync(Guid customerId)
+        {
+            var addresses = await _repo.GetByCustomerAsync(customerId);
 
-        if (dto.IsPrimary.HasValue)
-            address.IsPrimary = dto.IsPrimary.Value;
+            foreach (var a in addresses)
+                a.Customer = null;
 
-        await _repo.UpdateAsync(address);
-        await _repo.SaveChangesAsync();
+            return addresses;
+        }
 
-        address.Customer = null;
-        return address;
-    }
+        public async Task<CustomerAddress?> UpdateAsync(Guid id, UpdateCustomerAddressDto dto)
+        {
 
-    public async Task<bool> DeleteAsync(Guid id)
-    {
-        var address = await _repo.GetByIdAsync(id);
-        if (address == null) return false;
+            var address = await _repo.GetByIdAsync(id);
+            if (address == null) return null;
 
-        await _repo.DeleteAsync(address);
-        await _repo.SaveChangesAsync();
-        return true;
+            if (dto.IsPrimary == true)
+            {
+                var primaries = await _repo.GetPrimaryByCustomerAsync(address.CustomerId);
+
+                foreach (var p in primaries)
+                {
+                    p.IsPrimary = false;
+                    await _repo.UpdateAsync(p);
+                }
+            }
+
+            address.AddressLine1 = dto.AddressLine1 ?? address.AddressLine1;
+            address.AddressLine2 = dto.AddressLine2 ?? address.AddressLine2;
+            address.City = dto.City ?? address.City;
+            address.State = dto.State ?? address.State;
+            address.Country = dto.Country ?? address.Country;
+            address.PostalCode = dto.PostalCode ?? address.PostalCode;
+            address.Type = dto.Type ?? address.Type;
+
+
+            if (dto.IsPrimary.HasValue)
+                address.IsPrimary = dto.IsPrimary.Value;
+
+            if (dto.IsActive.HasValue)
+                address.IsActive = dto.IsActive.Value;
+
+            await _repo.UpdateAsync(address);
+            await _repo.SaveChangesAsync();
+
+            address.Customer = null;
+            return address;
+        }
+
+        public async Task<bool> DeleteAsync(Guid id)
+        {
+            var address = await _repo.GetByIdAsync(id);
+            if (address == null) return false;
+            address.IsActive = false;
+            address.IsPrimary = false;
+            await _repo.DeleteAsync(address);
+            await _repo.SaveChangesAsync();
+            return true;
+        }
     }
 }

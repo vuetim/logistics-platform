@@ -1,81 +1,91 @@
-﻿using LogisticsPlatform.Api.Controllers.LoadDocuments;
-using LogisticsPlatform.Application.DTOs.Loads.LoadDocuments;
+﻿using LogisticsPlatform.Application.DTOs.Loads.LoadDocuments;
 using LogisticsPlatform.Application.Interfaces.Services;
+using LogisticsPlatform.Domain.Security;
+using LogisticsPlatform.Infrastructure.Extensions; // User.GetUserId()
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-[ApiController]
-[Route("api/loads/{loadId:guid}/documents")]
-[Authorize]
-public class LoadDocumentsController : ControllerBase
+namespace LogisticsPlatform.Api.Controllers.LoadDocuments
 {
-    private readonly ILoadDocumentService _service;
-    private readonly IWebHostEnvironment _env;
-
-    public LoadDocumentsController(
-        ILoadDocumentService service,
-        IWebHostEnvironment env)
+    [ApiController]
+    [Route("api/loads/{loadId:guid}/documents")]
+    [Authorize]
+    public class LoadDocumentsController : ControllerBase
     {
-        _service = service;
-        _env = env;
-    }
+        private readonly ILoadDocumentService _service;
+        private readonly IWebHostEnvironment _env;
 
-    // ✅ UPLOAD FILE REAL
-    [HttpPost("upload")]
-    [Consumes("multipart/form-data")]
-    public async Task<IActionResult> Upload(
-        Guid loadId,
-        [FromForm] UploadLoadDocumentRequest request)
-    {
-        if (request.File == null || request.File.Length == 0)
-            return BadRequest("File is required");
-
-        var uploadsRoot = Path.Combine(
-            _env.WebRootPath,
-            "uploads",
-            "loads",
-            loadId.ToString()
-        );
-
-        if (!Directory.Exists(uploadsRoot))
-            Directory.CreateDirectory(uploadsRoot);
-
-        var safeFileName = $"{Guid.NewGuid()}_{request.File.FileName}";
-        var fullPath = Path.Combine(uploadsRoot, safeFileName);
-
-        using (var stream = new FileStream(fullPath, FileMode.Create))
+        public LoadDocumentsController(
+            ILoadDocumentService service,
+            IWebHostEnvironment env)
         {
-            await request.File.CopyToAsync(stream);
+            _service = service;
+            _env = env;
         }
 
-        var fileUrl = $"/uploads/loads/{loadId}/{safeFileName}";
+        //  UPLOAD DOCUMENT
 
-        await _service.AddAsync(loadId, new CreateLoadDocumentDto
+        [HttpPost("upload")]
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> Upload(
+            Guid loadId,
+            [FromForm] UploadLoadDocumentRequest request)
         {
-            DocumentType = request.DocumentType,
-            FileUrl = fileUrl
-        });
+            if (request.File == null || request.File.Length == 0)
+                return BadRequest("File is required.");
 
-        return Created(fileUrl, new
+            var uploadsRoot = Path.Combine(
+                _env.WebRootPath,
+                "uploads",
+                "loads",
+                loadId.ToString()
+            );
+
+            Directory.CreateDirectory(uploadsRoot);
+
+            var safeFileName = $"{Guid.NewGuid()}_{request.File.FileName}";
+            var fullPath = Path.Combine(uploadsRoot, safeFileName);
+
+            using var stream = new FileStream(fullPath, FileMode.Create);
+            await request.File.CopyToAsync(stream);
+
+            var fileUrl = $"/uploads/loads/{loadId}/{safeFileName}";
+            var userId = User.GetUserId();
+
+            await _service.AddAsync(
+                loadId,
+                new CreateLoadDocumentDto
+                {
+                    DocumentType = request.DocumentType,
+                    FileUrl = fileUrl,
+                    IsInternal = request.IsInternal
+                },
+                userId
+            );
+
+            return Ok();
+        }
+
+        //  GET DOCUMENTS (filtered by permission)
+        [HttpGet]
+        public async Task<IActionResult> GetByLoad(Guid loadId)
         {
-            documentType = request.DocumentType,
-            fileUrl
-        });
-    }
+            var userId = User.GetUserId();
 
-    // ✅ LIST DOCUMENTS
-    [HttpGet]
-    public async Task<IActionResult> GetByLoad(Guid loadId)
-    {
-        var docs = await _service.GetByLoadAsync(loadId);
-        return Ok(docs);
-    }
+            var docs = await _service.GetByLoadAsync(loadId, userId);
 
-    // DELETE DOCUMENT
-    [HttpDelete("{id:guid}")]
-    public async Task<IActionResult> Delete(Guid id)
-    {
-        await _service.DeleteAsync(id);
-        return NoContent();
+            return Ok(docs);
+        }
+
+        //  DELETE DOCUMENT
+        [HttpDelete("{id:guid}")]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            var userId = User.GetUserId();
+
+            await _service.DeleteAsync(id, userId);
+
+            return NoContent();
+        }
     }
 }

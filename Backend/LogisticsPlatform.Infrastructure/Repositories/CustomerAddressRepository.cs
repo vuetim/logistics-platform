@@ -36,6 +36,12 @@ public class CustomerAddressRepository : ICustomerAddressRepository
     {
         _context.CustomerAddresses.Remove(address);
     }
+    public async Task<List<CustomerAddress>> GetPrimaryByCustomerAsync(Guid customerId)
+    {
+        return await _context.CustomerAddresses
+            .Where(x => x.CustomerId == customerId && x.IsPrimary)
+            .ToListAsync();
+    }
 
     public async Task SaveChangesAsync()
     {

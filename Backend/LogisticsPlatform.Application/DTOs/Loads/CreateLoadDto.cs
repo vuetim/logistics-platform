@@ -14,8 +14,8 @@ public class CreateLoadDto
     public DateTime PickupDate { get; set; }
     public DateTime DeliveryDate { get; set; }
 
-    public decimal? CustomerRate { get; set; }
-    public decimal? CarrierRate { get; set; }
+    public decimal CustomerRate { get; set; }
+    public decimal CarrierRate { get; set; }
     public decimal? Accessorials { get; set; }
 
     public string? Summary { get; set; }

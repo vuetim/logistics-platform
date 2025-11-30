@@ -1,4 +1,6 @@
-﻿namespace LogisticsPlatform.Application.DTOs.Carriers.Addresses
+﻿using LogisticsPlatform.Domain.Enums;
+
+namespace LogisticsPlatform.Application.DTOs.Carriers.Addresses
 {
     public class CreateCarrierAddressDto
     {
@@ -11,7 +13,7 @@
         public string Country { get; set; } = string.Empty;
         public string PostalCode { get; set; } = string.Empty;
 
-        public string Type { get; set; } = "General";
+        public CarrierAddressType Type { get; set; }
         public bool IsPrimary { get; set; } = false;
     }
 }

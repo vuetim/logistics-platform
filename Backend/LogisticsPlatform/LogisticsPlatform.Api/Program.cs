@@ -1,3 +1,4 @@
+using LogisticsPlatform.Application.Authorization;
 using LogisticsPlatform.Application.Interfaces.Repositories;
 using LogisticsPlatform.Application.Interfaces.Services;
 using LogisticsPlatform.Application.Services;
@@ -74,6 +75,7 @@ builder.Services.AddScoped<ILoadStopService, LoadStopService>();
 builder.Services.AddScoped<ILoadEquipmentService, LoadEquipmentService>();
 builder.Services.AddScoped<ILoadDocumentService, LoadDocumentService>();
 builder.Services.AddScoped<ILoadNoteService, LoadNoteService>();
+builder.Services.AddScoped<IAuthorizationService, AuthorizationService>();
 
 
 

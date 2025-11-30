@@ -9,6 +9,8 @@ namespace LogisticsPlatform.Application.Interfaces.Repositories
         Task DeleteAsync(CarrierAddress address);
         Task<CarrierAddress?> GetByIdAsync(Guid id);
         Task<IEnumerable<CarrierAddress>> GetByCarrierAsync(Guid carrierId);
+        Task<List<CarrierAddress>> GetPrimaryByCarrierAsync(Guid carrierId);
+
         Task SaveChangesAsync();
     }
 }
