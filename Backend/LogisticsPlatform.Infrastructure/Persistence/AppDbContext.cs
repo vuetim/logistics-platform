@@ -99,6 +99,21 @@ public class AppDbContext : DbContext
                 .HasForeignKey(n => n.CreatedByUserId)
                 .OnDelete(DeleteBehavior.NoAction);
         });
+        modelBuilder.Entity<Load>().HasIndex(x => x.Status);
+        modelBuilder.Entity<Load>().HasIndex(x => x.IsArchived);
+        modelBuilder.Entity<Load>().HasIndex(x => new { x.CustomerId, x.Status });
+        modelBuilder.Entity<Load>().HasIndex(x => new { x.IsArchived, x.Status });
+        modelBuilder.Entity<CarrierAddress>()
+    .HasIndex(x => new { x.CarrierId, x.IsPrimary });
+
+        modelBuilder.Entity<CarrierAddress>()
+            .HasIndex(x => new { x.CarrierId, x.IsActive });
+        modelBuilder.Entity<CustomerAddress>()
+            .HasIndex(x => new { x.CustomerId, x.IsPrimary });
+
+        modelBuilder.Entity<CustomerAddress>()
+            .HasIndex(x => new { x.CustomerId, x.IsActive });
+
 
     }
 }

@@ -26,7 +26,15 @@ namespace LogisticsPlatform.Application.Services
                 throw new Exception("Customer not found");
             if (!CarrierContactRoles.All.Contains(dto.Position))
                 throw new Exception("Invalid role");
-
+            if (dto.IsPrimary)
+            {
+                var primaries = await _contacts.GetPrimaryByCustomerAsync(dto.CustomerId);
+                foreach (var p in primaries)
+                {
+                    p.IsPrimary = false;
+                    await _contacts.UpdateAsync(p);
+                }
+            }
             var contact = new CustomerContact
             {
                 CustomerId = dto.CustomerId,
@@ -34,7 +42,9 @@ namespace LogisticsPlatform.Application.Services
                 Email = dto.Email,
                 Phone = dto.Phone,
 
-                Position = dto.Position
+                Position = dto.Position,
+                IsPrimary = dto.IsPrimary,
+                IsActive = true
             };
 
             await _contacts.AddAsync(contact);
@@ -47,6 +57,15 @@ namespace LogisticsPlatform.Application.Services
         {
             var contact = await _contacts.GetByIdAsync(id);
             if (contact == null) return null;
+            if (dto.IsPrimary == true)
+            {
+                var primaries = await _contacts.GetPrimaryByCustomerAsync(contact.CustomerId);
+                foreach (var p in primaries)
+                {
+                    p.IsPrimary = false;
+                    await _contacts.UpdateAsync(p);
+                }
+            }
 
             contact.FullName = dto.FullName ?? contact.FullName;
             contact.Email = dto.Email ?? contact.Email;
@@ -67,7 +86,8 @@ namespace LogisticsPlatform.Application.Services
         {
             var contact = await _contacts.GetByIdAsync(id);
             if (contact == null) return false;
-
+            contact.IsActive = false;
+            contact.IsPrimary = false;
             await _contacts.DeleteAsync(contact);
             await _contacts.SaveChangesAsync();
             return true;

@@ -11,5 +11,6 @@ namespace LogisticsPlatform.Application.DTOs.Loads.LoadDocuments
     {
         public LoadDocumentType DocumentType { get; set; } = LoadDocumentType.POD;
         public string FileUrl { get; set; } = string.Empty;
+        public bool IsInternal { get;  set; }
     }
 }

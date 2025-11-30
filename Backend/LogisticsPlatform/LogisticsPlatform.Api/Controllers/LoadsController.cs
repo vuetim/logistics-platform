@@ -1,7 +1,6 @@
 ﻿using LogisticsPlatform.Application.DTOs.Loads;
 using LogisticsPlatform.Application.DTOs.Pagination;
 using LogisticsPlatform.Application.Interfaces.Services;
-using LogisticsPlatform.Application.Services;
 using LogisticsPlatform.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -25,7 +24,7 @@ namespace LogisticsPlatform.Api.Controllers
             _queries = queries;
         }
 
-       
+        //  GET LIST (permission check në QueryService nëse don)
         [HttpGet]
         public async Task<IActionResult> GetPaged([FromQuery] LoadQueryParameters parameters)
         {
@@ -33,7 +32,7 @@ namespace LogisticsPlatform.Api.Controllers
             return Ok(result);
         }
 
-
+        //  GET DETAILS
         [HttpGet("{id}")]
         public async Task<IActionResult> GetDetails(Guid id)
         {
@@ -42,35 +41,47 @@ namespace LogisticsPlatform.Api.Controllers
             return Ok(result);
         }
 
+        //  CREATE LOAD
         [HttpPost]
         public async Task<IActionResult> Create(CreateLoadDto dto)
         {
-            var userId = Guid.Parse(
-                User.FindFirstValue(ClaimTypes.NameIdentifier)!
-            );
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
             var id = await _service.CreateAsync(dto, userId);
+
             return CreatedAtAction(nameof(GetDetails), new { id }, null);
         }
 
+        //  UPDATE LOAD
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(Guid id, UpdateLoadDto dto)
         {
-            await _service.UpdateAsync(id, dto);
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+            await _service.UpdateAsync(id, dto, userId);
+
             return Ok();
         }
 
+        //  CHANGE STATUS
         [HttpPatch("{id}/status")]
         public async Task<IActionResult> ChangeStatus(Guid id, LoadStatus status)
         {
-            await _service.ChangeStatusAsync(id, status);
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+            await _service.ChangeStatusAsync(id, status, userId);
+
             return Ok();
         }
 
+        //  ARCHIVE LOAD
         [HttpPatch("{id}/archive")]
         public async Task<IActionResult> Archive(Guid id)
         {
-            await _service.ArchiveAsync(id);
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+            await _service.ArchiveAsync(id, userId);
+
             return Ok();
         }
     }

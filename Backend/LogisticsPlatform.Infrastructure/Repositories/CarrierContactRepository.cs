@@ -43,6 +43,12 @@ namespace LogisticsPlatform.Infrastructure.Repositories
                 .Where(c => c.CarrierId == carrierId)
                 .ToListAsync();
         }
+        public async Task<List<CarrierContact>> GetPrimaryByCarrierAsync(Guid carrierId)
+        {
+            return await _context.CarrierContacts
+                .Where(x => x.CarrierId == carrierId && x.IsPrimary)
+                .ToListAsync();
+        }
 
         public async Task SaveChangesAsync()
         {

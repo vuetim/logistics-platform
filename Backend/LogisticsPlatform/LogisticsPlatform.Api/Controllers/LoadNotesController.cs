@@ -19,12 +19,16 @@ public class LoadNotesController : ControllerBase
 
     [HttpGet]
     public async Task<IActionResult> Get(Guid loadId)
-        => Ok(await _service.GetByLoadAsync(loadId));
+    {
+        var userId = User.GetUserId();
+        return Ok(await _service.GetByLoadAsync(loadId, userId));
+    }
+
 
     [HttpPost]
     public async Task<IActionResult> Create(Guid loadId, CreateLoadNoteDto dto)
     {
-        var userId = User.GetUserId(); // extension
+        var userId = User.GetUserId();
         await _service.AddAsync(loadId, dto, userId);
         return Ok();
     }

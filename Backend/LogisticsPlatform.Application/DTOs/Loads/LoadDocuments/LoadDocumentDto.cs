@@ -13,5 +13,6 @@ namespace LogisticsPlatform.Application.DTOs.Loads.LoadDocuments
         public LoadDocumentType DocumentType { get; set; }
         public string FileUrl { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; }
+        public bool IsInternal { get; internal set; }
     }
 }

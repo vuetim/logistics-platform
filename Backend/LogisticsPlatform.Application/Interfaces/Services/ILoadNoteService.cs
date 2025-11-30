@@ -10,7 +10,7 @@ namespace LogisticsPlatform.Application.Interfaces.Services
     public interface ILoadNoteService
     {
         Task AddAsync(Guid loadId, CreateLoadNoteDto dto, Guid userId);
-        Task<List<LoadNoteDto>> GetByLoadAsync(Guid loadId);
+        Task<List<LoadNoteDto>> GetByLoadAsync(Guid loadId, Guid userId);
     }
 
 }

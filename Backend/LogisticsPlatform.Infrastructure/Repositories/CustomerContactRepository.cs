@@ -40,6 +40,12 @@ namespace LogisticsPlatform.Infrastructure.Repositories
         {
             _context.CustomerContacts.Remove(contact);
         }
+        public async Task<List<CustomerContact>> GetPrimaryByCustomerAsync(Guid customerId)
+        {
+            return await _context.CustomerContacts
+                .Where(x => x.CustomerId == customerId && x.IsPrimary)
+                .ToListAsync();
+        }
 
         public Task SaveChangesAsync()
         {

@@ -10,5 +10,6 @@ namespace LogisticsPlatform.Domain.Entities
 
         public LoadDocumentType DocumentType { get; set; } = LoadDocumentType.POD;
         public string FileUrl { get; set; } = string.Empty;
+        public bool IsInternal { get; set; }
     }
 }

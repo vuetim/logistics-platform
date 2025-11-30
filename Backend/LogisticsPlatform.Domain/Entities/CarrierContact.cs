@@ -12,5 +12,7 @@ namespace LogisticsPlatform.Domain.Entities
         public string? Email { get; set; }
         public string? Phone { get; set; }
         public string? Role { get; set; } = CarrierContactRoles.Other;
+        public bool IsPrimary { get; set; } = false;
+        public bool IsActive { get; set; } = true;
     }
 }

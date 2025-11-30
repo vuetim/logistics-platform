@@ -8,6 +8,7 @@
         Task AddAsync(CustomerContact contact);
         Task UpdateAsync(CustomerContact contact);
         Task DeleteAsync(CustomerContact contact);
+        Task<List<CustomerContact>> GetPrimaryByCustomerAsync(Guid customerId);
 
         Task SaveChangesAsync();
     }

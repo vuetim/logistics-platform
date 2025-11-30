@@ -1,4 +1,5 @@
 ﻿using LogisticsPlatform.Domain.Common;
+using LogisticsPlatform.Domain.Enums;
 
 namespace LogisticsPlatform.Domain.Entities
 {
@@ -14,7 +15,8 @@ namespace LogisticsPlatform.Domain.Entities
         public string Country { get; set; } = string.Empty;
         public string PostalCode { get; set; } = string.Empty;
 
-        public string Type { get; set; } = "General"; // Billing, Shipping, etc.
+        public CarrierAddressType Type { get; set; } = CarrierAddressType.General;
         public bool IsPrimary { get; set; } = false;
+        public bool IsActive { get; set; } = true;
     }
 }

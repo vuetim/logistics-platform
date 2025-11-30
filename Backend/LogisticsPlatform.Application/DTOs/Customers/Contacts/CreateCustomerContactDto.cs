@@ -9,5 +9,7 @@ namespace LogisticsPlatform.Application.DTOs.Customers.Contacts
         public string Email { get; set; } = string.Empty;
         public string Phone { get; set; } = string.Empty;
         public string Position { get; set; } = CustomerContactRoles.Other;
+        public bool IsPrimary { get; set; }
+        public bool IsActive { get; set; }
     }
 }

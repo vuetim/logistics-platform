@@ -1,7 +1,8 @@
 ﻿using LogisticsPlatform.Domain.Common;
 using LogisticsPlatform.Domain.Entities;
+using LogisticsPlatform.Domain.Enums;
 
-public class CustomerAddress : BaseEntity
+public class  CustomerAddress : BaseEntity
 {
     public Guid CustomerId { get; set; }
     public Customer? Customer { get; set; }
@@ -12,7 +13,8 @@ public class CustomerAddress : BaseEntity
     public string? State { get; set; }
     public string Country { get; set; } = string.Empty;
     public string? PostalCode { get; set; }
+    public CustomerAddressType Type { get; set; } 
 
-    public string Type { get; set; } = "Shipping"; // Shipping, Billing, Warehouse
     public bool IsPrimary { get; set; }
+    public bool IsActive { get; set; }
 }

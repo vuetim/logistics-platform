@@ -5,9 +5,9 @@ namespace LogisticsPlatform.Application.Interfaces.Services
 {
     public interface ILoadService
     {
-        Task<Guid> CreateAsync(CreateLoadDto dto, Guid createdByUserId);
-        Task UpdateAsync(Guid id, UpdateLoadDto dto);
-        Task ChangeStatusAsync(Guid id, LoadStatus newStatus);
-        Task ArchiveAsync(Guid id);
+        Task<Guid> CreateAsync(CreateLoadDto dto, Guid userId);
+        Task UpdateAsync(Guid id, UpdateLoadDto dto, Guid userId);
+        Task ChangeStatusAsync(Guid id, LoadStatus newStatus, Guid userId);
+        Task ArchiveAsync(Guid id, Guid userId);
     }
 }

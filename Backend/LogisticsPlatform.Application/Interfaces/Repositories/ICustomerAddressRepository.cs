@@ -5,5 +5,7 @@
     Task AddAsync(CustomerAddress address);
     Task UpdateAsync(CustomerAddress address);
     Task DeleteAsync(CustomerAddress address);
+    Task<List<CustomerAddress>> GetPrimaryByCustomerAsync(Guid customerId);
+
     Task SaveChangesAsync();
 }
