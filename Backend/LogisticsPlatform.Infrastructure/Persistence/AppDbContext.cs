@@ -31,6 +31,14 @@ public class AppDbContext : DbContext
 
 
     public DbSet<Carrier> Carriers => Set<Carrier>();
+    public DbSet<Order> Orders => Set<Order>();
+    public DbSet<OrderItem> OrderItems => Set<OrderItem>();
+    public DbSet<OrderCost> OrderCosts => Set<OrderCost>();
+    public DbSet<OrderExternalId> OrderExternalIds => Set<OrderExternalId>();
+    public DbSet<OrderNote> OrderNotes => Set<OrderNote>();
+    public DbSet<OrderDocument> OrderDocuments => Set<OrderDocument>();
+    public DbSet<OrderEquipmentRequirement> OrderEquipmentRequirements => Set<OrderEquipmentRequirement>();
+    public DbSet<OrderRoute> OrderRoutes => Set<OrderRoute>();
 
 
 
@@ -87,6 +95,95 @@ public class AppDbContext : DbContext
             entity.Property(x => x.Accessorials)
                   .HasPrecision(18, 2);
         });
+        modelBuilder.Entity<OrderCost>(entity =>
+        {
+            entity.Property(x => x.Quantity)
+                .HasPrecision(18, 4);
+
+            entity.Property(x => x.UnitPrice)
+                .HasPrecision(18, 4);
+
+            entity.Property(x => x.TotalAmount)
+                .HasPrecision(18, 4);
+        });
+        modelBuilder.Entity<LoadOrder>(entity =>
+        {
+            entity.HasKey(lo => lo.Id);
+
+            entity.HasOne(lo => lo.Order)
+                .WithMany(o => o.Loads)
+                .HasForeignKey(lo => lo.OrderId)
+                .OnDelete(DeleteBehavior.Restrict); 
+
+            entity.HasOne(lo => lo.Load)
+                .WithMany(l => l.Orders)
+                .HasForeignKey(lo => lo.LoadId)
+                .OnDelete(DeleteBehavior.Restrict); 
+        });
+
+        modelBuilder.Entity<OrderItem>(entity =>
+        {
+            entity.Property(x => x.Quantity)
+                .HasPrecision(18, 4);
+
+            entity.Property(x => x.HandlingQuantity)
+                .HasPrecision(18, 4);
+
+            entity.Property(x => x.UnitNetWeight)
+                .HasPrecision(18, 3);
+
+            entity.Property(x => x.UnitGrossWeight)
+                .HasPrecision(18, 3);
+
+            entity.Property(x => x.Volume)
+                .HasPrecision(18, 6);
+
+            entity.Property(x => x.Length)
+                .HasPrecision(18, 3);
+
+            entity.Property(x => x.Width)
+                .HasPrecision(18, 3);
+
+            entity.Property(x => x.Height)
+                .HasPrecision(18, 3);
+
+            entity.Property(x => x.MinTemperature)
+                .HasPrecision(5, 2);
+
+            entity.Property(x => x.MaxTemperature)
+                .HasPrecision(5, 2);
+
+            entity.Property(x => x.DeclaredValue)
+                .HasPrecision(18, 2);
+        });
+        modelBuilder.Entity<LoadStop>(entity =>
+        {
+            entity.Property(e => e.Latitude)
+                .HasPrecision(9, 6);
+
+            entity.Property(e => e.Longitude)
+                .HasPrecision(9, 6);
+        });
+
+
+        modelBuilder.Entity<OrderEquipmentRequirement>(entity =>
+        {
+            entity.Property(x => x.MaxWeight)
+                .HasPrecision(18, 3);
+
+            entity.Property(x => x.RequiredTemperature)
+                .HasPrecision(5, 2);
+        });
+        modelBuilder.Entity<OrderRoute>(entity =>
+        {
+            entity.Property(x => x.Latitude)
+                .HasPrecision(9, 6);
+
+            entity.Property(x => x.Longitude)
+                .HasPrecision(9, 6);
+        });
+
+
         modelBuilder.Entity<LoadNote>(b =>
         {
             b.HasOne(n => n.Load)
@@ -99,6 +196,13 @@ public class AppDbContext : DbContext
                 .HasForeignKey(n => n.CreatedByUserId)
                 .OnDelete(DeleteBehavior.NoAction);
         });
+  
+        modelBuilder.Entity<OrderNote>()
+            .HasOne(n => n.CreatedByUser)
+            .WithMany()
+            .HasForeignKey(n => n.CreatedByUserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
         modelBuilder.Entity<Load>().HasIndex(x => x.Status);
         modelBuilder.Entity<Load>().HasIndex(x => x.IsArchived);
         modelBuilder.Entity<Load>().HasIndex(x => new { x.CustomerId, x.Status });

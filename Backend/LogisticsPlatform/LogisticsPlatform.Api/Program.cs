@@ -1,8 +1,10 @@
 using LogisticsPlatform.Application.Authorization;
 using LogisticsPlatform.Application.Interfaces.Repositories;
+using LogisticsPlatform.Application.Interfaces.Repositories.Queries;
 using LogisticsPlatform.Application.Interfaces.Services;
 using LogisticsPlatform.Application.Services;
 using LogisticsPlatform.Infrastructure.Persistence;
+using LogisticsPlatform.Infrastructure.Persistence.Repositories.Queries;
 using LogisticsPlatform.Infrastructure.Repositories;
 using LogisticsPlatform.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -45,6 +47,9 @@ builder.Services.AddScoped<ILoadStopRepository, LoadStopRepository>();
 builder.Services.AddScoped<ILoadEquipmentRepository, LoadEquipmentRepository>();
 builder.Services.AddScoped<ILoadDocumentRepository, LoadDocumentRepository>();
 builder.Services.AddScoped<ILoadNoteRepository, LoadNoteRepository>();
+builder.Services.AddScoped<IOrderQueryRepository, OrderQueryRepository>();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IOrderRouteRepository, OrderRouteRepository>();
 
 
 
@@ -76,6 +81,9 @@ builder.Services.AddScoped<ILoadEquipmentService, LoadEquipmentService>();
 builder.Services.AddScoped<ILoadDocumentService, LoadDocumentService>();
 builder.Services.AddScoped<ILoadNoteService, LoadNoteService>();
 builder.Services.AddScoped<IAuthorizationService, AuthorizationService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IOrderQueryService, OrderQueryService>();
+builder.Services.AddScoped<IOrderRouteService, OrderRouteService>();
 
 
 

@@ -13,10 +13,18 @@ public class LoadRepository : ILoadRepository
     {
         _context = context;
     }
+    public async Task AddLoadOrderAsync(LoadOrder link)
+    {
+        await _context.LoadOrders.AddAsync(link);
+    }
 
     public async Task AddAsync(Load load)
     {
         await _context.Loads.AddAsync(load);
+    }
+    public async Task AddStopAsync(LoadStop stop)
+    {
+        await _context.LoadStops.AddAsync(stop);
     }
 
     public async Task UpdateAsync(Load load)
@@ -27,10 +35,14 @@ public class LoadRepository : ILoadRepository
     public async Task<Load?> GetByIdAsync(Guid id)
     {
         return await _context.Loads
-            .Include(x => x.Customer)
-            .Include(x => x.Carrier)
-            .FirstOrDefaultAsync(x => x.Id == id);
+            .Include(l => l.Customer)
+            .Include(l => l.Carrier)
+            .Include(l => l.Stops)
+            .Include(l => l.Orders)
+                .ThenInclude(lo => lo.Order)
+            .FirstOrDefaultAsync(l => l.Id == id);
     }
+
 
     public async Task SaveChangesAsync()
     {

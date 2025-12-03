@@ -17,5 +17,9 @@ public enum Permission
     // LOAD DOCUMENTS
     LoadDocument_View,
     LoadDocument_Upload,
-    LoadDocument_Delete
+    LoadDocument_Delete,
+
+
+    //Load from order
+    Load_CreateFromOrder
 }

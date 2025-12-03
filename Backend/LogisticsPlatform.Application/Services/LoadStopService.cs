@@ -26,15 +26,27 @@ namespace LogisticsPlatform.Application.Services
                 LoadId = loadId,
                 StopType = dto.StopType,
                 Sequence = dto.Sequence,
+
                 LocationName = dto.LocationName,
+                AddressLine1 = dto.AddressLine1,
+                AddressLine2 = dto.AddressLine2,
                 City = dto.City,
                 State = dto.State,
-                Zip = dto.Zip,
-                PlannedDate = dto.PlannedDate,
-                AppointmentFrom = dto.AppointmentFrom,
-                AppointmentTo = dto.AppointmentTo,
-                HasTime = dto.HasTime,
+                PostalCode = dto.PostalCode,
+                Country = dto.Country,
+
+                PlannedArrivalFrom = dto.PlannedArrivalFrom,
+                PlannedArrivalTo = dto.PlannedArrivalTo,
+
+                PlannedDepartureFrom = dto.PlannedDepartureFrom,
+                PlannedDepartureTo = dto.PlannedDepartureTo,
+
+                AppointmentType = dto.AppointmentType,
+                FlexMinutes = dto.FlexMinutes,
+
                 Notes = dto.Notes
+
+
             };
 
             await _repository.AddAsync(stop);
@@ -44,17 +56,26 @@ namespace LogisticsPlatform.Application.Services
         {
             var stop = await _repository.GetByIdAsync(stopId)
                 ?? throw new Exception("Load stop not found");
-
             stop.StopType = dto.StopType;
             stop.Sequence = dto.Sequence;
+
             stop.LocationName = dto.LocationName;
+            stop.AddressLine1 = dto.AddressLine1;
+            stop.AddressLine2 = dto.AddressLine2;
             stop.City = dto.City;
             stop.State = dto.State;
-            stop.Zip = dto.Zip;
-            stop.PlannedDate = dto.PlannedDate;
-            stop.AppointmentFrom = dto.AppointmentFrom;
-            stop.AppointmentTo = dto.AppointmentTo;
-            stop.HasTime = dto.HasTime;
+            stop.PostalCode = dto.PostalCode;
+            stop.Country = dto.Country;
+
+            stop.PlannedArrivalFrom = dto.PlannedArrivalFrom;
+            stop.PlannedArrivalTo = dto.PlannedArrivalTo;
+
+            stop.PlannedDepartureFrom = dto.PlannedDepartureFrom;
+            stop.PlannedDepartureTo = dto.PlannedDepartureTo;
+
+            stop.AppointmentType = dto.AppointmentType;
+            stop.FlexMinutes = dto.FlexMinutes;
+
             stop.Notes = dto.Notes;
 
             await _repository.UpdateAsync(stop);
