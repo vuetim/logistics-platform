@@ -59,7 +59,6 @@ builder.Services.AddScoped<IOrderRouteRepository, OrderRouteRepository>();
 
 
 
-
 // 4. Services
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -84,6 +83,8 @@ builder.Services.AddScoped<IAuthorizationService, AuthorizationService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IOrderQueryService, OrderQueryService>();
 builder.Services.AddScoped<IOrderRouteService, OrderRouteService>();
+builder.Services.AddScoped<ILoadStatusCalculatorService, LoadStatusCalculatorService>();
+builder.Services.AddScoped<ILoadStopExecutionService, LoadStopExecutionService>();
 
 
 

@@ -13,10 +13,13 @@ namespace LogisticsPlatform.Application.Services
     public class LoadStopService : ILoadStopService
     {
         private readonly ILoadStopRepository _repository;
+        private readonly ILoadRepository _loadRepo;
 
-        public LoadStopService(ILoadStopRepository repository)
+
+        public LoadStopService(ILoadStopRepository repository, ILoadRepository loadRepo)
         {
             _repository = repository;
+            _loadRepo = loadRepo;
         }
 
         public async Task AddAsync(Guid loadId, CreateLoadStopDto dto)
@@ -50,6 +53,9 @@ namespace LogisticsPlatform.Application.Services
             };
 
             await _repository.AddAsync(stop);
+            await _loadRepo.SaveChangesAsync(); 
+
+
         }
 
         public async Task UpdateAsync(Guid stopId, UpdateLoadStopDto dto)
@@ -79,6 +85,8 @@ namespace LogisticsPlatform.Application.Services
             stop.Notes = dto.Notes;
 
             await _repository.UpdateAsync(stop);
+            await _loadRepo.SaveChangesAsync(); 
+
         }
 
         public async Task DeleteAsync(Guid stopId)
@@ -87,6 +95,8 @@ namespace LogisticsPlatform.Application.Services
                 ?? throw new Exception("Load stop not found");
 
             await _repository.DeleteAsync(stop);
+            await _loadRepo.SaveChangesAsync(); 
+
         }
     }
 }

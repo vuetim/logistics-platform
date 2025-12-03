@@ -7,7 +7,7 @@ public interface ILoadStopRepository
     Task AddAsync(LoadStop stop);
     Task UpdateAsync(LoadStop stop);
     Task DeleteAsync(LoadStop stop);
-
+    Task<LoadStop?> GetByIdWithLoadAsync(Guid id);
     Task<LoadStop?> GetByIdAsync(Guid id);
     Task<List<LoadStop>> GetByLoadIdAsync(Guid loadId);
 }

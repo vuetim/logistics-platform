@@ -3,8 +3,6 @@ using LogisticsPlatform.Domain.Entities;
 using LogisticsPlatform.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
-namespace LogisticsPlatform.Infrastructure.Repositories;
-
 public class LoadStopRepository : ILoadStopRepository
 {
     private readonly AppDbContext _context;
@@ -14,22 +12,22 @@ public class LoadStopRepository : ILoadStopRepository
         _context = context;
     }
 
-    public async Task AddAsync(LoadStop stop)
+    public Task AddAsync(LoadStop stop)
     {
         _context.LoadStops.Add(stop);
-        await _context.SaveChangesAsync();
+        return Task.CompletedTask;
     }
 
-    public async Task UpdateAsync(LoadStop stop)
+    public Task UpdateAsync(LoadStop stop)
     {
         _context.LoadStops.Update(stop);
-        await _context.SaveChangesAsync();
+        return Task.CompletedTask;
     }
 
-    public async Task DeleteAsync(LoadStop stop)
+    public Task DeleteAsync(LoadStop stop)
     {
         _context.LoadStops.Remove(stop);
-        await _context.SaveChangesAsync();
+        return Task.CompletedTask;
     }
 
     public async Task<LoadStop?> GetByIdAsync(Guid id)
@@ -43,5 +41,13 @@ public class LoadStopRepository : ILoadStopRepository
             .Where(s => s.LoadId == loadId)
             .OrderBy(s => s.Sequence)
             .ToListAsync();
+    }
+
+    public async Task<LoadStop?> GetByIdWithLoadAsync(Guid id)
+    {
+        return await _context.LoadStops
+            .Include(s => s.Load)
+                .ThenInclude(l => l.Stops)
+            .FirstOrDefaultAsync(s => s.Id == id);
     }
 }
