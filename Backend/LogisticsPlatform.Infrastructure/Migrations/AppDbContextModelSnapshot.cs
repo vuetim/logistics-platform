@@ -73,7 +73,7 @@ namespace LogisticsPlatform.Infrastructure.Migrations
 
                     b.HasIndex("CustomerId", "IsPrimary");
 
-                    b.ToTable("CustomerAddresses");
+                    b.ToTable("CustomerAddresses", (string)null);
                 });
 
             modelBuilder.Entity("CustomerContact", b =>
@@ -117,7 +117,7 @@ namespace LogisticsPlatform.Infrastructure.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.ToTable("CustomerContacts");
+                    b.ToTable("CustomerContacts", (string)null);
                 });
 
             modelBuilder.Entity("LoadItem", b =>
@@ -217,7 +217,7 @@ namespace LogisticsPlatform.Infrastructure.Migrations
 
                     b.HasIndex("LoadId");
 
-                    b.ToTable("LoadItems");
+                    b.ToTable("LoadItems", (string)null);
                 });
 
             modelBuilder.Entity("LoadOrder", b =>
@@ -248,7 +248,7 @@ namespace LogisticsPlatform.Infrastructure.Migrations
 
                     b.HasIndex("OrderId");
 
-                    b.ToTable("LoadOrders");
+                    b.ToTable("LoadOrders", (string)null);
                 });
 
             modelBuilder.Entity("LogisticsPlatform.Domain.Entities.ActivityLog", b =>
@@ -282,7 +282,7 @@ namespace LogisticsPlatform.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ActivityLogs");
+                    b.ToTable("ActivityLogs", (string)null);
                 });
 
             modelBuilder.Entity("LogisticsPlatform.Domain.Entities.Carrier", b =>
@@ -326,7 +326,7 @@ namespace LogisticsPlatform.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Carriers");
+                    b.ToTable("Carriers", (string)null);
                 });
 
             modelBuilder.Entity("LogisticsPlatform.Domain.Entities.CarrierAddress", b =>
@@ -382,7 +382,7 @@ namespace LogisticsPlatform.Infrastructure.Migrations
 
                     b.HasIndex("CarrierId", "IsPrimary");
 
-                    b.ToTable("CarrierAddresses");
+                    b.ToTable("CarrierAddresses", (string)null);
                 });
 
             modelBuilder.Entity("LogisticsPlatform.Domain.Entities.CarrierContact", b =>
@@ -423,7 +423,7 @@ namespace LogisticsPlatform.Infrastructure.Migrations
 
                     b.HasIndex("CarrierId");
 
-                    b.ToTable("CarrierContacts");
+                    b.ToTable("CarrierContacts", (string)null);
                 });
 
             modelBuilder.Entity("LogisticsPlatform.Domain.Entities.CarrierDocument", b =>
@@ -465,7 +465,7 @@ namespace LogisticsPlatform.Infrastructure.Migrations
 
                     b.HasIndex("UploadedByUserId");
 
-                    b.ToTable("CarrierDocuments");
+                    b.ToTable("CarrierDocuments", (string)null);
                 });
 
             modelBuilder.Entity("LogisticsPlatform.Domain.Entities.CarrierNote", b =>
@@ -500,7 +500,7 @@ namespace LogisticsPlatform.Infrastructure.Migrations
 
                     b.HasIndex("CreatedByUserId");
 
-                    b.ToTable("CarrierNotes");
+                    b.ToTable("CarrierNotes", (string)null);
                 });
 
             modelBuilder.Entity("LogisticsPlatform.Domain.Entities.Customer", b =>
@@ -530,7 +530,7 @@ namespace LogisticsPlatform.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Customers");
+                    b.ToTable("Customers", (string)null);
                 });
 
             modelBuilder.Entity("LogisticsPlatform.Domain.Entities.CustomerNote", b =>
@@ -565,7 +565,7 @@ namespace LogisticsPlatform.Infrastructure.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.ToTable("CustomerNotes");
+                    b.ToTable("CustomerNotes", (string)null);
                 });
 
             modelBuilder.Entity("LogisticsPlatform.Domain.Entities.Load", b =>
@@ -639,7 +639,7 @@ namespace LogisticsPlatform.Infrastructure.Migrations
 
                     b.HasIndex("IsArchived", "Status");
 
-                    b.ToTable("Loads");
+                    b.ToTable("Loads", (string)null);
                 });
 
             modelBuilder.Entity("LogisticsPlatform.Domain.Entities.LoadDocument", b =>
@@ -671,7 +671,7 @@ namespace LogisticsPlatform.Infrastructure.Migrations
 
                     b.HasIndex("LoadId");
 
-                    b.ToTable("LoadDocuments");
+                    b.ToTable("LoadDocuments", (string)null);
                 });
 
             modelBuilder.Entity("LogisticsPlatform.Domain.Entities.LoadEquipment", b =>
@@ -718,7 +718,7 @@ namespace LogisticsPlatform.Infrastructure.Migrations
 
                     b.HasIndex("LoadId");
 
-                    b.ToTable("LoadEquipment");
+                    b.ToTable("LoadEquipment", (string)null);
                 });
 
             modelBuilder.Entity("LogisticsPlatform.Domain.Entities.LoadNote", b =>
@@ -752,7 +752,7 @@ namespace LogisticsPlatform.Infrastructure.Migrations
 
                     b.HasIndex("LoadId");
 
-                    b.ToTable("LoadNotes");
+                    b.ToTable("LoadNotes", (string)null);
                 });
 
             modelBuilder.Entity("LogisticsPlatform.Domain.Entities.LoadStop", b =>
@@ -851,7 +851,7 @@ namespace LogisticsPlatform.Infrastructure.Migrations
 
                     b.HasIndex("LoadId");
 
-                    b.ToTable("LoadStops");
+                    b.ToTable("LoadStops", (string)null);
                 });
 
             modelBuilder.Entity("LogisticsPlatform.Domain.Entities.Order", b =>
@@ -911,7 +911,7 @@ namespace LogisticsPlatform.Infrastructure.Migrations
 
                     b.HasIndex("PreferredCarrierId");
 
-                    b.ToTable("Orders");
+                    b.ToTable("Orders", (string)null);
                 });
 
             modelBuilder.Entity("LogisticsPlatform.Domain.Entities.OrderCost", b =>
@@ -981,7 +981,7 @@ namespace LogisticsPlatform.Infrastructure.Migrations
                     b.HasIndex("OrderId")
                         .IsUnique();
 
-                    b.ToTable("OrderCosts");
+                    b.ToTable("OrderCosts", (string)null);
                 });
 
             modelBuilder.Entity("LogisticsPlatform.Domain.Entities.OrderDocument", b =>
@@ -1016,7 +1016,7 @@ namespace LogisticsPlatform.Infrastructure.Migrations
 
                     b.HasIndex("OrderId");
 
-                    b.ToTable("OrderDocuments");
+                    b.ToTable("OrderDocuments", (string)null);
                 });
 
             modelBuilder.Entity("LogisticsPlatform.Domain.Entities.OrderEquipmentRequirement", b =>
@@ -1071,7 +1071,7 @@ namespace LogisticsPlatform.Infrastructure.Migrations
 
                     b.HasIndex("OrderId");
 
-                    b.ToTable("OrderEquipmentRequirements");
+                    b.ToTable("OrderEquipmentRequirements", (string)null);
                 });
 
             modelBuilder.Entity("LogisticsPlatform.Domain.Entities.OrderExternalId", b =>
@@ -1107,7 +1107,7 @@ namespace LogisticsPlatform.Infrastructure.Migrations
 
                     b.HasIndex("OrderId");
 
-                    b.ToTable("OrderExternalIds");
+                    b.ToTable("OrderExternalIds", (string)null);
                 });
 
             modelBuilder.Entity("LogisticsPlatform.Domain.Entities.OrderItem", b =>
@@ -1238,7 +1238,7 @@ namespace LogisticsPlatform.Infrastructure.Migrations
 
                     b.HasIndex("OrderId");
 
-                    b.ToTable("OrderItems");
+                    b.ToTable("OrderItems", (string)null);
                 });
 
             modelBuilder.Entity("LogisticsPlatform.Domain.Entities.OrderNote", b =>
@@ -1272,7 +1272,7 @@ namespace LogisticsPlatform.Infrastructure.Migrations
 
                     b.HasIndex("OrderId");
 
-                    b.ToTable("OrderNotes");
+                    b.ToTable("OrderNotes", (string)null);
                 });
 
             modelBuilder.Entity("LogisticsPlatform.Domain.Entities.OrderRoute", b =>
@@ -1368,7 +1368,7 @@ namespace LogisticsPlatform.Infrastructure.Migrations
 
                     b.HasIndex("OrderId");
 
-                    b.ToTable("OrderRoutes");
+                    b.ToTable("OrderRoutes", (string)null);
                 });
 
             modelBuilder.Entity("LogisticsPlatform.Domain.Entities.Role", b =>
@@ -1389,7 +1389,7 @@ namespace LogisticsPlatform.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Roles");
+                    b.ToTable("Roles", (string)null);
 
                     b.HasData(
                         new
@@ -1450,7 +1450,7 @@ namespace LogisticsPlatform.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("LogisticsPlatform.Domain.Entities.UserRole", b =>
@@ -1465,7 +1465,7 @@ namespace LogisticsPlatform.Infrastructure.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("UserRoles");
+                    b.ToTable("UserRoles", (string)null);
                 });
 
             modelBuilder.Entity("CustomerAddress", b =>

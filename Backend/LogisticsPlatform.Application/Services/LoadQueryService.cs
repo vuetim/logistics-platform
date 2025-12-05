@@ -19,7 +19,6 @@ namespace LogisticsPlatform.Application.Services
 
         public async Task<PagedResult<LoadListItemDto>> GetPagedAsync(LoadQueryParameters parameters)
         {
-            // vend për guardrails, defaults, security
             if (parameters.PageSize > 100)
                 parameters.PageSize = 100;
 
@@ -36,6 +35,7 @@ namespace LogisticsPlatform.Application.Services
 
             return new LoadDetailsDto
             {
+                //  EXECUTION 
                 Execution = new LoadExecutionDetailsDto
                 {
                     Id = load.Id,
@@ -47,11 +47,9 @@ namespace LogisticsPlatform.Application.Services
                     Destination = load.Destination,
 
                     CarrierName = load.Carrier?.Name,
-
                     CustomerRate = load.CustomerRate,
                     CarrierRate = load.CarrierRate,
 
-                    //  STOPS = EXECUTION ONLY
                     Stops = load.Stops
                         .OrderBy(s => s.Sequence)
                         .Select(s => new LoadStopDetailsDto
@@ -81,59 +79,119 @@ namespace LogisticsPlatform.Application.Services
                             ActualDeparture = s.ActualDeparture,
 
                             Notes = s.Notes
-                        })
-
-                        .ToList(),
-                    Items = load.Items.Select(i => new LoadItemDto
-                    {
-                        Id = i.Id,
-                        Name = i.Name,
-                        Quantity = i.Quantity,
-                        QuantityUnit = i.QuantityUnit,
-                        IsHazmat = i.IsHazmat,
-                        FreightClass = i.FreightClass,
-                        Notes = i.Notes
-                    }).ToList()
-
+                        }).ToList()
                 },
 
-
+                //  ORDER SNAPSHOT
                 OrderSnapshot = orderLink?.Order == null
-    ? null
-    : new LoadOrderSnapshotDto
-    {
-        OrderId = orderLink.Order.Id,
-        OrderNumber = orderLink.Order.OrderNumber,
+                    ? null
+                    : new LoadOrderSnapshotDto
+                    {
+                        OrderId = orderLink.Order.Id,
+                        OrderNumber = orderLink.Order.OrderNumber,
+                        OrderType = orderLink.Order.OrderType,
+                        Direction = orderLink.Order.Direction,
+                        PlannedPickupDate = orderLink.Order.PlannedPickupDate,
+                        PlannedDeliveryDate = orderLink.Order.PlannedDeliveryDate,
 
-        OrderType = orderLink.Order.OrderType,
-        Direction = orderLink.Order.Direction,
+                        Routes = orderLink.Order.OrderRoutes
+                            .Where(r => r.IsActive)
+                            .OrderBy(r => r.Sequence)
+                            .Select(r => new OrderRouteDto
+                            {
+                                Sequence = r.Sequence,
+                                StopType = r.StopType,
+                                LocationName = r.LocationName,
+                                City = r.City,
+                                State = r.State,
+                                Country = r.Country,
 
-        PlannedPickupDate = orderLink.Order.PlannedPickupDate,
-        PlannedDeliveryDate = orderLink.Order.PlannedDeliveryDate,
+                                PlannedArrivalFrom = r.PlannedArrivalFrom,
+                                PlannedArrivalTo = r.PlannedArrivalTo,
 
-        Routes = orderLink.Order.OrderRoutes
-            .Where(r => r.IsActive)
-            .OrderBy(r => r.Sequence)
-            .Select(r => new OrderRouteDto
+                                HasTime = r.HasTime,
+                                CopyToLoad = r.CopyToLoad,
+                                Notes = r.Notes,
+                                IsActive = r.IsActive
+                            })
+                            .ToList()
+                    },
+
+                // ITEMS
+                Items = load.Items.Select(i => new LoadItemDto
+                {
+                    Id = i.Id,
+                    Name = i.Name,
+                    Quantity = i.Quantity,
+                    QuantityUnit = i.QuantityUnit,
+                    IsHazmat = i.IsHazmat,
+                    FreightClass = i.FreightClass,
+                    Notes = i.Notes
+                }).ToList(),
+
+                //  SUMMARY 
+                Summary = CalculateSummary(load)
+            };
+        }
+
+       
+        // - SUMMARY CALCULATION 
+       
+        private LoadSummaryDto CalculateSummary(Load load)
+        {
+            decimal totalWeight = 0;
+            decimal totalVolume = 0;
+            decimal totalPallets = 0;
+
+            foreach (var item in load.Items)
             {
-                Sequence = r.Sequence,
-                StopType = r.StopType,
-                LocationName = r.LocationName,
-                City = r.City,
-                State = r.State,
-                Country = r.Country,
+                // Weight
+                var weight = item.UnitGrossWeight ?? item.UnitNetWeight ?? 0;
+                totalWeight += weight * item.Quantity;
 
-                PlannedArrivalFrom = r.PlannedArrivalFrom,
-                PlannedArrivalTo = r.PlannedArrivalTo,
+                // Volume
+                if (item.Length.HasValue && item.Width.HasValue && item.Height.HasValue)
+                {
+                    var volume = item.Length.Value * item.Width.Value * item.Height.Value * item.Quantity;
+                    totalVolume += volume;
+                }
 
-                HasTime = r.HasTime,
-                CopyToLoad = r.CopyToLoad,
-                Notes = r.Notes,
-                IsActive = r.IsActive
-            })
+                // Pallets
+                if (item.HandlingQuantity.HasValue)
+                    totalPallets += item.HandlingQuantity.Value;
+
+            }
+            var pickupStops = load.Stops.Count(s => s.StopType == StopType.Pickup);
+            var deliveryStops = load.Stops.Count(s => s.StopType == StopType.Delivery);
+
+
+            var pickupStopsList = load.Stops
+         .Where(s => s.StopType == StopType.Pickup)
+         .ToList();
+
+            var deliveryStopsList = load.Stops
+                .Where(s => s.StopType == StopType.Delivery)
+                .ToList();
+
+            return new LoadSummaryDto
+            {
+                TotalWeight = totalWeight,
+                TotalVolume = totalVolume,
+                TotalPallets = totalPallets,
+                TotalItems = load.Items.Count,
+
+                TotalStops = load.Stops.Count,
+                PickupStops = pickupStopsList.Count,
+                DeliveryStops = deliveryStopsList.Count,
+
+                PickupLocations = pickupStopsList
+            .Select(s => $"{s.City}, {s.State}")
+            .ToList(),
+
+                DeliveryLocations = deliveryStopsList
+            .Select(s => $"{s.City}, {s.State}")
             .ToList()
-    }
-    };
+            };
         }
     }
 }

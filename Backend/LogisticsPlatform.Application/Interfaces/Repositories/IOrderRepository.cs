@@ -8,6 +8,8 @@ namespace LogisticsPlatform.Application.Interfaces.Repositories
         Task UpdateAsync(Order order);
         Task<Order?> GetByIdAsync(Guid id);
         Task<Order?> GetByIdWithRoutesAsync(Guid id);
+        Task<Order?> GetByIdWithItemsAsync(Guid orderId);
+
 
         Task SaveChangesAsync();
     }

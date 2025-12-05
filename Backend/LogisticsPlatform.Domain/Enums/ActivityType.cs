@@ -7,7 +7,10 @@
         Load_StatusChanged = 110,
         Load_StopStatusChanged = 120,
         Load_RddChanged = 130,
-        Load_ItemUpdated = 140,
+        Load_ItemCreated = 140,
+        Load_ItemUpdated = 150,
+        
+        Load_ItemDeleted=160,
 
         // ===== ORDER =====
         Order_Created = 200,
