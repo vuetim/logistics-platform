@@ -4,6 +4,7 @@ using LogisticsPlatform.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LogisticsPlatform.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251203195156_AddActivityLog")]
+    partial class AddActivityLog
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -118,106 +121,6 @@ namespace LogisticsPlatform.Infrastructure.Migrations
                     b.HasIndex("CustomerId");
 
                     b.ToTable("CustomerContacts");
-                });
-
-            modelBuilder.Entity("LoadItem", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Currency")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal?>("DeclaredValue")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("DimensionUnit")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FreightClass")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal?>("HandlingQuantity")
-                        .HasPrecision(18, 4)
-                        .HasColumnType("decimal(18,4)");
-
-                    b.Property<string>("HandlingUnit")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal?>("Height")
-                        .HasPrecision(18, 4)
-                        .HasColumnType("decimal(18,4)");
-
-                    b.Property<bool>("IsHazmat")
-                        .HasColumnType("bit");
-
-                    b.Property<decimal?>("Length")
-                        .HasPrecision(18, 4)
-                        .HasColumnType("decimal(18,4)");
-
-                    b.Property<Guid>("LoadId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<decimal?>("MaxTemperature")
-                        .HasPrecision(5, 2)
-                        .HasColumnType("decimal(5,2)");
-
-                    b.Property<decimal?>("MinTemperature")
-                        .HasPrecision(5, 2)
-                        .HasColumnType("decimal(5,2)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Notes")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("Quantity")
-                        .HasPrecision(18, 4)
-                        .HasColumnType("decimal(18,4)");
-
-                    b.Property<string>("QuantityUnit")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid?>("SourceOrderItemId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("Stackable")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("TemperatureUnit")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal?>("UnitGrossWeight")
-                        .HasPrecision(18, 4)
-                        .HasColumnType("decimal(18,4)");
-
-                    b.Property<decimal?>("UnitNetWeight")
-                        .HasPrecision(18, 4)
-                        .HasColumnType("decimal(18,4)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("WeightUnit")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal?>("Width")
-                        .HasPrecision(18, 4)
-                        .HasColumnType("decimal(18,4)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("LoadId");
-
-                    b.ToTable("LoadItems");
                 });
 
             modelBuilder.Entity("LoadOrder", b =>
@@ -1395,31 +1298,31 @@ namespace LogisticsPlatform.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa1"),
-                            CreatedAt = new DateTime(2025, 12, 5, 1, 1, 7, 930, DateTimeKind.Utc).AddTicks(9589),
+                            CreatedAt = new DateTime(2025, 12, 3, 19, 51, 53, 124, DateTimeKind.Utc).AddTicks(2339),
                             Name = "Admin"
                         },
                         new
                         {
                             Id = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa2"),
-                            CreatedAt = new DateTime(2025, 12, 5, 1, 1, 7, 930, DateTimeKind.Utc).AddTicks(9610),
+                            CreatedAt = new DateTime(2025, 12, 3, 19, 51, 53, 124, DateTimeKind.Utc).AddTicks(2359),
                             Name = "Broker"
                         },
                         new
                         {
                             Id = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa3"),
-                            CreatedAt = new DateTime(2025, 12, 5, 1, 1, 7, 930, DateTimeKind.Utc).AddTicks(9613),
+                            CreatedAt = new DateTime(2025, 12, 3, 19, 51, 53, 124, DateTimeKind.Utc).AddTicks(2362),
                             Name = "Operator"
                         },
                         new
                         {
                             Id = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa4"),
-                            CreatedAt = new DateTime(2025, 12, 5, 1, 1, 7, 930, DateTimeKind.Utc).AddTicks(9616),
+                            CreatedAt = new DateTime(2025, 12, 3, 19, 51, 53, 124, DateTimeKind.Utc).AddTicks(2365),
                             Name = "Dispatcher"
                         },
                         new
                         {
                             Id = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa5"),
-                            CreatedAt = new DateTime(2025, 12, 5, 1, 1, 7, 930, DateTimeKind.Utc).AddTicks(9618),
+                            CreatedAt = new DateTime(2025, 12, 3, 19, 51, 53, 124, DateTimeKind.Utc).AddTicks(2367),
                             Name = "Accounting"
                         });
                 });
@@ -1488,17 +1391,6 @@ namespace LogisticsPlatform.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Customer");
-                });
-
-            modelBuilder.Entity("LoadItem", b =>
-                {
-                    b.HasOne("LogisticsPlatform.Domain.Entities.Load", "Load")
-                        .WithMany("Items")
-                        .HasForeignKey("LoadId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Load");
                 });
 
             modelBuilder.Entity("LoadOrder", b =>
@@ -1822,8 +1714,6 @@ namespace LogisticsPlatform.Infrastructure.Migrations
                     b.Navigation("Documents");
 
                     b.Navigation("Equipment");
-
-                    b.Navigation("Items");
 
                     b.Navigation("Notes");
 

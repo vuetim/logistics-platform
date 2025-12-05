@@ -19,8 +19,6 @@ namespace LogisticsPlatform.Application.Services
         private readonly IAuthorizationService _auth;
         private readonly IOrderRepository _orders;
 
-
-
         public LoadService(
             ILoadRepository loads,
             ICustomerRepository customers,
@@ -37,7 +35,9 @@ namespace LogisticsPlatform.Application.Services
             _orders = orders;
         }
 
-        // ✅ CREATE LOAD (Admin, Broker)
+        // =============================
+        // CREATE LOAD (manual) (Admin, Broker)
+        // =============================
         public async Task<Guid> CreateAsync(CreateLoadDto dto, Guid userId)
         {
             var user = await GetUserOrThrow(userId);
@@ -46,18 +46,19 @@ namespace LogisticsPlatform.Application.Services
                 throw new Common.Exceptions.ForbiddenException("You are not allowed to create loads.");
 
             var customer = await _customers.GetByIdAsync(dto.CustomerId)
-                ?? throw new Exception("Customer not found");
+                ?? throw new NotFoundException("Customer not found.");
 
             Carrier? carrier = null;
             if (dto.CarrierId.HasValue)
             {
                 carrier = await _carriers.GetByIdAsync(dto.CarrierId.Value)
-                    ?? throw new Exception("Carrier not found");
+                    ?? throw new NotFoundException("Carrier not found.");
             }
 
             var load = new Load
             {
                 LoadNumber = $"L-{DateTime.UtcNow:yyyyMMddHHmmss}",
+
                 CustomerId = customer.Id,
                 CarrierId = carrier?.Id,
 
@@ -82,11 +83,13 @@ namespace LogisticsPlatform.Application.Services
             return load.Id;
         }
 
-        //  UPDATE LOAD
+        // =============================
+        // UPDATE LOAD
+        // =============================
         public async Task UpdateAsync(Guid id, UpdateLoadDto dto, Guid userId)
         {
             var load = await _loads.GetByIdAsync(id)
-                ?? throw new Exception("Load not found");
+                ?? throw new NotFoundException("Load not found.");
 
             var user = await GetUserOrThrow(userId);
 
@@ -94,7 +97,7 @@ namespace LogisticsPlatform.Application.Services
                 throw new Common.Exceptions.ForbiddenException("You are not allowed to update this load.");
 
             load.Origin = dto.Origin ?? load.Origin;
-            load.Destination = dto.Destination ?? load.Destination;
+            load.Destination = dto.Destination ?? load.Origin;
 
             if (dto.ModeType.HasValue)
                 load.Mode = dto.ModeType.Value;
@@ -114,11 +117,13 @@ namespace LogisticsPlatform.Application.Services
             await _loads.SaveChangesAsync();
         }
 
-        //  CHANGE LOAD STATUS
+        // =============================
+        // CHANGE LOAD STATUS
+        // =============================
         public async Task ChangeStatusAsync(Guid id, LoadStatus newStatus, Guid userId)
         {
             var load = await _loads.GetByIdAsync(id)
-                ?? throw new Exception("Load not found");
+                ?? throw new NotFoundException("Load not found.");
 
             var user = await GetUserOrThrow(userId);
 
@@ -126,7 +131,7 @@ namespace LogisticsPlatform.Application.Services
                 throw new Common.Exceptions.ForbiddenException("You are not allowed to change load status.");
 
             if (load.Status == LoadStatus.Completed)
-                throw new Exception("Completed load cannot be changed.");
+                throw new BusinessRuleException("Completed load cannot be changed.");
 
             load.Status = newStatus;
 
@@ -134,20 +139,27 @@ namespace LogisticsPlatform.Application.Services
             await _loads.SaveChangesAsync();
         }
 
-        //loadorder
-
+        // =============================
+        // CREATE LOAD FROM ORDER (snapshot)
+        // =============================
         public async Task<Guid> CreateFromOrderAsync(
-        CreateLoadFromOrderDto dto,
-        Guid userId)
+            CreateLoadFromOrderDto dto,
+            Guid userId)
         {
-            // 1️⃣ Order + routes
-            var order = await _orders.GetByIdWithRoutesAsync(dto.OrderId)
-                ?? throw new NotFoundException("Order not found.");
-
+            // 1️⃣ Load user & permissions
             var user = await GetUserOrThrow(userId);
 
             if (!_auth.HasPermission(user, Permission.Load_CreateFromOrder))
                 throw new Common.Exceptions.ForbiddenException("Not allowed to create load from order.");
+
+            // 2️⃣ Load order with routes + items
+            var order = await _orders.GetByIdWithRoutesAsync(dto.OrderId)
+                ?? throw new NotFoundException("Order not found.");
+
+            // SHËNIM:
+            // GetByIdWithRoutesAsync duhet të përfshij:
+            //  .Include(o => o.OrderRoutes)
+            //  .Include(o => o.Items)
 
             var routes = order.OrderRoutes
                 .Where(r => r.CopyToLoad && r.IsActive)
@@ -157,21 +169,29 @@ namespace LogisticsPlatform.Application.Services
             if (!routes.Any())
                 throw new BusinessRuleException("No active routes to copy.");
 
-            // 2️⃣ Create Load (ONCE)
+            // (opsionale) nëse biznesi kërkon patjetër items:
+            // if (!order.Items.Any())
+            //     throw new BusinessRuleException("Order has no items.");
+
+            // 3️⃣ Create Load (in-memory, pa SaveChanges ende)
+            var firstRoute = routes.First();
+            var lastRoute = routes.Last();
+
             var load = new Load
             {
                 LoadNumber = $"L-{DateTime.UtcNow:yyyyMMddHHmmss}",
+
                 CustomerId = order.CustomerId,
                 CarrierId = dto.CarrierId ?? order.PreferredCarrierId,
 
                 Status = LoadStatus.Draft,
-                Mode = ModeType.TL,
+                Mode = ModeType.TL, // TODO: më vonë mund të vijë nga Order/DTO
 
                 CustomerRate = dto.CustomerRate ?? 0,
                 CarrierRate = dto.CarrierRate ?? 0,
 
-                Origin = $"{routes.First().City}, {routes.First().State}",
-                Destination = $"{routes.Last().City}, {routes.Last().State}",
+                Origin = $"{firstRoute.City}, {firstRoute.State}",
+                Destination = $"{lastRoute.City}, {lastRoute.State}",
 
                 IsArchived = false,
                 CreatedByUserId = userId,
@@ -179,14 +199,14 @@ namespace LogisticsPlatform.Application.Services
             };
 
             await _loads.AddAsync(load);
-            await _loads.SaveChangesAsync(); // ✅ LoadId exists now
 
-            // 3️⃣ Create LoadStops (snapshot)
+            //  Snapshot OrderRoutes - LoadStops
             foreach (var route in routes)
             {
-                await _loads.AddStopAsync(new LoadStop
+                var stop = new LoadStop
                 {
-                    LoadId = load.Id,
+                    // lidhje me Load si navigation – EF do mbush LoadId
+                    Load = load,
 
                     Sequence = route.Sequence,
                     StopType = route.StopType,
@@ -211,33 +231,54 @@ namespace LogisticsPlatform.Application.Services
 
                     Status = StopStatus.Pending,
                     Notes = route.Notes
-                });
+                };
+
+                await _loads.AddStopAsync(stop);
             }
 
-            await _loads.SaveChangesAsync();
-
-            // 4️⃣ Link Order ↔ Load
-            await _loads.AddLoadOrderAsync(new LoadOrder
+            //  Snapshot OrderItems - LoadItems
+            foreach (var orderItem in order.Items)
             {
-                LoadId = load.Id,
+                var loadItem = new LoadItem
+                {
+                    Load = load,                   // navigation
+                    SourceOrderItemId = orderItem.Id,
+
+                    Name = orderItem.Name,
+                    Quantity = orderItem.Quantity,
+                    QuantityUnit = orderItem.QuantityUnit,
+
+                    IsHazmat = orderItem.IsHazmat,
+                    FreightClass = orderItem.FreightClass,
+                    Notes = orderItem.Notes
+                };
+
+                load.Items.Add(loadItem);
+            }
+
+            // Link Order ↔ Load (LoadOrder)
+            var loadOrder = new LoadOrder
+            {
+                Load = load,
                 OrderId = order.Id,
                 PONumber = order.OrderNumber
-            });
+            };
 
+            await _loads.AddLoadOrderAsync(loadOrder);
+
+            // one SaveChanges for all
             await _loads.SaveChangesAsync();
 
             return load.Id;
         }
 
-
-
-
-
-        //  ARCHIVE LOAD (Admin only)
+        // =============================
+        // ARCHIVE LOAD (Admin only)
+        // =============================
         public async Task ArchiveAsync(Guid id, Guid userId)
         {
             var load = await _loads.GetByIdAsync(id)
-                ?? throw new Exception("Load not found");
+                ?? throw new NotFoundException("Load not found.");
 
             var user = await GetUserOrThrow(userId);
 
@@ -250,7 +291,9 @@ namespace LogisticsPlatform.Application.Services
             await _loads.SaveChangesAsync();
         }
 
-        // 🔒 PRIVATE HELPER
+        // =============================
+        // PRIVATE HELPERS
+        // =============================
         private async Task<User> GetUserOrThrow(Guid userId)
         {
             return await _users.GetByIdAsync(userId)

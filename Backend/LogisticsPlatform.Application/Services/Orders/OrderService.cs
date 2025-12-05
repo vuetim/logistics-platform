@@ -64,10 +64,7 @@ namespace LogisticsPlatform.Application.Services
                 CreatedByUserId = user.Id
             };
 
-            // Child aggregates
-            //if (dto.Items != null)
-            //    foreach (var item in dto.Items)
-            //        order.Items.Add(item.ToEntity());
+          
 
             //if (dto.EquipmentRequirements != null)
             //    foreach (var eq in dto.EquipmentRequirements)

@@ -40,6 +40,7 @@ namespace LogisticsPlatform.Infrastructure.Repositories
         {
             return await _context.Orders
                 .Include(o => o.OrderRoutes)
+                 .Include(o => o.Items)
                 .FirstOrDefaultAsync(o => o.Id == id);
         }
 

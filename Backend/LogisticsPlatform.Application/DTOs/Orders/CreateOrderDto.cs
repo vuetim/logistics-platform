@@ -17,7 +17,6 @@ namespace LogisticsPlatform.Application.DTOs.Orders
         public DateTime? PlannedPickupDate { get; set; }
         public DateTime? PlannedDeliveryDate { get; set; }
 
-        public List<CreateOrderItemDto> Items { get; set; } = new();
         //public CreateOrderCostDto? Cost { get; set; }
         //public List<CreateOrderExternalIdDto> ExternalIds { get; set; } = new();
     }

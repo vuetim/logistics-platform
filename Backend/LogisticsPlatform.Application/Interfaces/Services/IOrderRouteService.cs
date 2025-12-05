@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace LogisticsPlatform.Application.Interfaces.Services
+﻿
+public interface IOrderRouteService
 {
-    public class IOrderRouteService
-    {
-    }
+    Task<Guid> CreateAsync(Guid orderId, CreateOrderRouteDto dto);
+    Task<List<OrderRouteDto>> GetByOrderIdAsync(Guid orderId);
+    Task UpdateAsync(Guid routeId, UpdateOrderRouteDto dto);
+    Task DeleteAsync(Guid routeId);
 }

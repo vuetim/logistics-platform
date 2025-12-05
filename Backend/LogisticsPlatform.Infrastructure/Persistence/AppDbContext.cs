@@ -40,6 +40,8 @@ public class AppDbContext : DbContext
     public DbSet<OrderEquipmentRequirement> OrderEquipmentRequirements => Set<OrderEquipmentRequirement>();
     public DbSet<OrderRoute> OrderRoutes => Set<OrderRoute>();
 
+    public DbSet<ActivityLog> ActivityLogs { get; set; } = null!;
+    public DbSet<LoadItem> LoadItems => Set<LoadItem>();
 
 
 
@@ -183,7 +185,52 @@ public class AppDbContext : DbContext
                 .HasPrecision(9, 6);
         });
 
+        modelBuilder.Entity<LoadItem>(entity =>
+        {
+            // Quantities
+            entity.Property(x => x.Quantity)
+                .HasPrecision(18, 4);
 
+            entity.Property(x => x.HandlingQuantity)
+                .HasPrecision(18, 4);
+
+            // Weights
+            entity.Property(x => x.UnitNetWeight)
+                .HasPrecision(18, 4);
+
+            entity.Property(x => x.UnitGrossWeight)
+                .HasPrecision(18, 4);
+
+            // Dimensions
+            entity.Property(x => x.Length)
+                .HasPrecision(18, 4);
+
+            entity.Property(x => x.Width)
+                .HasPrecision(18, 4);
+
+            entity.Property(x => x.Height)
+                .HasPrecision(18, 4);
+
+            
+
+            // Temperature
+            entity.Property(x => x.MinTemperature)
+                .HasPrecision(5, 2);
+
+            entity.Property(x => x.MaxTemperature)
+                .HasPrecision(5, 2);
+
+            // Money
+            entity.Property(x => x.DeclaredValue)
+                .HasPrecision(18, 2);
+        });
+
+
+        modelBuilder.Entity<OrderItem>(entity =>
+        {
+            entity.Property(x => x.Quantity)
+                  .HasPrecision(18, 4);
+        });
         modelBuilder.Entity<LoadNote>(b =>
         {
             b.HasOne(n => n.Load)

@@ -150,6 +150,7 @@ namespace LogisticsPlatform.Infrastructure.Repositories
                 .Include(l => l.Customer)
                 .Include(l => l.Carrier)
                 .Include(l => l.Stops)
+                .Include(l => l.Items)
                 .Include(l => l.Equipment)
                 .Include(l => l.Notes)
                 .Include(l => l.Documents)

@@ -51,7 +51,7 @@ namespace LogisticsPlatform.Application.Services
                     CustomerRate = load.CustomerRate,
                     CarrierRate = load.CarrierRate,
 
-                    // ✅ STOPS = EXECUTION ONLY
+                    //  STOPS = EXECUTION ONLY
                     Stops = load.Stops
                         .OrderBy(s => s.Sequence)
                         .Select(s => new LoadStopDetailsDto
@@ -82,8 +82,21 @@ namespace LogisticsPlatform.Application.Services
 
                             Notes = s.Notes
                         })
-                        .ToList()
+
+                        .ToList(),
+                    Items = load.Items.Select(i => new LoadItemDto
+                    {
+                        Id = i.Id,
+                        Name = i.Name,
+                        Quantity = i.Quantity,
+                        QuantityUnit = i.QuantityUnit,
+                        IsHazmat = i.IsHazmat,
+                        FreightClass = i.FreightClass,
+                        Notes = i.Notes
+                    }).ToList()
+
                 },
+
 
                 OrderSnapshot = orderLink?.Order == null
     ? null

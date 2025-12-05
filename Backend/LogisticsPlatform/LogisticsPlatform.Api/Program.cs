@@ -50,6 +50,10 @@ builder.Services.AddScoped<ILoadNoteRepository, LoadNoteRepository>();
 builder.Services.AddScoped<IOrderQueryRepository, OrderQueryRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IOrderRouteRepository, OrderRouteRepository>();
+builder.Services.AddScoped<IActivityLogRepository, ActivityLogRepository>();
+builder.Services.AddScoped<IActivityLogQueryRepository, ActivityLogQueryRepository>();
+builder.Services.AddScoped<IOrderItemRepository, OrderItemRepository>();
+builder.Services.AddScoped<ILoadItemRepository, LoadItemRepository>();
 
 
 
@@ -85,6 +89,9 @@ builder.Services.AddScoped<IOrderQueryService, OrderQueryService>();
 builder.Services.AddScoped<IOrderRouteService, OrderRouteService>();
 builder.Services.AddScoped<ILoadStatusCalculatorService, LoadStatusCalculatorService>();
 builder.Services.AddScoped<ILoadStopExecutionService, LoadStopExecutionService>();
+builder.Services.AddScoped<IActivityLogService, ActivityLogService>();
+builder.Services.AddScoped<IOrderItemService, OrderItemService>();
+builder.Services.AddScoped<ILoadItemService, LoadItemService>();
 
 
 

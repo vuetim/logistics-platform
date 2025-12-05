@@ -37,6 +37,8 @@ namespace LogisticsPlatform.Domain.Entities
         public ICollection<LoadOrder> Orders { get; set; } = new List<LoadOrder>();
         public ICollection<LoadNote> Notes { get; set; } = new List<LoadNote>();
         public ICollection<LoadDocument> Documents { get; set; } = new List<LoadDocument>();
+        public ICollection<LoadItem> Items { get; set; } = new List<LoadItem>();
+
 
         // Audit
         public Guid CreatedByUserId { get; set; }

@@ -1,4 +1,6 @@
-﻿using LogisticsPlatform.Application.DTOs.Loads.LoadStop;
+﻿using LogisticsPlatform.Application.DTOs.Loads;
+using LogisticsPlatform.Application.DTOs.Loads.LoadStop;
+using LogisticsPlatform.Domain.Entities;
 using LogisticsPlatform.Domain.Enums;
 
 public class LoadExecutionDetailsDto
@@ -31,4 +33,6 @@ public class LoadExecutionDetailsDto
 
     //  Execution stops
     public IReadOnlyList<LoadStopDetailsDto> Stops { get; set; } = new List<LoadStopDetailsDto>();
+    public List<LoadItemDto> Items { get; set; } = new();
+
 }
