@@ -47,6 +47,7 @@ namespace LogisticsPlatform.Application.Services
 
                     Origin = load.Origin,
                     Destination = load.Destination,
+                    CustomerName = load.Customer.Name,
 
                     CarrierName = load.Carrier?.Name,
                     CustomerRate = load.CustomerRate,
@@ -105,6 +106,8 @@ namespace LogisticsPlatform.Application.Services
                             .OrderBy(r => r.Sequence)
                             .Select(r => new OrderRouteDto
                             {
+                                Id = r.Id,
+
                                 Sequence = r.Sequence,
                                 StopType = r.StopType,
                                 LocationName = r.LocationName,
@@ -124,7 +127,6 @@ namespace LogisticsPlatform.Application.Services
                     },
 
                 //Equipmnt snapshot
-                // EQUIPMENT snapshot
                 Equipment = load.Equipment.Select(e => new LoadEquipmentDto
                 {
                     Id = e.Id,

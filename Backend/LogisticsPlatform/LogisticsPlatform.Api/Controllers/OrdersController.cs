@@ -70,28 +70,28 @@ namespace LogisticsPlatform.Api.Controllers
         }
 
 
-        [HttpPost("{orderId}/loads")]
-        public async Task<IActionResult> CreateLoadFromOrder(
-           Guid orderId,
-           [FromBody] CreateLoadFromOrderDto dto)
-        {
-            // 🔐 Auth
-            var userId = Guid.Parse(
-                User.FindFirstValue(ClaimTypes.NameIdentifier)!
-            );
+        //[HttpPost("{orderId}/loads")]
+        //public async Task<IActionResult> CreateLoadFromOrder(
+        //   Guid orderId,
+        //   [FromBody] CreateLoadFromOrderDto dto)
+        //{
+        //    // 🔐 Auth
+        //    var userId = Guid.Parse(
+        //        User.FindFirstValue(ClaimTypes.NameIdentifier)!
+        //    );
 
-            // ✅ Enforce path → body consistency
-            dto.OrderId = orderId;
+        //    // ✅ Enforce path → body consistency
+        //    dto.OrderId = orderId;
 
-            // ⚙️ Delegate to LoadService
-            var loadId = await _loadService.CreateFromOrderAsync(dto, userId);
+        //    // ⚙️ Delegate to LoadService
+        //    var loadId = await _loadService.CreateFromOrderAsync(dto, userId);
 
-            // 📍 REST response
-            return CreatedAtRoute(
-                routeName: "GetLoadDetails",
-                routeValues: new { id = loadId },
-                value: null
-            );
-        }
+        //    // 📍 REST response
+        //    return CreatedAtRoute(
+        //        routeName: "GetLoadDetails",
+        //        routeValues: new { id = loadId },
+        //        value: null
+        //    );
+        //}
     }
 }

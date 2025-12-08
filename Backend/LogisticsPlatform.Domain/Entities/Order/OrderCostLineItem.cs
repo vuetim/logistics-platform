@@ -8,8 +8,7 @@ public class OrderCostLineItem : BaseEntity
     public Guid OrderCostId { get; set; }
     public OrderCost OrderCost { get; set; } = null!;
 
-    public string TypeCode { get; set; } = null!;   //  "FREIGHT_FLAT"
-    public string TypeLabel { get; set; } = null!;  //  "Freight - flat"
+  
 
     public decimal Qty { get; set; }
     public decimal Price { get; set; }

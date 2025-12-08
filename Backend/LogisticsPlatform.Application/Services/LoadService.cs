@@ -187,7 +187,7 @@ namespace LogisticsPlatform.Application.Services
                 Status = LoadStatus.Draft,
                 Mode = ModeType.TL, // TODO: më vonë mund të vijë nga Order/DTO
 
-                CustomerRate = dto.CustomerRate ?? 0,
+                CustomerRate = order.CustomerRate,
                 CarrierRate = dto.CarrierRate ?? 0,
 
                 Origin = $"{firstRoute.City}, {firstRoute.State}",
@@ -274,7 +274,7 @@ namespace LogisticsPlatform.Application.Services
 
                     // Snapshot weight requirement
                     Weight = req.MaxWeight,
-                    WeightUnit = WeightUnit.Lb, // ose WeightUnit.Kg nëse req.WeightUnit = "kg"
+                    WeightUnit = WeightUnit.Lb, //  WeightUnit.Kg or req.WeightUnit = "kg"
 
                     // Temperature snapshot only if Reefer
                     MinTemp = req.RequiredTemperature,
@@ -284,7 +284,10 @@ namespace LogisticsPlatform.Application.Services
 
                 load.Equipment.Add(loadEq);
             }
-
+            if (load.Equipment.Any())
+            {
+                load.HasEquipment = true;
+            }
 
             // Link Order ↔ Load (LoadOrder)
             var loadOrder = new LoadOrder

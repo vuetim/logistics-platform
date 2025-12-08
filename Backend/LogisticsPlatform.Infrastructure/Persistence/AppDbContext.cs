@@ -124,11 +124,7 @@ public class AppDbContext : DbContext
 
         modelBuilder.Entity<OrderCostLineItem>(entity =>
         {
-            entity.Property(x => x.TypeCode)
-                  .HasMaxLength(100);
-
-            entity.Property(x => x.TypeLabel)
-                  .HasMaxLength(200);
+          
 
             entity.Property(x => x.Qty)
                   .HasPrecision(18, 4);
