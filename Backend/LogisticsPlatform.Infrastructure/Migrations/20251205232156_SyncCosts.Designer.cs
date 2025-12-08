@@ -4,6 +4,7 @@ using LogisticsPlatform.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LogisticsPlatform.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251205232156_SyncCosts")]
+    partial class SyncCosts
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -686,12 +689,6 @@ namespace LogisticsPlatform.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<bool>("IsCarrier")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsCustomer")
-                        .HasColumnType("bit");
-
                     b.Property<Guid>("LoadCostId")
                         .HasColumnType("uniqueidentifier");
 
@@ -708,9 +705,6 @@ namespace LogisticsPlatform.Infrastructure.Migrations
                     b.Property<decimal>("Qty")
                         .HasPrecision(18, 4)
                         .HasColumnType("decimal(18,4)");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
 
                     b.Property<string>("TypeCode")
                         .IsRequired()
@@ -1024,12 +1018,6 @@ namespace LogisticsPlatform.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<bool>("IsCarrier")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsCustomer")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Notes")
                         .HasColumnType("nvarchar(max)");
 
@@ -1043,9 +1031,6 @@ namespace LogisticsPlatform.Infrastructure.Migrations
                     b.Property<decimal>("Qty")
                         .HasPrecision(18, 4)
                         .HasColumnType("decimal(18,4)");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
 
                     b.Property<string>("TypeCode")
                         .IsRequired()
@@ -1478,31 +1463,31 @@ namespace LogisticsPlatform.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa1"),
-                            CreatedAt = new DateTime(2025, 12, 8, 8, 9, 29, 740, DateTimeKind.Utc).AddTicks(8772),
+                            CreatedAt = new DateTime(2025, 12, 5, 23, 21, 55, 660, DateTimeKind.Utc).AddTicks(2635),
                             Name = "Admin"
                         },
                         new
                         {
                             Id = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa2"),
-                            CreatedAt = new DateTime(2025, 12, 8, 8, 9, 29, 740, DateTimeKind.Utc).AddTicks(8788),
+                            CreatedAt = new DateTime(2025, 12, 5, 23, 21, 55, 660, DateTimeKind.Utc).AddTicks(2647),
                             Name = "Broker"
                         },
                         new
                         {
                             Id = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa3"),
-                            CreatedAt = new DateTime(2025, 12, 8, 8, 9, 29, 740, DateTimeKind.Utc).AddTicks(8791),
+                            CreatedAt = new DateTime(2025, 12, 5, 23, 21, 55, 660, DateTimeKind.Utc).AddTicks(2649),
                             Name = "Operator"
                         },
                         new
                         {
                             Id = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa4"),
-                            CreatedAt = new DateTime(2025, 12, 8, 8, 9, 29, 740, DateTimeKind.Utc).AddTicks(8793),
+                            CreatedAt = new DateTime(2025, 12, 5, 23, 21, 55, 660, DateTimeKind.Utc).AddTicks(2651),
                             Name = "Dispatcher"
                         },
                         new
                         {
                             Id = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa5"),
-                            CreatedAt = new DateTime(2025, 12, 8, 8, 9, 29, 740, DateTimeKind.Utc).AddTicks(8805),
+                            CreatedAt = new DateTime(2025, 12, 5, 23, 21, 55, 660, DateTimeKind.Utc).AddTicks(2654),
                             Name = "Accounting"
                         });
                 });

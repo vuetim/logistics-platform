@@ -62,6 +62,7 @@ namespace LogisticsPlatform.Domain.Entities
 
         // Customer charges
         public OrderCost? Cost { get; set; }
+        public decimal? CustomerRate { get; set; }
 
         // External customer references (PO, Ref #)
         public ICollection<OrderExternalId> ExternalIds { get; set; }

@@ -43,7 +43,10 @@ public class AppDbContext : DbContext
     public DbSet<ActivityLog> ActivityLogs { get; set; } = null!;
     public DbSet<LoadItem> LoadItems => Set<LoadItem>();
 
+    public DbSet<OrderCostLineItem> OrderCostLineItems { get; set; } = null!;
 
+    public DbSet<LoadCost> LoadCosts { get; set; } = null!;
+    public DbSet<LoadCostLineItem> LoadCostLineItems { get; set; } = null!;
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -97,16 +100,78 @@ public class AppDbContext : DbContext
             entity.Property(x => x.Accessorials)
                   .HasPrecision(18, 2);
         });
+        // ORDER COST
+        modelBuilder.Entity<Order>()
+            .HasOne(o => o.Cost)
+            .WithOne(c => c.Order)
+            .HasForeignKey<OrderCost>(c => c.OrderId);
+        modelBuilder.Entity<Order>(entity =>
+        {
+            entity.Property(x => x.CustomerRate)
+                   .HasPrecision(18, 2);
+
+        });
+
+
         modelBuilder.Entity<OrderCost>(entity =>
         {
-            entity.Property(x => x.Quantity)
-                .HasPrecision(18, 4);
-
-            entity.Property(x => x.UnitPrice)
-                .HasPrecision(18, 4);
+            entity.Property(x => x.Notes)
+                  .HasMaxLength(2000);
 
             entity.Property(x => x.TotalAmount)
-                .HasPrecision(18, 4);
+                  .HasPrecision(18, 4);
+        });
+
+        modelBuilder.Entity<OrderCostLineItem>(entity =>
+        {
+            entity.Property(x => x.TypeCode)
+                  .HasMaxLength(100);
+
+            entity.Property(x => x.TypeLabel)
+                  .HasMaxLength(200);
+
+            entity.Property(x => x.Qty)
+                  .HasPrecision(18, 4);
+
+            entity.Property(x => x.Price)
+                  .HasPrecision(18, 4);
+
+            entity.Property(x => x.Amount)
+                  .HasPrecision(18, 4);
+        });
+
+
+        // LOAD COST
+        modelBuilder.Entity<Load>()
+            .HasOne(l => l.Cost)
+            .WithOne(c => c.Load)
+            .HasForeignKey<LoadCost>(c => c.LoadId);
+
+        modelBuilder.Entity<LoadCost>(entity =>
+        {
+            entity.Property(x => x.Notes)
+                  .HasMaxLength(2000);
+
+            entity.Property(x => x.TotalAmount)
+                  .HasPrecision(18, 4);
+        });
+
+        modelBuilder.Entity<LoadCostLineItem>(entity =>
+        {
+            entity.Property(x => x.TypeCode)
+                  .HasMaxLength(100);
+
+            entity.Property(x => x.TypeLabel)
+                  .HasMaxLength(200);
+
+            entity.Property(x => x.Qty)
+                  .HasPrecision(18, 4);
+
+            entity.Property(x => x.Price)
+                  .HasPrecision(18, 4);
+
+            entity.Property(x => x.Amount)
+                  .HasPrecision(18, 4);
         });
         modelBuilder.Entity<LoadOrder>(entity =>
         {

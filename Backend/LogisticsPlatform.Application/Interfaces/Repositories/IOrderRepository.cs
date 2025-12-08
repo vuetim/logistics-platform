@@ -9,6 +9,8 @@ namespace LogisticsPlatform.Application.Interfaces.Repositories
         Task<Order?> GetByIdAsync(Guid id);
         Task<Order?> GetByIdWithRoutesAsync(Guid id);
         Task<Order?> GetByIdWithItemsAsync(Guid orderId);
+        Task<Order?> GetByIdWithLoadsAsync(Guid orderId);
+
 
 
         Task SaveChangesAsync();

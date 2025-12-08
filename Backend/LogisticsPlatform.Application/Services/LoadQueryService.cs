@@ -1,4 +1,5 @@
-﻿using LogisticsPlatform.Application.DTOs.Loads;
+﻿using LogisticsPlatform.Application.DTOs.Costs;
+using LogisticsPlatform.Application.DTOs.Loads;
 using LogisticsPlatform.Application.DTOs.Loads.LoadStop;
 using LogisticsPlatform.Application.DTOs.Pagination;
 using LogisticsPlatform.Application.Interfaces.Repositories;
@@ -79,8 +80,11 @@ namespace LogisticsPlatform.Application.Services
                             ActualDeparture = s.ActualDeparture,
 
                             Notes = s.Notes
+
                         }).ToList()
                 },
+             
+
 
                 //  ORDER SNAPSHOT
                 OrderSnapshot = orderLink?.Order == null
@@ -130,8 +134,23 @@ namespace LogisticsPlatform.Application.Services
                 }).ToList(),
 
                 //  SUMMARY 
-                Summary = CalculateSummary(load)
+                Summary = CalculateSummary(load),
+                 CostSummary = new LoadCostSummaryDto
+                 {
+                     CustomerRate = load.CustomerRate ?? 0,
+                     CarrierRate = load.CarrierRate ?? 0,
+
+                     TotalBillable = load.Orders
+            .FirstOrDefault()?.Order?.Cost?
+            .LineItems.Where(x => x.Billable)
+            .Sum(x => x.Amount) ?? 0,
+
+                     TotalPayable = load.Cost?
+            .LineItems.Where(x => x.Payable)
+            .Sum(x => x.Amount) ?? 0
+                 }
             };
+        
         }
 
        

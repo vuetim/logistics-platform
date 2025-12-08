@@ -27,9 +27,9 @@ public class LoadExecutionDetailsDto
     public DateTime? ActualDeliveryDate { get; set; }
 
     //  Finance
-    public decimal CustomerRate { get; set; }
-    public decimal CarrierRate { get; set; }
-    public decimal Margin => CustomerRate - CarrierRate;
+    public decimal? CustomerRate { get; set; }
+    public decimal? CarrierRate { get; set; }
+    public decimal? Margin => CustomerRate - CarrierRate;
 
     //  Execution stops
     public IReadOnlyList<LoadStopDetailsDto> Stops { get; set; } = new List<LoadStopDetailsDto>();

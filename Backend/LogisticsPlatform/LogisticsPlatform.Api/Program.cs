@@ -3,6 +3,7 @@ using LogisticsPlatform.Application.Interfaces.Repositories;
 using LogisticsPlatform.Application.Interfaces.Repositories.Queries;
 using LogisticsPlatform.Application.Interfaces.Services;
 using LogisticsPlatform.Application.Services;
+using LogisticsPlatform.Application.Services.Orders;
 using LogisticsPlatform.Infrastructure.Persistence;
 using LogisticsPlatform.Infrastructure.Persistence.Repositories.Queries;
 using LogisticsPlatform.Infrastructure.Repositories;
@@ -54,6 +55,8 @@ builder.Services.AddScoped<IActivityLogRepository, ActivityLogRepository>();
 builder.Services.AddScoped<IActivityLogQueryRepository, ActivityLogQueryRepository>();
 builder.Services.AddScoped<IOrderItemRepository, OrderItemRepository>();
 builder.Services.AddScoped<ILoadItemRepository, LoadItemRepository>();
+builder.Services.AddScoped<IOrderCostRepository, OrderCostRepository>();
+builder.Services.AddScoped<ILoadCostRepository, LoadCostRepository>();
 
 
 
@@ -92,6 +95,9 @@ builder.Services.AddScoped<ILoadStopExecutionService, LoadStopExecutionService>(
 builder.Services.AddScoped<IActivityLogService, ActivityLogService>();
 builder.Services.AddScoped<IOrderItemService, OrderItemService>();
 builder.Services.AddScoped<ILoadItemService, LoadItemService>();
+builder.Services.AddScoped<IOrderCostService, OrderCostService>();
+builder.Services.AddScoped<ILoadCostService, LoadCostService>();
+
 
 
 
