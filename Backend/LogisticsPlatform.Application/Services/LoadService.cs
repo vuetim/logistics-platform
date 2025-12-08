@@ -255,6 +255,36 @@ namespace LogisticsPlatform.Application.Services
 
                 load.Items.Add(loadItem);
             }
+            // 4️⃣ Snapshot OrderEquipmentRequirement → LoadEquipment
+            var equipmentReqs = order.EquipmentRequirements
+                .Where(e => e.CopyToLoad)
+                .ToList();
+
+            foreach (var req in equipmentReqs)
+            {
+                var loadEq = new LoadEquipment
+                {
+                    Load = load,
+
+                    // Convert string → EquipmentType enum
+                    EquipmentType = ParseEquipmentType(req.EquipmentType),
+
+                    // Convert "53 ft" → 53
+                    Length = ParseLength(req.EquipmentSize),
+
+                    // Snapshot weight requirement
+                    Weight = req.MaxWeight,
+                    WeightUnit = WeightUnit.Lb, // ose WeightUnit.Kg nëse req.WeightUnit = "kg"
+
+                    // Temperature snapshot only if Reefer
+                    MinTemp = req.RequiredTemperature,
+                    MaxTemp = req.RequiredTemperature,
+                    TempUnit = ParseTemperatureUnit(req.TemperatureUnit)
+                };
+
+                load.Equipment.Add(loadEq);
+            }
+
 
             // Link Order ↔ Load (LoadOrder)
             var loadOrder = new LoadOrder
@@ -299,5 +329,54 @@ namespace LogisticsPlatform.Application.Services
             return await _users.GetByIdAsync(userId)
                 ?? throw new Common.Exceptions.ForbiddenException("User not found.");
         }
+
+        private EquipmentType ParseEquipmentType(string type)
+        {
+            if (string.IsNullOrWhiteSpace(type))
+                return EquipmentType.DryVan;
+
+            return type.ToLower() switch
+            {
+                "dry van" => EquipmentType.DryVan,
+                "van" => EquipmentType.DryVan,
+                "reefer" => EquipmentType.Reefer,
+                "refrigerated" => EquipmentType.Reefer,
+                "flatbed" => EquipmentType.Flatbed,
+                "stepdeck" => EquipmentType.StepDeck,
+                "step deck" => EquipmentType.StepDeck,
+                "power only" => EquipmentType.PowerOnly,
+                _ => EquipmentType.DryVan
+            };
+        }
+
+        private decimal? ParseLength(string? size)
+        {
+            if (string.IsNullOrWhiteSpace(size))
+                return null;
+
+            // Examples: "53 ft", "48ft", "53"
+            var clean = new string(size.Where(char.IsDigit).ToArray());
+
+            if (decimal.TryParse(clean, out var length))
+                return length;
+
+            return null;
+        }
+
+        private TemperatureUnit ParseTemperatureUnit(string? unit)
+        {
+            if (string.IsNullOrWhiteSpace(unit))
+                return TemperatureUnit.F;
+
+            return unit.ToLower() switch
+            {
+                "f" => TemperatureUnit.F,
+                "fahrenheit" => TemperatureUnit.F,
+                "c" => TemperatureUnit.C,
+                "celsius" => TemperatureUnit.C,
+                _ => TemperatureUnit.F
+            };
+        }
+
     }
 }

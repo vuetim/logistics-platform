@@ -57,6 +57,7 @@ builder.Services.AddScoped<IOrderItemRepository, OrderItemRepository>();
 builder.Services.AddScoped<ILoadItemRepository, LoadItemRepository>();
 builder.Services.AddScoped<IOrderCostRepository, OrderCostRepository>();
 builder.Services.AddScoped<ILoadCostRepository, LoadCostRepository>();
+builder.Services.AddScoped<IOrderEquipmentRequirementRepository, OrderEquipmentRequirementRepository>();
 
 
 
@@ -97,6 +98,7 @@ builder.Services.AddScoped<IOrderItemService, OrderItemService>();
 builder.Services.AddScoped<ILoadItemService, LoadItemService>();
 builder.Services.AddScoped<IOrderCostService, OrderCostService>();
 builder.Services.AddScoped<ILoadCostService, LoadCostService>();
+builder.Services.AddScoped<IOrderEquipmentRequirementService, OrderEquipmentRequirementService>();
 
 
 

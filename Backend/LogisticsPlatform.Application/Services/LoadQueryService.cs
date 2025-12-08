@@ -1,5 +1,6 @@
 ﻿using LogisticsPlatform.Application.DTOs.Costs;
 using LogisticsPlatform.Application.DTOs.Loads;
+using LogisticsPlatform.Application.DTOs.Loads.LoadEquipment;
 using LogisticsPlatform.Application.DTOs.Loads.LoadStop;
 using LogisticsPlatform.Application.DTOs.Pagination;
 using LogisticsPlatform.Application.Interfaces.Repositories;
@@ -50,6 +51,7 @@ namespace LogisticsPlatform.Application.Services
                     CarrierName = load.Carrier?.Name,
                     CustomerRate = load.CustomerRate,
                     CarrierRate = load.CarrierRate,
+
 
                     Stops = load.Stops
                         .OrderBy(s => s.Sequence)
@@ -120,6 +122,22 @@ namespace LogisticsPlatform.Application.Services
                             })
                             .ToList()
                     },
+
+                //Equipmnt snapshot
+                // EQUIPMENT snapshot
+                Equipment = load.Equipment.Select(e => new LoadEquipmentDto
+                {
+                    Id = e.Id,
+                    EquipmentType = e.EquipmentType,
+                    Length = e.Length,
+                    Weight = e.Weight,
+                    WeightUnit = e.WeightUnit,
+                    MinTemp = e.MinTemp,
+                    MaxTemp = e.MaxTemp,
+                    TempUnit = e.TempUnit
+                }).ToList(),
+                HasEquipment = load.HasEquipment,
+
 
                 // ITEMS
                 Items = load.Items.Select(i => new LoadItemDto
@@ -212,5 +230,7 @@ namespace LogisticsPlatform.Application.Services
             .ToList()
             };
         }
+
+
     }
 }

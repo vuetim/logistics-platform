@@ -30,6 +30,7 @@ namespace LogisticsPlatform.Domain.Entities
         // Flags
         public bool IsTemperatureControlled { get; set; }
         public bool IsArchived { get; set; }
+        public bool HasEquipment { get; set; }
 
         // Navigation
         public ICollection<LoadStop> Stops { get; set; } = new List<LoadStop>();

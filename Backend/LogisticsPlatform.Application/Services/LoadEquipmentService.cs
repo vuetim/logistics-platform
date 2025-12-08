@@ -42,7 +42,7 @@ public class LoadEquipmentService : ILoadEquipmentService
         if (load == null)
             throw new Exception("Load not found");
 
-        // ✅ Reefer validation
+        // Reefer validation
         if (dto.EquipmentType == EquipmentType.Reefer &&
             (!dto.MinTemp.HasValue || !dto.MaxTemp.HasValue))
         {
@@ -62,6 +62,11 @@ public class LoadEquipmentService : ILoadEquipmentService
         };
 
         await _equipmentRepo.AddAsync(equipment);
+
+        // 🔥 KËTU — vendosim flag-un në Load
+        load.HasEquipment = true;
+        await _loadRepo.UpdateAsync(load);
+
         await _equipmentRepo.SaveChangesAsync();
 
         return new LoadEquipmentDto

@@ -53,6 +53,8 @@ namespace LogisticsPlatform.Infrastructure.Repositories
 
             if (parameters.Mode.HasValue)
                 query = query.Where(l => l.Mode == parameters.Mode);
+            if (parameters.Mode.HasValue)
+                query = query.Where(l => l.Mode == parameters.Mode);
 
             if (parameters.PickupFrom.HasValue)
             {
@@ -114,6 +116,7 @@ namespace LogisticsPlatform.Infrastructure.Repositories
                     CarrierName = l.Carrier != null ? l.Carrier.Name : null,
                     Status = l.Status,
                     ModeType = l.Mode,
+                    HasEquipment = l.HasEquipment,
 
                     PickupDate = l.Stops
                         .Where(s => s.StopType == StopType.Pickup)

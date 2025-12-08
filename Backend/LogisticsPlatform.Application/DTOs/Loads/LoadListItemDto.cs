@@ -19,4 +19,6 @@ public class LoadListItemDto
     public decimal? CustomerRate { get; set; }
     public decimal? CarrierRate { get; set; }
     public decimal? Margin { get; set; }
+    public bool HasEquipment { get; set; }
+
 }
