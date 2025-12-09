@@ -22,14 +22,15 @@ namespace LogisticsPlatform.Domain.Entities
         public string Destination { get; set; } = string.Empty;
 
         // Finance (summary)
-        public decimal CustomerRate { get; set; }
-        public decimal CarrierRate { get; set; }
+        public decimal? CustomerRate { get; set; }
+        public decimal? CarrierRate { get; set; }
         public decimal? Accessorials { get; set; }
         public ModeType Mode { get; set; } = ModeType.TL;
 
         // Flags
         public bool IsTemperatureControlled { get; set; }
         public bool IsArchived { get; set; }
+        public bool HasEquipment { get; set; }
 
         // Navigation
         public ICollection<LoadStop> Stops { get; set; } = new List<LoadStop>();
@@ -37,6 +38,10 @@ namespace LogisticsPlatform.Domain.Entities
         public ICollection<LoadOrder> Orders { get; set; } = new List<LoadOrder>();
         public ICollection<LoadNote> Notes { get; set; } = new List<LoadNote>();
         public ICollection<LoadDocument> Documents { get; set; } = new List<LoadDocument>();
+        public ICollection<LoadItem> Items { get; set; } = new List<LoadItem>();
+
+        //financials 
+        public LoadCost? Cost { get; set; }
 
         // Audit
         public Guid CreatedByUserId { get; set; }

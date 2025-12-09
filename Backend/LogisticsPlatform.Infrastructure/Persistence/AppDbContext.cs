@@ -31,9 +31,22 @@ public class AppDbContext : DbContext
 
 
     public DbSet<Carrier> Carriers => Set<Carrier>();
+    public DbSet<Order> Orders => Set<Order>();
+    public DbSet<OrderItem> OrderItems => Set<OrderItem>();
+    public DbSet<OrderCost> OrderCosts => Set<OrderCost>();
+    public DbSet<OrderExternalId> OrderExternalIds => Set<OrderExternalId>();
+    public DbSet<OrderNote> OrderNotes => Set<OrderNote>();
+    public DbSet<OrderDocument> OrderDocuments => Set<OrderDocument>();
+    public DbSet<OrderEquipmentRequirement> OrderEquipmentRequirements => Set<OrderEquipmentRequirement>();
+    public DbSet<OrderRoute> OrderRoutes => Set<OrderRoute>();
 
+    public DbSet<ActivityLog> ActivityLogs { get; set; } = null!;
+    public DbSet<LoadItem> LoadItems => Set<LoadItem>();
 
+    public DbSet<OrderCostLineItem> OrderCostLineItems { get; set; } = null!;
 
+    public DbSet<LoadCost> LoadCosts { get; set; } = null!;
+    public DbSet<LoadCostLineItem> LoadCostLineItems { get; set; } = null!;
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -87,6 +100,205 @@ public class AppDbContext : DbContext
             entity.Property(x => x.Accessorials)
                   .HasPrecision(18, 2);
         });
+        // ORDER COST
+        modelBuilder.Entity<Order>()
+            .HasOne(o => o.Cost)
+            .WithOne(c => c.Order)
+            .HasForeignKey<OrderCost>(c => c.OrderId);
+        modelBuilder.Entity<Order>(entity =>
+        {
+            entity.Property(x => x.CustomerRate)
+                   .HasPrecision(18, 2);
+
+        });
+
+
+        modelBuilder.Entity<OrderCost>(entity =>
+        {
+            entity.Property(x => x.Notes)
+                  .HasMaxLength(2000);
+
+            entity.Property(x => x.TotalAmount)
+                  .HasPrecision(18, 4);
+        });
+
+        modelBuilder.Entity<OrderCostLineItem>(entity =>
+        {
+          
+
+            entity.Property(x => x.Qty)
+                  .HasPrecision(18, 4);
+
+            entity.Property(x => x.Price)
+                  .HasPrecision(18, 4);
+
+            entity.Property(x => x.Amount)
+                  .HasPrecision(18, 4);
+        });
+
+
+        // LOAD COST
+        modelBuilder.Entity<Load>()
+            .HasOne(l => l.Cost)
+            .WithOne(c => c.Load)
+            .HasForeignKey<LoadCost>(c => c.LoadId);
+
+        modelBuilder.Entity<LoadCost>(entity =>
+        {
+            entity.Property(x => x.Notes)
+                  .HasMaxLength(2000);
+
+            entity.Property(x => x.TotalAmount)
+                  .HasPrecision(18, 4);
+        });
+
+        modelBuilder.Entity<LoadCostLineItem>(entity =>
+        {
+
+
+            entity.Property(x => x.Qty)
+                  .HasPrecision(18, 4);
+
+            entity.Property(x => x.Price)
+                  .HasPrecision(18, 4);
+
+            entity.Property(x => x.Amount)
+                  .HasPrecision(18, 4);
+        });
+        modelBuilder.Entity<OrderCost>()
+    .HasMany(c => c.LineItems)
+    .WithOne(li => li.OrderCost)
+    .HasForeignKey(li => li.OrderCostId)
+    .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<LoadCost>()
+    .HasMany(c => c.LineItems)
+    .WithOne(li => li.LoadCost)
+    .HasForeignKey(li => li.LoadCostId)
+    .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<LoadOrder>(entity =>
+        {
+            entity.HasKey(lo => lo.Id);
+
+            entity.HasOne(lo => lo.Order)
+                .WithMany(o => o.Loads)
+                .HasForeignKey(lo => lo.OrderId)
+                .OnDelete(DeleteBehavior.Restrict); 
+
+            entity.HasOne(lo => lo.Load)
+                .WithMany(l => l.Orders)
+                .HasForeignKey(lo => lo.LoadId)
+                .OnDelete(DeleteBehavior.Restrict); 
+        });
+
+        modelBuilder.Entity<OrderItem>(entity =>
+        {
+            entity.Property(x => x.Quantity)
+                .HasPrecision(18, 4);
+
+            entity.Property(x => x.HandlingQuantity)
+                .HasPrecision(18, 4);
+
+            entity.Property(x => x.UnitNetWeight)
+                .HasPrecision(18, 3);
+
+            entity.Property(x => x.UnitGrossWeight)
+                .HasPrecision(18, 3);
+
+            entity.Property(x => x.Volume)
+                .HasPrecision(18, 6);
+
+            entity.Property(x => x.Length)
+                .HasPrecision(18, 3);
+
+            entity.Property(x => x.Width)
+                .HasPrecision(18, 3);
+
+            entity.Property(x => x.Height)
+                .HasPrecision(18, 3);
+
+            entity.Property(x => x.MinTemperature)
+                .HasPrecision(5, 2);
+
+            entity.Property(x => x.MaxTemperature)
+                .HasPrecision(5, 2);
+
+            entity.Property(x => x.DeclaredValue)
+                .HasPrecision(18, 2);
+        });
+        modelBuilder.Entity<LoadStop>(entity =>
+        {
+            entity.Property(e => e.Latitude)
+                .HasPrecision(9, 6);
+
+            entity.Property(e => e.Longitude)
+                .HasPrecision(9, 6);
+        });
+
+
+        modelBuilder.Entity<OrderEquipmentRequirement>(entity =>
+        {
+            entity.Property(x => x.MaxWeight)
+                .HasPrecision(18, 3);
+
+            entity.Property(x => x.RequiredTemperature)
+                .HasPrecision(5, 2);
+        });
+        modelBuilder.Entity<OrderRoute>(entity =>
+        {
+            entity.Property(x => x.Latitude)
+                .HasPrecision(9, 6);
+
+            entity.Property(x => x.Longitude)
+                .HasPrecision(9, 6);
+        });
+
+        modelBuilder.Entity<LoadItem>(entity =>
+        {
+            // Quantities
+            entity.Property(x => x.Quantity)
+                .HasPrecision(18, 4);
+
+            entity.Property(x => x.HandlingQuantity)
+                .HasPrecision(18, 4);
+
+            // Weights
+            entity.Property(x => x.UnitNetWeight)
+                .HasPrecision(18, 4);
+
+            entity.Property(x => x.UnitGrossWeight)
+                .HasPrecision(18, 4);
+
+            // Dimensions
+            entity.Property(x => x.Length)
+                .HasPrecision(18, 4);
+
+            entity.Property(x => x.Width)
+                .HasPrecision(18, 4);
+
+            entity.Property(x => x.Height)
+                .HasPrecision(18, 4);
+
+            
+
+            // Temperature
+            entity.Property(x => x.MinTemperature)
+                .HasPrecision(5, 2);
+
+            entity.Property(x => x.MaxTemperature)
+                .HasPrecision(5, 2);
+
+            // Money
+            entity.Property(x => x.DeclaredValue)
+                .HasPrecision(18, 2);
+        });
+
+
+        modelBuilder.Entity<OrderItem>(entity =>
+        {
+            entity.Property(x => x.Quantity)
+                  .HasPrecision(18, 4);
+        });
         modelBuilder.Entity<LoadNote>(b =>
         {
             b.HasOne(n => n.Load)
@@ -99,6 +311,13 @@ public class AppDbContext : DbContext
                 .HasForeignKey(n => n.CreatedByUserId)
                 .OnDelete(DeleteBehavior.NoAction);
         });
+  
+        modelBuilder.Entity<OrderNote>()
+            .HasOne(n => n.CreatedByUser)
+            .WithMany()
+            .HasForeignKey(n => n.CreatedByUserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
         modelBuilder.Entity<Load>().HasIndex(x => x.Status);
         modelBuilder.Entity<Load>().HasIndex(x => x.IsArchived);
         modelBuilder.Entity<Load>().HasIndex(x => new { x.CustomerId, x.Status });

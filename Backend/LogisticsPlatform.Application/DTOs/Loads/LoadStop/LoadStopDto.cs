@@ -26,5 +26,20 @@ namespace LogisticsPlatform.Application.DTOs.Loads.LoadStop
         public bool HasTime { get; set; }
 
         public string? Notes { get; set; }
+        public static LoadStopDto FromEntity(LoadStopDto stop)
+        {
+            return new LoadStopDto
+            {
+                Sequence = stop.Sequence,
+                StopType = stop.StopType,
+                LocationName = stop.LocationName,
+                City = stop.City,
+                State = stop.State,
+                AppointmentFrom = stop.AppointmentFrom,
+                AppointmentTo = stop.AppointmentTo,
+                Notes = stop.Notes
+            };
+        }
     }
 }
+    

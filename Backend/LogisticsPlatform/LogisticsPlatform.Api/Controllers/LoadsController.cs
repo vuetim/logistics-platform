@@ -24,7 +24,7 @@ namespace LogisticsPlatform.Api.Controllers
             _queries = queries;
         }
 
-        //  GET LIST (permission check në QueryService nëse don)
+        //  GET LIST (permission check in QueryService)
         [HttpGet]
         public async Task<IActionResult> GetPaged([FromQuery] LoadQueryParameters parameters)
         {
@@ -33,7 +33,7 @@ namespace LogisticsPlatform.Api.Controllers
         }
 
         //  GET DETAILS
-        [HttpGet("{id}")]
+        [HttpGet("{id}", Name = "GetLoadDetails")]
         public async Task<IActionResult> GetDetails(Guid id)
         {
             var result = await _queries.GetDetailsAsync(id);
@@ -74,6 +74,8 @@ namespace LogisticsPlatform.Api.Controllers
             return Ok();
         }
 
+
+
         //  ARCHIVE LOAD
         [HttpPatch("{id}/archive")]
         public async Task<IActionResult> Archive(Guid id)
@@ -84,5 +86,6 @@ namespace LogisticsPlatform.Api.Controllers
 
             return Ok();
         }
+
     }
 }

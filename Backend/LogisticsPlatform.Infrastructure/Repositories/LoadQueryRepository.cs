@@ -1,6 +1,7 @@
 ﻿using LogisticsPlatform.Application.DTOs.Loads;
 using LogisticsPlatform.Application.DTOs.Pagination;
 using LogisticsPlatform.Application.Interfaces.Repositories;
+using LogisticsPlatform.Domain.Entities;
 using LogisticsPlatform.Domain.Enums;
 using LogisticsPlatform.Infrastructure.Extensions;
 using LogisticsPlatform.Infrastructure.Persistence;
@@ -17,15 +18,19 @@ namespace LogisticsPlatform.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<PagedResult<LoadListItemDto>> GetPagedAsync(LoadQueryParameters parameters)
+        // ====================================================
+        // LIST VIEW (TABLE / SEARCH / FILTERS)
+        // ====================================================
+        public async Task<PagedResult<LoadListItemDto>> GetPagedAsync(
+            LoadQueryParameters parameters)
         {
             var query = _context.Loads
-                .Include(x => x.Customer)
-                .Include(x => x.Carrier)
-                .Include(x => x.Stops)     
+                .Include(l => l.Customer)
+                .Include(l => l.Carrier)
+                .Include(l => l.Stops)
                 .AsQueryable();
 
-            // 🔎 Search
+            // 🔍 SEARCH
             if (!string.IsNullOrWhiteSpace(parameters.Search))
             {
                 var s = parameters.Search.ToLower();
@@ -36,7 +41,7 @@ namespace LogisticsPlatform.Infrastructure.Repositories
                 );
             }
 
-            //  FILTERS 
+            // 🎯 FILTERS
             if (parameters.Status.HasValue)
                 query = query.Where(l => l.Status == parameters.Status);
 
@@ -48,32 +53,49 @@ namespace LogisticsPlatform.Infrastructure.Repositories
 
             if (parameters.Mode.HasValue)
                 query = query.Where(l => l.Mode == parameters.Mode);
+            if (parameters.Mode.HasValue)
+                query = query.Where(l => l.Mode == parameters.Mode);
 
             if (parameters.PickupFrom.HasValue)
+            {
                 query = query.Where(l =>
                     l.Stops.Any(s =>
                         s.StopType == StopType.Pickup &&
-                        s.PlannedDate >= parameters.PickupFrom));
+                        (s.PlannedArrivalFrom >= parameters.PickupFrom ||
+ s.PlannedArrivalTo >= parameters.PickupFrom)));
+            }
 
             if (parameters.PickupTo.HasValue)
+            {
                 query = query.Where(l =>
                     l.Stops.Any(s =>
                         s.StopType == StopType.Pickup &&
-                        s.PlannedDate <= parameters.PickupTo));
+                        (s.PlannedArrivalFrom <= parameters.PickupTo ||
+                         s.PlannedArrivalTo <= parameters.PickupTo)));
+            }
+
 
             if (parameters.DeliveryFrom.HasValue)
+            {
                 query = query.Where(l =>
                     l.Stops.Any(s =>
                         s.StopType == StopType.Delivery &&
-                        s.PlannedDate >= parameters.DeliveryFrom));
+                        (s.PlannedArrivalFrom >= parameters.DeliveryFrom ||
+                         s.PlannedArrivalTo >= parameters.DeliveryFrom)));
+            }
+
 
             if (parameters.DeliveryTo.HasValue)
+            {
                 query = query.Where(l =>
                     l.Stops.Any(s =>
                         s.StopType == StopType.Delivery &&
-                        s.PlannedDate <= parameters.DeliveryTo));
+                        (s.PlannedArrivalFrom <= parameters.DeliveryTo ||
+                         s.PlannedArrivalTo <= parameters.DeliveryTo)));
+            }
 
-            // 🔽 Sorting
+
+            // 🔽 SORTING
             if (!string.IsNullOrWhiteSpace(parameters.SortBy))
             {
                 query = parameters.SortDir == "desc"
@@ -94,17 +116,18 @@ namespace LogisticsPlatform.Infrastructure.Repositories
                     CarrierName = l.Carrier != null ? l.Carrier.Name : null,
                     Status = l.Status,
                     ModeType = l.Mode,
+                    HasEquipment = l.HasEquipment,
 
                     PickupDate = l.Stops
                         .Where(s => s.StopType == StopType.Pickup)
                         .OrderBy(s => s.Sequence)
-                        .Select(s => s.PlannedDate)
+.Select(s => s.PlannedArrivalFrom ?? s.PlannedArrivalTo)
                         .FirstOrDefault(),
 
                     DeliveryDate = l.Stops
                         .Where(s => s.StopType == StopType.Delivery)
                         .OrderByDescending(s => s.Sequence)
-                        .Select(s => s.PlannedDate)
+.Select(s => s.PlannedArrivalFrom ?? s.PlannedArrivalTo)
                         .FirstOrDefault(),
 
                     CustomerRate = l.CustomerRate,
@@ -121,53 +144,31 @@ namespace LogisticsPlatform.Infrastructure.Repositories
             );
         }
 
-        public async Task<LoadDetailsDto?> GetDetailsAsync(Guid id)
+        // ====================================================
+        // DETAILS (ENTITY GRAPH – NO DTO PROJECTION)
+        // ====================================================
+        public async Task<Load?> GetByIdAsync(Guid id)
         {
             return await _context.Loads
                 .Include(l => l.Customer)
                 .Include(l => l.Carrier)
-                .Where(l => l.Id == id)
-                .Select(l => new LoadDetailsDto
-                {
-                    Id = l.Id,
-                    LoadNumber = l.LoadNumber,
-                    Status = l.Status,
+                .Include(l => l.Stops)
+                .Include(l => l.Items)
+                .Include(l => l.Equipment)
+                .Include(l => l.Notes)
+                .Include(l => l.Documents)
+                .Include(l => l.Orders)
+                    .ThenInclude(lo => lo.Order)
+                        .ThenInclude(o => o.OrderRoutes)
+                .FirstOrDefaultAsync(l => l.Id == id);
+        }
 
-                    ModeType = l.Mode,
-
-                    CustomerId = l.CustomerId,
-                    CustomerName = l.Customer.Name,
-
-                    CarrierId = l.CarrierId,
-                    CarrierName = l.Carrier != null ? l.Carrier.Name : null,
-
-                    Origin = l.Origin,
-                    Destination = l.Destination,
-
-                    PickupDate = l.Stops
-.Where(s => s.StopType == StopType.Pickup)
-.OrderBy(s => s.Sequence)
-.Select(s => s.PlannedDate)
-.FirstOrDefault(),
-
-                    DeliveryDate = l.Stops
-.Where(s => s.StopType == StopType.Delivery)
-.OrderByDescending(s => s.Sequence)
-.Select(s => s.PlannedDate)
-.FirstOrDefault(),
-
-
-                    CustomerRate = l.CustomerRate,
-                    CarrierRate = l.CarrierRate,
-                    Accessorials = l.Accessorials,
-
-                    EquipmentTypes = l.Equipment
-    .Select(e => e.EquipmentType)
-    .Distinct()
-    .ToList()
-                })
-
-                .FirstOrDefaultAsync();
+        // ====================================================
+        // WRITE HELPER (LINK ORDER ↔ LOAD)
+        // ====================================================
+        public async Task AddLoadOrderAsync(LoadOrder loadOrder)
+        {
+            await _context.LoadOrders.AddAsync(loadOrder);
         }
     }
 }

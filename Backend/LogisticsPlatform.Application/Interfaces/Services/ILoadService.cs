@@ -9,5 +9,8 @@ namespace LogisticsPlatform.Application.Interfaces.Services
         Task UpdateAsync(Guid id, UpdateLoadDto dto, Guid userId);
         Task ChangeStatusAsync(Guid id, LoadStatus newStatus, Guid userId);
         Task ArchiveAsync(Guid id, Guid userId);
+        Task<Guid> CreateFromOrderAsync(
+       CreateLoadFromOrderDto dto,
+       Guid userId);
     }
 }

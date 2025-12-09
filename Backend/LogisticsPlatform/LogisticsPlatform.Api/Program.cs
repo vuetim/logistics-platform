@@ -1,8 +1,11 @@
 using LogisticsPlatform.Application.Authorization;
 using LogisticsPlatform.Application.Interfaces.Repositories;
+using LogisticsPlatform.Application.Interfaces.Repositories.Queries;
 using LogisticsPlatform.Application.Interfaces.Services;
 using LogisticsPlatform.Application.Services;
+using LogisticsPlatform.Application.Services.Orders;
 using LogisticsPlatform.Infrastructure.Persistence;
+using LogisticsPlatform.Infrastructure.Persistence.Repositories.Queries;
 using LogisticsPlatform.Infrastructure.Repositories;
 using LogisticsPlatform.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -45,7 +48,16 @@ builder.Services.AddScoped<ILoadStopRepository, LoadStopRepository>();
 builder.Services.AddScoped<ILoadEquipmentRepository, LoadEquipmentRepository>();
 builder.Services.AddScoped<ILoadDocumentRepository, LoadDocumentRepository>();
 builder.Services.AddScoped<ILoadNoteRepository, LoadNoteRepository>();
-
+builder.Services.AddScoped<IOrderQueryRepository, OrderQueryRepository>();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IOrderRouteRepository, OrderRouteRepository>();
+builder.Services.AddScoped<IActivityLogRepository, ActivityLogRepository>();
+builder.Services.AddScoped<IActivityLogQueryRepository, ActivityLogQueryRepository>();
+builder.Services.AddScoped<IOrderItemRepository, OrderItemRepository>();
+builder.Services.AddScoped<ILoadItemRepository, LoadItemRepository>();
+builder.Services.AddScoped<IOrderCostRepository, OrderCostRepository>();
+builder.Services.AddScoped<ILoadCostRepository, LoadCostRepository>();
+builder.Services.AddScoped<IOrderEquipmentRequirementRepository, OrderEquipmentRequirementRepository>();
 
 
 
@@ -76,6 +88,18 @@ builder.Services.AddScoped<ILoadEquipmentService, LoadEquipmentService>();
 builder.Services.AddScoped<ILoadDocumentService, LoadDocumentService>();
 builder.Services.AddScoped<ILoadNoteService, LoadNoteService>();
 builder.Services.AddScoped<IAuthorizationService, AuthorizationService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IOrderQueryService, OrderQueryService>();
+builder.Services.AddScoped<IOrderRouteService, OrderRouteService>();
+builder.Services.AddScoped<ILoadStatusCalculatorService, LoadStatusCalculatorService>();
+builder.Services.AddScoped<ILoadStopExecutionService, LoadStopExecutionService>();
+builder.Services.AddScoped<IActivityLogService, ActivityLogService>();
+builder.Services.AddScoped<IOrderItemService, OrderItemService>();
+builder.Services.AddScoped<ILoadItemService, LoadItemService>();
+builder.Services.AddScoped<IOrderCostService, OrderCostService>();
+builder.Services.AddScoped<ILoadCostService, LoadCostService>();
+builder.Services.AddScoped<IOrderEquipmentRequirementService, OrderEquipmentRequirementService>();
+
 
 
 
