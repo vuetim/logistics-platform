@@ -255,7 +255,7 @@ namespace LogisticsPlatform.Application.Services
 
                 load.Items.Add(loadItem);
             }
-            // 4️⃣ Snapshot OrderEquipmentRequirement → LoadEquipment
+            // 4 Snapshot OrderEquipmentRequirement → LoadEquipment
             var equipmentReqs = order.EquipmentRequirements
                 .Where(e => e.CopyToLoad)
                 .ToList();
@@ -287,6 +287,11 @@ namespace LogisticsPlatform.Application.Services
             if (load.Equipment.Any())
             {
                 load.HasEquipment = true;
+            }
+
+            if (load.Equipment.Any(e => e.EquipmentType == EquipmentType.Reefer))
+            {
+                load.IsTemperatureControlled = true;
             }
 
             // Link Order ↔ Load (LoadOrder)

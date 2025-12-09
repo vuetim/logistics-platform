@@ -154,11 +154,7 @@ public class AppDbContext : DbContext
 
         modelBuilder.Entity<LoadCostLineItem>(entity =>
         {
-            entity.Property(x => x.TypeCode)
-                  .HasMaxLength(100);
 
-            entity.Property(x => x.TypeLabel)
-                  .HasMaxLength(200);
 
             entity.Property(x => x.Qty)
                   .HasPrecision(18, 4);
@@ -169,6 +165,17 @@ public class AppDbContext : DbContext
             entity.Property(x => x.Amount)
                   .HasPrecision(18, 4);
         });
+        modelBuilder.Entity<OrderCost>()
+    .HasMany(c => c.LineItems)
+    .WithOne(li => li.OrderCost)
+    .HasForeignKey(li => li.OrderCostId)
+    .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<LoadCost>()
+    .HasMany(c => c.LineItems)
+    .WithOne(li => li.LoadCost)
+    .HasForeignKey(li => li.LoadCostId)
+    .OnDelete(DeleteBehavior.Cascade);
+
         modelBuilder.Entity<LoadOrder>(entity =>
         {
             entity.HasKey(lo => lo.Id);

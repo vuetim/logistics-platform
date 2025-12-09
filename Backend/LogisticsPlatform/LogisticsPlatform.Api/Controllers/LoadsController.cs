@@ -24,7 +24,7 @@ namespace LogisticsPlatform.Api.Controllers
             _queries = queries;
         }
 
-        //  GET LIST (permission check në QueryService nëse don)
+        //  GET LIST (permission check in QueryService)
         [HttpGet]
         public async Task<IActionResult> GetPaged([FromQuery] LoadQueryParameters parameters)
         {

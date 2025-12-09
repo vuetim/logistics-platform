@@ -10,7 +10,7 @@ namespace LogisticsPlatform.Application.DTOs.Costs
     {
         public decimal CustomerRate { get; set; }
         public decimal CarrierRate { get; set; }
-        public decimal Margin => CustomerRate - CarrierRate;
+        public decimal Margin { get; set; }
         public decimal TotalBillable { get; set; }
         public decimal TotalPayable { get; set; }
     }

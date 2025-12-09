@@ -9,7 +9,7 @@ public class LoadCost : BaseEntity
 
     public string? Notes { get; set; }
 
-    public decimal TotalAmount { get; set; }   // total payable për carrier
+    public decimal TotalAmount { get; set; }   // total payable for carrier
 
     public ICollection<LoadCostLineItem> LineItems { get; set; } = new List<LoadCostLineItem>();
 }

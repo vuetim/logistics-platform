@@ -13,10 +13,14 @@ namespace LogisticsPlatform.Application.Services
     public class LoadQueryService : ILoadQueryService
     {
         private readonly ILoadQueryRepository _repo;
+        private readonly ILoadCostRepository _loadCostRepo;
 
-        public LoadQueryService(ILoadQueryRepository repo)
+        public LoadQueryService(
+            ILoadQueryRepository repo,
+            ILoadCostRepository loadCostRepo)
         {
             _repo = repo;
+            _loadCostRepo = loadCostRepo;
         }
 
         public async Task<PagedResult<LoadListItemDto>> GetPagedAsync(LoadQueryParameters parameters)
@@ -35,9 +39,22 @@ namespace LogisticsPlatform.Application.Services
 
             var orderLink = load.Orders.FirstOrDefault();
 
+            // 🔥 LoadCost (nga db)
+            var loadCost = await _loadCostRepo.GetByLoadIdAsync(loadId);
+
+            var totalBillable = loadCost?
+                .LineItems.Where(x => x.IsCustomer)
+                .Sum(x => x.Amount) ?? 0;
+
+            var totalPayable = loadCost?
+                .LineItems.Where(x => x.IsCarrier)
+                .Sum(x => x.Amount) ?? 0;
+
             return new LoadDetailsDto
             {
-                //  EXECUTION 
+                // ==================
+                // EXECUTION SECTION
+                // ==================
                 Execution = new LoadExecutionDetailsDto
                 {
                     Id = load.Id,
@@ -48,11 +65,10 @@ namespace LogisticsPlatform.Application.Services
                     Origin = load.Origin,
                     Destination = load.Destination,
                     CustomerName = load.Customer.Name,
-
                     CarrierName = load.Carrier?.Name,
+
                     CustomerRate = load.CustomerRate,
                     CarrierRate = load.CarrierRate,
-
 
                     Stops = load.Stops
                         .OrderBy(s => s.Sequence)
@@ -62,7 +78,6 @@ namespace LogisticsPlatform.Application.Services
                             Sequence = s.Sequence,
                             StopType = s.StopType,
                             Status = s.Status,
-
                             LocationName = s.LocationName,
                             AddressLine1 = s.AddressLine1,
                             AddressLine2 = s.AddressLine2,
@@ -70,26 +85,22 @@ namespace LogisticsPlatform.Application.Services
                             State = s.State,
                             PostalCode = s.PostalCode,
                             Country = s.Country,
-
                             PlannedArrivalFrom = s.PlannedArrivalFrom,
                             PlannedArrivalTo = s.PlannedArrivalTo,
                             AppointmentType = s.AppointmentType,
                             FlexMinutes = s.FlexMinutes,
-
                             RevisedArrivalFrom = s.RevisedArrivalFrom,
                             RevisedArrivalTo = s.RevisedArrivalTo,
-
                             ActualArrival = s.ActualArrival,
                             ActualDeparture = s.ActualDeparture,
-
                             Notes = s.Notes
-
-                        }).ToList()
+                        })
+                        .ToList()
                 },
-             
 
-
-                //  ORDER SNAPSHOT
+                // ==================
+                // ORDER SNAPSHOT
+                // ==================
                 OrderSnapshot = orderLink?.Order == null
                     ? null
                     : new LoadOrderSnapshotDto
@@ -107,17 +118,14 @@ namespace LogisticsPlatform.Application.Services
                             .Select(r => new OrderRouteDto
                             {
                                 Id = r.Id,
-
                                 Sequence = r.Sequence,
                                 StopType = r.StopType,
                                 LocationName = r.LocationName,
                                 City = r.City,
                                 State = r.State,
                                 Country = r.Country,
-
                                 PlannedArrivalFrom = r.PlannedArrivalFrom,
                                 PlannedArrivalTo = r.PlannedArrivalTo,
-
                                 HasTime = r.HasTime,
                                 CopyToLoad = r.CopyToLoad,
                                 Notes = r.Notes,
@@ -126,7 +134,9 @@ namespace LogisticsPlatform.Application.Services
                             .ToList()
                     },
 
-                //Equipmnt snapshot
+                // ==================
+                // EQUIPMENT
+                // ==================
                 Equipment = load.Equipment.Select(e => new LoadEquipmentDto
                 {
                     Id = e.Id,
@@ -140,8 +150,9 @@ namespace LogisticsPlatform.Application.Services
                 }).ToList(),
                 HasEquipment = load.HasEquipment,
 
-
+                // ==================
                 // ITEMS
+                // ==================
                 Items = load.Items.Select(i => new LoadItemDto
                 {
                     Id = i.Id,
@@ -153,29 +164,44 @@ namespace LogisticsPlatform.Application.Services
                     Notes = i.Notes
                 }).ToList(),
 
-                //  SUMMARY 
+                // ==================
+                // SUMMARY
+                // ==================
                 Summary = CalculateSummary(load),
-                 CostSummary = new LoadCostSummaryDto
-                 {
-                     CustomerRate = load.CustomerRate ?? 0,
-                     CarrierRate = load.CarrierRate ?? 0,
 
-                     TotalBillable = load.Orders
-            .FirstOrDefault()?.Order?.Cost?
-            .LineItems.Where(x => x.Billable)
-            .Sum(x => x.Amount) ?? 0,
+                // ==================
+                // COST SUMMARY
+                // ==================
+                CostSummary = new LoadCostSummaryDto
+                {
+                    CustomerRate = load.CustomerRate ?? 0,
+                    CarrierRate = load.CarrierRate ?? 0,
 
-                     TotalPayable = load.Cost?
-            .LineItems.Where(x => x.Payable)
-            .Sum(x => x.Amount) ?? 0
-                 }
+                    TotalBillable =
+        (load.CustomerRate ?? 0) +
+        (load.Cost?.LineItems
+            .Where(x => x.IsCustomer)
+            .Sum(x => x.Amount) ?? 0),
+
+                    TotalPayable =
+        (load.CarrierRate ?? 0) +
+        (load.Cost?.LineItems
+            .Where(x => x.IsCarrier)
+            .Sum(x => x.Amount) ?? 0),
+
+                    Margin =
+        ((load.CustomerRate ?? 0) +
+         (load.Cost?.LineItems.Where(x => x.IsCustomer).Sum(x => x.Amount) ?? 0))
+         -
+        ((load.CarrierRate ?? 0) +
+         (load.Cost?.LineItems.Where(x => x.IsCarrier).Sum(x => x.Amount) ?? 0))
+                }
             };
-        
         }
 
-       
-        // - SUMMARY CALCULATION 
-       
+        // =============
+        // SUMMARY LOGIC
+        // =============
         private LoadSummaryDto CalculateSummary(Load load)
         {
             decimal totalWeight = 0;
@@ -184,33 +210,22 @@ namespace LogisticsPlatform.Application.Services
 
             foreach (var item in load.Items)
             {
-                // Weight
                 var weight = item.UnitGrossWeight ?? item.UnitNetWeight ?? 0;
                 totalWeight += weight * item.Quantity;
 
-                // Volume
                 if (item.Length.HasValue && item.Width.HasValue && item.Height.HasValue)
                 {
-                    var volume = item.Length.Value * item.Width.Value * item.Height.Value * item.Quantity;
-                    totalVolume += volume;
+                    totalVolume += item.Length.Value * item.Width.Value * item.Height.Value * item.Quantity;
                 }
 
-                // Pallets
                 if (item.HandlingQuantity.HasValue)
+                {
                     totalPallets += item.HandlingQuantity.Value;
-
+                }
             }
-            var pickupStops = load.Stops.Count(s => s.StopType == StopType.Pickup);
-            var deliveryStops = load.Stops.Count(s => s.StopType == StopType.Delivery);
 
-
-            var pickupStopsList = load.Stops
-         .Where(s => s.StopType == StopType.Pickup)
-         .ToList();
-
-            var deliveryStopsList = load.Stops
-                .Where(s => s.StopType == StopType.Delivery)
-                .ToList();
+            var pickupStops = load.Stops.Where(s => s.StopType == StopType.Pickup).ToList();
+            var deliveryStops = load.Stops.Where(s => s.StopType == StopType.Delivery).ToList();
 
             return new LoadSummaryDto
             {
@@ -218,21 +233,12 @@ namespace LogisticsPlatform.Application.Services
                 TotalVolume = totalVolume,
                 TotalPallets = totalPallets,
                 TotalItems = load.Items.Count,
-
                 TotalStops = load.Stops.Count,
-                PickupStops = pickupStopsList.Count,
-                DeliveryStops = deliveryStopsList.Count,
-
-                PickupLocations = pickupStopsList
-            .Select(s => $"{s.City}, {s.State}")
-            .ToList(),
-
-                DeliveryLocations = deliveryStopsList
-            .Select(s => $"{s.City}, {s.State}")
-            .ToList()
+                PickupStops = pickupStops.Count,
+                DeliveryStops = deliveryStops.Count,
+                PickupLocations = pickupStops.Select(s => $"{s.City}, {s.State}").ToList(),
+                DeliveryLocations = deliveryStops.Select(s => $"{s.City}, {s.State}").ToList()
             };
         }
-
-
     }
 }

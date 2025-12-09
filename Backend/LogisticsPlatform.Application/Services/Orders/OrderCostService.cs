@@ -1,5 +1,6 @@
 ﻿using LogisticsPlatform.Application.DTOs.ActivityLog;
 using LogisticsPlatform.Application.DTOs.Costs;
+using LogisticsPlatform.Application.Extensions;
 using LogisticsPlatform.Application.Interfaces.Repositories;
 using LogisticsPlatform.Application.Interfaces.Services;
 using LogisticsPlatform.Domain.Entities;
@@ -68,7 +69,7 @@ public class OrderCostService : IOrderCostService
     public async Task UpdateAsync(Guid orderId, UpdateOrderCostDto dto, Guid userId)
     {
         var order = await _orders.GetByIdWithLoadsAsync(orderId)
-        ?? throw new NotFoundException("Order not found.");
+            ?? throw new NotFoundException("Order not found.");
 
         var cost = await _costs.GetByOrderIdAsync(orderId);
         if (cost == null)
@@ -83,7 +84,6 @@ public class OrderCostService : IOrderCostService
             await _costs.AddAsync(cost);
         }
 
-        // PUT style replace
         cost.Notes = dto.Notes;
         cost.LineItems.Clear();
 
@@ -99,27 +99,26 @@ public class OrderCostService : IOrderCostService
                 Amount = amount,
                 IsCustomer = liDto.IsCustomer,
                 IsCarrier = false,
-
-
                 Notes = liDto.Notes
             });
         }
+
         var totalBillable = cost.LineItems.Where(x => x.IsCustomer).Sum(x => x.Amount);
         var totalNonBillable = cost.LineItems.Where(x => !x.IsCustomer).Sum(x => x.Amount);
 
-
         cost.TotalAmount = totalBillable + totalNonBillable;
 
-        // sync automatic me order
+        // sync to order
         order.CustomerRate = totalBillable;
-        if (order.Loads != null)
+
+        // sync all loads
+        foreach (var link in order.Loads)
         {
-            foreach (var link in order.Loads)
+            if (link.Load is not null)
             {
-                if (link.Load != null)
-                {
-                    link.Load.CustomerRate = totalBillable;
-                }
+                link.Load.CustomerRate = totalBillable;
+                link.Load.RecalculateFinancials();
+
             }
         }
 
@@ -130,7 +129,7 @@ public class OrderCostService : IOrderCostService
             EntityType = "Order",
             EntityId = orderId,
             ActivityType = ActivityType.Order_CostUpdated,
-            Summary = $"Order costs updated: Billable={totalBillable}, NonBillable={totalNonBillable}",
+            Summary = $"Order cost updated: Billable={totalBillable}, NonBillable={totalNonBillable}",
             PerformedByUserId = userId
         });
     }

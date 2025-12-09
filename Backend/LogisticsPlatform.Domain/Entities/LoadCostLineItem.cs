@@ -8,8 +8,7 @@ public class LoadCostLineItem : BaseEntity
     public Guid LoadCostId { get; set; }
     public LoadCost LoadCost { get; set; } = null!;
 
-    public string TypeCode { get; set; } = null!;
-    public string TypeLabel { get; set; } = null!;
+ 
 
     public decimal Qty { get; set; }
     public decimal Price { get; set; }
