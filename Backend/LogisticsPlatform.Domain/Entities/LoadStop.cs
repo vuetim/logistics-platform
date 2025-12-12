@@ -50,6 +50,17 @@ namespace LogisticsPlatform.Domain.Entities
         public DateTime? ActualArrival { get; set; }
         public DateTime? ActualDeparture { get; set; }
 
+        public DateTime? ActualCheckedInTime { get; set; }
+        public DateTime? ActualCheckedOutTime { get; set; }
+
+        public bool IsLateArrival { get; set; }
+        public bool IsLateDeparture { get; set; }
+
+        public string? AppointmentNumber { get; set; }
+        public string? ContactName { get; set; }
+        public string? ContactPhone { get; set; }
+
+
         // ======================
         // STATUS (core execution state)
         // ======================

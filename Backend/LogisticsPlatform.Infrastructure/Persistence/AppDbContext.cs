@@ -1,5 +1,6 @@
 ﻿using LogisticsPlatform.Domain.Constants;
 using LogisticsPlatform.Domain.Entities;
+using LogisticsPlatform.Domain.Entities.Financial;
 using Microsoft.EntityFrameworkCore;
 
 namespace LogisticsPlatform.Infrastructure.Persistence;
@@ -39,14 +40,21 @@ public class AppDbContext : DbContext
     public DbSet<OrderDocument> OrderDocuments => Set<OrderDocument>();
     public DbSet<OrderEquipmentRequirement> OrderEquipmentRequirements => Set<OrderEquipmentRequirement>();
     public DbSet<OrderRoute> OrderRoutes => Set<OrderRoute>();
-
+    //activitylog
     public DbSet<ActivityLog> ActivityLogs { get; set; } = null!;
+    //loaditems
     public DbSet<LoadItem> LoadItems => Set<LoadItem>();
-
+    //costs
     public DbSet<OrderCostLineItem> OrderCostLineItems { get; set; } = null!;
 
     public DbSet<LoadCost> LoadCosts { get; set; } = null!;
     public DbSet<LoadCostLineItem> LoadCostLineItems { get; set; } = null!;
+    //financials
+    public DbSet<CustomerInvoice> CustomerInvoices => Set<CustomerInvoice>();
+    public DbSet<CustomerInvoiceLineItem> CustomerInvoiceLineItems => Set<CustomerInvoiceLineItem>();
+
+    public DbSet<CarrierSettlement> CarrierSettlements => Set<CarrierSettlement>();
+    public DbSet<CarrierSettlementLineItem> CarrierSettlementLineItems => Set<CarrierSettlementLineItem>();
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -190,6 +198,18 @@ public class AppDbContext : DbContext
                 .HasForeignKey(lo => lo.LoadId)
                 .OnDelete(DeleteBehavior.Restrict); 
         });
+        modelBuilder.Entity<CustomerInvoice>()
+    .HasOne(x => x.Load)
+    .WithMany()
+    .HasForeignKey(x => x.LoadId)
+    .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<CarrierSettlement>()
+            .HasOne(x => x.Load)
+            .WithMany()
+            .HasForeignKey(x => x.LoadId)
+            .OnDelete(DeleteBehavior.Restrict);
+
 
         modelBuilder.Entity<OrderItem>(entity =>
         {
@@ -311,7 +331,41 @@ public class AppDbContext : DbContext
                 .HasForeignKey(n => n.CreatedByUserId)
                 .OnDelete(DeleteBehavior.NoAction);
         });
-  
+        modelBuilder.Entity<CustomerInvoice>(entity =>
+        {
+            entity.Property(x => x.TotalAmount).HasPrecision(18, 2);
+
+            entity.HasMany(x => x.LineItems)
+                  .WithOne(li => li.Invoice)
+                  .HasForeignKey(li => li.InvoiceId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<CarrierSettlement>(entity =>
+        {
+            entity.Property(x => x.TotalAmount).HasPrecision(18, 2);
+
+            entity.HasMany(x => x.LineItems)
+                  .WithOne(li => li.Settlement)
+                  .HasForeignKey(li => li.SettlementId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<CustomerInvoiceLineItem>(entity =>
+        {
+            entity.Property(x => x.Qty).HasPrecision(18, 2);
+            entity.Property(x => x.Price).HasPrecision(18, 2);
+            entity.Property(x => x.Amount).HasPrecision(18, 2);
+        });
+
+        modelBuilder.Entity<CarrierSettlementLineItem>(entity =>
+        {
+            entity.Property(x => x.Qty).HasPrecision(18, 2);
+            entity.Property(x => x.Price).HasPrecision(18, 2);
+            entity.Property(x => x.Amount).HasPrecision(18, 2);
+        });
+
+
         modelBuilder.Entity<OrderNote>()
             .HasOne(n => n.CreatedByUser)
             .WithMany()

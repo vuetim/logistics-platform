@@ -42,6 +42,25 @@ namespace LogisticsPlatform.Domain.Entities
 
         //financials 
         public LoadCost? Cost { get; set; }
+        public string? BolNumber { get; set; }
+        public string? ProNumber { get; set; }
+        public string? RateConfirmationNumber { get; set; }
+        public string? TrackingNumber { get; set; }
+
+        public string? DriverName { get; set; }
+        public string? DriverPhone { get; set; }
+        public string? DriverEmail { get; set; }
+
+        public string? TruckNumber { get; set; }
+        public string? TrailerNumber { get; set; }
+        public string? CarrierSCAC { get; set; }
+
+        public DateTime? PodReceivedAt { get; set; }
+        public string? PodUploadedBy { get; set; }
+
+        public bool OnTimePickup { get; set; }
+        public bool OnTimeDelivery { get; set; }
+        public int? TransitTimeHours { get; set; }
 
         // Audit
         public Guid CreatedByUserId { get; set; }

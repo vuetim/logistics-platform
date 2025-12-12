@@ -8,6 +8,8 @@
         public string? Phone { get; set; }
         public string? Email { get; set; }
         public string? Status { get; set; }
+        public int PaymentTermsDays { get; set; } = 30; // NET 30 default
+
         public int? Rating { get; set; }
     }
 }

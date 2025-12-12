@@ -8,6 +8,7 @@ namespace LogisticsPlatform.Domain.Entities
         public string? Email { get; set; }
         public string? Phone { get; set; }
         public string? Address { get; set; }
+        public int PaymentTermsDays { get; set; } = 30; 
 
         public ICollection<CustomerAddress> Addresses { get; set; } = new List<CustomerAddress>();
 

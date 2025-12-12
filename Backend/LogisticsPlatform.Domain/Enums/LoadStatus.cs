@@ -1,20 +1,14 @@
 ﻿public enum LoadStatus
 {
     Draft = 0,
-
-    Tendered = 10,
-    Covered = 20,
-
-    Dispatched = 30,
-
-    AtPickup = 40,
-    InTransit = 50,
-    AtDelivery = 60,
-
-    Delivered = 70,
-
-    ReadyForBilling = 80,
-    Completed = 90,
-
-    Canceled = 100
+    Planned = 1,
+    Dispatched = 2,
+    EnRouteToPickup = 3,
+    AtPickup = 4,
+    Loaded = 5,
+    EnRouteToDelivery = 6,
+    AtDelivery = 7,
+    Delivered = 8,
+    Completed = 9,
+    Cancelled = 10
 }
