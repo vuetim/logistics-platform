@@ -10,5 +10,6 @@
     AtDelivery = 7,
     Delivered = 8,
     Completed = 9,
-    Cancelled = 10
+    Cancelled = 10,
+    InTransit = 11,
 }
