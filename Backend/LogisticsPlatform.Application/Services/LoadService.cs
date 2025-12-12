@@ -18,6 +18,7 @@ namespace LogisticsPlatform.Application.Services
         private readonly IUserRepository _users;
         private readonly IAuthorizationService _auth;
         private readonly IOrderRepository _orders;
+        private readonly ILoadFinancialAutomationService _financialAutomationService;
 
         public LoadService(
             ILoadRepository loads,
@@ -25,7 +26,8 @@ namespace LogisticsPlatform.Application.Services
             ICarrierRepository carriers,
             IUserRepository users,
             IAuthorizationService auth,
-            IOrderRepository orders)
+            IOrderRepository orders,
+            ILoadFinancialAutomationService loadFinancialAutomationService)
         {
             _loads = loads;
             _customers = customers;
@@ -33,6 +35,7 @@ namespace LogisticsPlatform.Application.Services
             _users = users;
             _auth = auth;
             _orders = orders;
+            _financialAutomationService = loadFinancialAutomationService;
         }
 
         // =============================
@@ -75,6 +78,7 @@ namespace LogisticsPlatform.Application.Services
                 IsArchived = false,
 
                 CreatedByUserId = user.Id
+
             };
 
             await _loads.AddAsync(load);
@@ -83,9 +87,9 @@ namespace LogisticsPlatform.Application.Services
             return load.Id;
         }
 
-        // =============================
+        
         // UPDATE LOAD
-        // =============================
+        
         public async Task UpdateAsync(Guid id, UpdateLoadDto dto, Guid userId)
         {
             var load = await _loads.GetByIdAsync(id)
@@ -112,6 +116,24 @@ namespace LogisticsPlatform.Application.Services
 
             if (dto.CarrierId.HasValue)
                 load.CarrierId = dto.CarrierId.Value;
+            load.BolNumber = dto.BolNumber ?? load.BolNumber;
+            load.ProNumber = dto.ProNumber ?? load.ProNumber;
+            load.RateConfirmationNumber = dto.RateConfirmationNumber ?? load.RateConfirmationNumber;
+            load.TrackingNumber = dto.TrackingNumber ?? load.TrackingNumber;
+
+            load.DriverName = dto.DriverName ?? load.DriverName;
+            load.DriverPhone = dto.DriverPhone ?? load.DriverPhone;
+            load.DriverEmail = dto.DriverEmail ?? load.DriverEmail;
+
+            load.TruckNumber = dto.TruckNumber ?? load.TruckNumber;
+            load.TrailerNumber = dto.TrailerNumber ?? load.TrailerNumber;
+            load.CarrierSCAC = dto.CarrierSCAC ?? load.CarrierSCAC;
+
+            if (dto.PodReceivedAt.HasValue)
+                load.PodReceivedAt = dto.PodReceivedAt.Value;
+            if (!string.IsNullOrWhiteSpace(dto.PodUploadedBy))
+                load.PodUploadedBy = dto.PodUploadedBy;
+
 
             await _loads.UpdateAsync(load);
             await _loads.SaveChangesAsync();
@@ -132,6 +154,11 @@ namespace LogisticsPlatform.Application.Services
 
             if (load.Status == LoadStatus.Completed)
                 throw new BusinessRuleException("Completed load cannot be changed.");
+            if (newStatus == LoadStatus.Completed)
+            {
+                await _financialAutomationService.GenerateFinancialDocumentsAsync(load);
+            }
+
 
             load.Status = newStatus;
 
@@ -388,3 +415,320 @@ namespace LogisticsPlatform.Application.Services
 
     }
 }
+//using LogisticsPlatform.Application.Authorization;
+//using LogisticsPlatform.Application.Common.Exceptions;
+//using LogisticsPlatform.Application.DTOs.Loads;
+//using LogisticsPlatform.Application.Interfaces.Repositories;
+//using LogisticsPlatform.Application.Interfaces.Services;
+//using LogisticsPlatform.Domain.Entities;
+//using LogisticsPlatform.Domain.Enums;
+//using LogisticsPlatform.Domain.Security;
+//using SendGrid.Helpers.Errors.Model;
+//using ForbiddenException = LogisticsPlatform.Application.Common.Exceptions.ForbiddenException;
+
+//namespace LogisticsPlatform.Application.Services;
+
+//public class LoadService : ILoadService
+//{
+//    private readonly ILoadRepository _loads;
+//    private readonly ICustomerRepository _customers;
+//    private readonly ICarrierRepository _carriers;
+//    private readonly IUserRepository _users;
+//    private readonly IAuthorizationService _auth;
+//    private readonly IOrderRepository _orders;
+//    private readonly ILoadFinancialAutomationService _financialAutomation;
+
+//    public LoadService(
+//        ILoadRepository loads,
+//        ICustomerRepository customers,
+//        ICarrierRepository carriers,
+//        IUserRepository users,
+//        IAuthorizationService auth,
+//        IOrderRepository orders,
+//        ILoadFinancialAutomationService financialAutomation)
+//    {
+//        _loads = loads;
+//        _customers = customers;
+//        _carriers = carriers;
+//        _users = users;
+//        _auth = auth;
+//        _orders = orders;
+//        _financialAutomation = financialAutomation;
+//    }
+
+//    // ============================================================
+//    // CREATE LOAD (Manual creation)
+//    // ============================================================
+
+//    public async Task<Guid> CreateAsync(CreateLoadDto dto, Guid userId)
+//    {
+//        var user = await GetUser(userId);
+
+//        if (!_auth.HasPermission(user, Permission.Load_Create))
+//            throw new ForbiddenException("You cannot create loads.");
+
+//        var customer = await _customers.GetByIdAsync(dto.CustomerId)
+//            ?? throw new NotFoundException("Customer not found.");
+
+//        var load = new Load
+//        {
+//            LoadNumber = $"L-{DateTime.UtcNow:yyyyMMddHHmmss}",
+//            CustomerId = customer.Id,
+//            CarrierId = dto.CarrierId,
+
+//            Origin = dto.Origin,
+//            Destination = dto.Destination,
+
+//            Mode = dto.Mode,
+//            Status = LoadStatus.Draft,
+//            IsTemperatureControlled = dto.IsTemperatureControlled,
+
+//            CustomerRate = dto.CustomerRate,
+//            CarrierRate = dto.CarrierRate,
+//            Accessorials = dto.Accessorials,
+
+//            CreatedByUserId = user.Id,
+//            IsArchived = false
+//        };
+
+//        await _loads.AddAsync(load);
+//        await _loads.SaveChangesAsync();
+
+//        return load.Id;
+//    }
+
+//    // ============================================================
+//    // UPDATE LOAD
+//    // ============================================================
+
+//    public async Task UpdateAsync(Guid id, UpdateLoadDto dto, Guid userId)
+//    {
+//        var load = await _loads.GetByIdAsync(id)
+//            ?? throw new NotFoundException("Load not found.");
+
+//        var user = await GetUser(userId);
+
+//        if (!_auth.HasPermission(user, Permission.Load_Update, load))
+//            throw new ForbiddenException("Not allowed to modify this load.");
+
+//        load.Origin = dto.Origin ?? load.Origin;
+//        load.Destination = dto.Destination ?? load.Destination;
+
+//        if (dto.Mode.HasValue) load.Mode = dto.Mode.Value;
+//        if (dto.EquipmentType.HasValue)
+//            load.HasEquipment = true; // mark equipment presence
+
+//        if (dto.CustomerRate.HasValue) load.CustomerRate = dto.CustomerRate.Value;
+//        if (dto.CarrierRate.HasValue) load.CarrierRate = dto.CarrierRate.Value;
+//        if (dto.Accessorials.HasValue) load.Accessorials = dto.Accessorials;
+
+//        load.CarrierId = dto.CarrierId ?? load.CarrierId;
+
+//        // Numbers
+//        load.BolNumber = dto.BolNumber ?? load.BolNumber;
+//        load.ProNumber = dto.ProNumber ?? load.ProNumber;
+//        load.RateConfirmationNumber = dto.RateConfirmationNumber ?? load.RateConfirmationNumber;
+//        load.TrackingNumber = dto.TrackingNumber ?? load.TrackingNumber;
+
+//        // Driver
+//        load.DriverName = dto.DriverName ?? load.DriverName;
+//        load.DriverPhone = dto.DriverPhone ?? load.DriverPhone;
+//        load.DriverEmail = dto.DriverEmail ?? load.DriverEmail;
+
+//        load.TruckNumber = dto.TruckNumber ?? load.TruckNumber;
+//        load.TrailerNumber = dto.TrailerNumber ?? load.TrailerNumber;
+//        load.CarrierSCAC = dto.CarrierSCAC ?? load.CarrierSCAC;
+
+//        if (dto.PodReceivedAt.HasValue)
+//            load.PodReceivedAt = dto.PodReceivedAt.Value;
+
+//        if (!string.IsNullOrWhiteSpace(dto.PodUploadedBy))
+//            load.PodUploadedBy = dto.PodUploadedBy;
+
+//        await _loads.UpdateAsync(load);
+//        await _loads.SaveChangesAsync();
+//    }
+
+//    // ============================================================
+//    // CHANGE STATUS (with financial automation)
+//    // ============================================================
+
+//    public async Task ChangeStatusAsync(Guid id, LoadStatus newStatus, Guid userId)
+//    {
+//        var load = await _loads.GetByIdAsync(id)
+//            ?? throw new NotFoundException("Load not found.");
+
+//        var user = await GetUser(userId);
+
+//        if (!_auth.HasPermission(user, Permission.Load_ChangeStatus, load))
+//            throw new ForbiddenException("You cannot change status.");
+
+//        if (load.Status == LoadStatus.Completed)
+//            throw new BusinessRuleException("Completed loads cannot be modified.");
+
+//        // Auto-generate invoice/settlement when completed
+//        if (newStatus == LoadStatus.Completed)
+//            await _financialAutomation.GenerateFinancialDocumentsAsync(load);
+
+//        load.Status = newStatus;
+
+//        await _loads.UpdateAsync(load);
+//        await _loads.SaveChangesAsync();
+//    }
+
+//    // ============================================================
+//    // CREATE FROM ORDER (Snapshot Logic)
+//    // ============================================================
+
+//    public async Task<Guid> CreateFromOrderAsync(CreateLoadFromOrderDto dto, Guid userId)
+//    {
+//        var user = await GetUser(userId);
+
+//        if (!_auth.HasPermission(user, Permission.Load_CreateFromOrder))
+//            throw new ForbiddenException("Not allowed to create load from order.");
+
+//        var order = await _orders.GetByIdWithRoutesAsync(dto.OrderId)
+//            ?? throw new NotFoundException("Order not found.");
+
+//        var routes = order.OrderRoutes
+//            .Where(r => r.CopyToLoad && r.IsActive)
+//            .OrderBy(r => r.Sequence)
+//            .ToList();
+
+//        if (!routes.Any())
+//            throw new BusinessRuleException("Order has no routes.");
+
+//        var first = routes.First();
+//        var last = routes.Last();
+
+//        var load = new Load
+//        {
+//            LoadNumber = $"L-{DateTime.UtcNow:yyyyMMddHHmmss}",
+//            CustomerId = order.CustomerId,
+//            CarrierId = dto.CarrierId ?? order.PreferredCarrierId,
+
+//            Origin = $"{first.City}, {first.State}",
+//            Destination = $"{last.City}, {last.State}",
+
+//            Mode = ModeType.TL,
+//            Status = LoadStatus.Draft,
+
+//            CustomerRate = order.CustomerRate,
+//            CarrierRate = dto.CarrierRate ?? 0,
+
+//            CreatedByUserId = userId,
+//            CreatedAt = DateTime.UtcNow,
+//            IsArchived = false
+//        };
+
+//        await _loads.AddAsync(load);
+
+//        // Stops snapshot
+//        foreach (var r in routes)
+//        {
+//            await _loads.AddStopAsync(new LoadStop
+//            {
+//                Load = load,
+//                Sequence = r.Sequence,
+//                StopType = r.StopType,
+
+//                LocationName = r.LocationName,
+//                AddressLine1 = r.AddressLine1,
+//                AddressLine2 = r.AddressLine2,
+//                City = r.City,
+//                State = r.State,
+//                PostalCode = r.PostalCode,
+//                Country = r.Country,
+
+//                PlannedArrivalFrom = r.PlannedArrivalFrom,
+//                PlannedArrivalTo = r.PlannedArrivalTo,
+//                PlannedDepartureFrom = r.PlannedDepartureFrom,
+//                PlannedDepartureTo = r.PlannedDepartureTo,
+
+//                AppointmentType = r.AppointmentType,
+//                FlexMinutes = r.FlexMinutes,
+//                Notes = r.Notes,
+
+//                Status = StopStatus.Pending
+//            });
+//        }
+
+//        // Items snapshot
+//        foreach (var item in order.Items)
+//        {
+//            load.Items.Add(new LoadItem
+//            {
+//                Load = load,
+//                SourceOrderItemId = item.Id,
+//                Name = item.Name,
+//                Quantity = item.Quantity,
+//                QuantityUnit = item.QuantityUnit,
+//                IsHazmat = item.IsHazmat,
+//                FreightClass = item.FreightClass,
+//                Notes = item.Notes
+//            });
+//        }
+
+//        // Equipment snapshot
+//        foreach (var req in order.EquipmentRequirements.Where(e => e.CopyToLoad))
+//        {
+//            load.Equipment.Add(new LoadEquipment
+//            {
+//                Load = load,
+//                EquipmentType = ParseEquipmentType(req.EquipmentType),
+//                Length = ParseLength(req.EquipmentSize),
+//                Weight = req.MaxWeight,
+//                WeightUnit = WeightUnit.Lb,
+//                MinTemp = req.RequiredTemperature,
+//                MaxTemp = req.RequiredTemperature,
+//                TempUnit = ParseTemperatureUnit(req.TemperatureUnit)
+//            });
+//        }
+
+//        load.HasEquipment = load.Equipment.Any();
+//        load.IsTemperatureControlled = load.Equipment.Any(e => e.EquipmentType == EquipmentType.Reefer);
+
+//        // Link order
+//        await _loads.AddLoadOrderAsync(new LoadOrder
+//        {
+//            Load = load,
+//            Order = order,
+//            PONumber = order.OrderNumber
+//        });
+
+//        await _loads.SaveChangesAsync();
+//        return load.Id;
+//    }
+
+//    // ============================================================
+//    // PRIVATE HELPERS
+//    // ============================================================
+
+//    private async Task<User> GetUser(Guid id)
+//        => await _users.GetByIdAsync(id)
+//        ?? throw new ForbiddenException("User not found.");
+
+//    private EquipmentType ParseEquipmentType(string type)
+//        => type?.ToLower() switch
+//        {
+//            "dry van" => EquipmentType.DryVan,
+//            "reefer" => EquipmentType.Reefer,
+//            "flatbed" => EquipmentType.Flatbed,
+//            _ => EquipmentType.DryVan
+//        };
+
+//    private decimal? ParseLength(string? size)
+//    {
+//        if (string.IsNullOrWhiteSpace(size)) return null;
+//        var digits = new string(size.Where(char.IsDigit).ToArray());
+//        return decimal.TryParse(digits, out var v) ? v : null;
+//    }
+
+//    private TemperatureUnit ParseTemperatureUnit(string? unit)
+//        => unit?.ToLower() switch
+//        {
+//            "c" => TemperatureUnit.C,
+//            "celsius" => TemperatureUnit.C,
+//            _ => TemperatureUnit.F
+//        };
+//}

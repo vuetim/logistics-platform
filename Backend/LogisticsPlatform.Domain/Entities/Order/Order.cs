@@ -48,10 +48,24 @@ namespace LogisticsPlatform.Domain.Entities
 
         //public Guid DestinationAddressId { get; set; }
         //public CustomerAddress DestinationAddress { get; set; } = null!;
+        public string? PrimaryPONumber { get; set; }
+        public string? PrimaryBolNumber { get; set; }
+        public string? PrimaryProNumber { get; set; }
+
+        public string? Commodity { get; set; }
+        public decimal? TotalWeight { get; set; }
+        public int? TotalPallets { get; set; }
+        public decimal? TotalVolume { get; set; }
+
+        public string? DispatchNotes { get; set; }
+        public string? DeliveryNotes { get; set; }
+
 
         // =========================
         // Child aggregates
         // =========================
+
+
 
         // WHAT is being shipped
         public ICollection<OrderItem> Items { get; set; } = new List<OrderItem>();

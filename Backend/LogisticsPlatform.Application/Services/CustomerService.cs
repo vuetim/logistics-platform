@@ -31,7 +31,8 @@ namespace LogisticsPlatform.Application.Services
                 Name = dto.Name,
                 Email = dto.Email,
                 Phone = dto.Phone,
-                Address = dto.Address
+                Address = dto.Address,
+                PaymentTermsDays = dto.PaymentTermsDays
             };
 
             await _customers.AddAsync(customer);
@@ -49,7 +50,7 @@ namespace LogisticsPlatform.Application.Services
             customer.Email = dto.Email ?? customer.Email;
             customer.Phone = dto.Phone ?? customer.Phone;
             customer.Address = dto.Address ?? customer.Address;
-
+            customer.PaymentTermsDays = dto.PaymentTermsDays;
             await _customers.UpdateAsync(customer);
             await _customers.SaveChangesAsync();
 

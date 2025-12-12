@@ -10,5 +10,6 @@ namespace LogisticsPlatform.Application.Interfaces.Services
         Task<Carrier> CreateAsync(CreateCarrierDto dto);
         Task<Carrier?> UpdateAsync(Guid id, UpdateCarrierDto dto);
         Task<bool> DeleteAsync(Guid id);
+
     }
 }

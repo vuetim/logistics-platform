@@ -17,6 +17,7 @@ namespace LogisticsPlatform.Domain.Entities
 
         // 1–5 rating (opsionale për tani)
         public int Rating { get; set; } = 0;
+        public int PaymentTermsDays { get; set; } = 30; // NET 30 default
 
         public ICollection<CarrierContact> Contacts { get; set; } = new List<CarrierContact>();
         public ICollection<CarrierNote> Notes { get; set; } = new List<CarrierNote>();

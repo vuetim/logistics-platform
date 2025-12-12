@@ -34,7 +34,8 @@ namespace LogisticsPlatform.Application.Services
                 Phone = dto.Phone,
                 Email = dto.Email,
                 Status = dto.Status,
-                Rating = dto.Rating
+                Rating = dto.Rating,
+                PaymentTermsDays = dto.PaymentTermsDays
             };
 
             await _carriers.AddAsync(carrier);
@@ -54,6 +55,7 @@ namespace LogisticsPlatform.Application.Services
             carrier.Phone = dto.Phone ?? carrier.Phone;
             carrier.Email = dto.Email ?? carrier.Email;
             carrier.Status = dto.Status ?? carrier.Status;
+            carrier.PaymentTermsDays = dto.PaymentTermsDays;
 
             if (dto.Rating.HasValue)
                 carrier.Rating = dto.Rating.Value;

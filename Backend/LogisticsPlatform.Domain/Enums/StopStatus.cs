@@ -8,11 +8,15 @@ namespace LogisticsPlatform.Domain.Enums
 {
     public enum StopStatus
     {
-        Pending = 0,     // stop exists but execution not started
-        EnRoute = 10,    // driver moving to location
-        Arrived = 20,    // arrived but not loaded/unloaded
-        Loaded = 30,     // pickup done
-        Completed = 40   // delivery done
+        Pending = 0,
+        EnRoute = 1,
+        Arrived = 2,
+        Loading = 3,
+        Loaded = 4,
+        Unloading = 5,
+        Unloaded = 6,
+        Completed = 7
     }
+
 
 }

@@ -1,12 +1,12 @@
-﻿namespace LogisticsPlatform.Domain.Enums
+﻿public enum LoadDocumentType
 {
-    public enum LoadDocumentType : int
-    {
-        POD = 0,          // Proof of Delivery
-        BOL = 1,          // Bill of Lading
-        RateConfirmation = 2,
-        Invoice = 3,
-        Other = 99
-    }
-
+    BOL = 1,                // Bill of Lading
+    POD = 2,                // Proof of Delivery
+    RateConfirmation = 3,   // Carrier rate confirmation
+    InvoiceCustomer = 4,    // Customer invoice PDF
+    SettlementCarrier = 5,  // Carrier settlement PDF
+    LumperReceipt = 6,      // Lumper / unloading fees
+    AccessorialReceipt = 7, // Extra charges proof
+    WeightTicket = 8,       // Scale ticket
+    Other = 99
 }

@@ -2,19 +2,26 @@ using LogisticsPlatform.Application.Authorization;
 using LogisticsPlatform.Application.Interfaces.Repositories;
 using LogisticsPlatform.Application.Interfaces.Repositories.Queries;
 using LogisticsPlatform.Application.Interfaces.Services;
+using LogisticsPlatform.Application.Options;
 using LogisticsPlatform.Application.Services;
+using LogisticsPlatform.Application.Services.Financial;
 using LogisticsPlatform.Application.Services.Orders;
 using LogisticsPlatform.Infrastructure.Persistence;
 using LogisticsPlatform.Infrastructure.Persistence.Repositories.Queries;
 using LogisticsPlatform.Infrastructure.Repositories;
+using LogisticsPlatform.Infrastructure.Repositories.Financial;
 using LogisticsPlatform.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using QuestPDF.Infrastructure;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+//QUESTPDF LICENSE
+QuestPDF.Settings.License = LicenseType.Community;
 
 // 1. Add Controllers
 builder.Services.AddControllers();
@@ -25,6 +32,11 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(connectionString)
 );
+//email
+builder.Services.Configure<SmtpOptions>(
+    builder.Configuration.GetSection("Smtp"));
+builder.Services.AddScoped<IEmailService, EmailService>();
+
 
 // 3. Repositories
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
@@ -58,7 +70,10 @@ builder.Services.AddScoped<ILoadItemRepository, LoadItemRepository>();
 builder.Services.AddScoped<IOrderCostRepository, OrderCostRepository>();
 builder.Services.AddScoped<ILoadCostRepository, LoadCostRepository>();
 builder.Services.AddScoped<IOrderEquipmentRequirementRepository, OrderEquipmentRequirementRepository>();
-
+// Financial Repositories
+builder.Services.AddScoped<ICustomerInvoiceRepository, CustomerInvoiceRepository>();
+builder.Services.AddScoped<ICarrierSettlementRepository, CarrierSettlementRepository>();
+builder.Services.AddScoped<ILoadFinancialSnapshotRepository, LoadFinancialSnapshotRepository>();
 
 
 
@@ -99,6 +114,17 @@ builder.Services.AddScoped<ILoadItemService, LoadItemService>();
 builder.Services.AddScoped<IOrderCostService, OrderCostService>();
 builder.Services.AddScoped<ILoadCostService, LoadCostService>();
 builder.Services.AddScoped<IOrderEquipmentRequirementService, OrderEquipmentRequirementService>();
+// Financial Services
+builder.Services.AddScoped<ICustomerInvoiceService, CustomerInvoiceService>();
+builder.Services.AddScoped<ICarrierSettlementService, CarrierSettlementService>();
+builder.Services.AddScoped<ILoadFinancialSnapshotService, LoadFinancialSnapshotService>();
+builder.Services.AddScoped<ILoadFinancialAutomationService, LoadFinancialAutomationService>();
+builder.Services.AddScoped<IPdfService, PdfService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+
+//pdf 
+builder.Services.AddScoped<IPdfService, PdfService>();
+
 
 
 
