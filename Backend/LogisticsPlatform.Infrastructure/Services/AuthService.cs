@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace LogisticsPlatform.Infrastructure.Services
@@ -265,24 +266,26 @@ namespace LogisticsPlatform.Infrastructure.Services
         public async Task<Guid?> ForgotPasswordAsync(string email)
         {
             var user = await _users.GetByEmailAsync(email);
-
-            // 
             if (user == null)
                 return null;
 
-            var tokenValue = GenerateSecureToken();
+            var rawToken = GenerateSecureToken();
+            var hashedToken = TokenHasher.Hash(rawToken);
 
             var token = new PasswordResetToken
             {
                 UserId = user.Id,
-                Token = tokenValue,
+                Token = hashedToken, 
                 ExpiresAt = DateTime.UtcNow.AddMinutes(30)
             };
 
             await _passwordResetTokens.AddAsync(token);
             await _passwordResetTokens.SaveChangesAsync();
 
-            var link = $"{_config["Frontend:BaseUrl"]}/reset-password?token={tokenValue}";
+            var encodedToken = Uri.EscapeDataString(rawToken);
+
+            var link =
+                $"{_config["Frontend:BaseUrl"]}/reset-password?token={encodedToken}";
 
             await _email.SendAsync(
                 user.Email,
@@ -290,12 +293,15 @@ namespace LogisticsPlatform.Infrastructure.Services
                 $"Click the link to reset your password:\n{link}"
             );
 
-            return user.Id; // 
+            return user.Id;
         }
 
         public async Task<Guid> ResetPasswordAsync(string tokenValue, string newPassword)
         {
-            var token = await _passwordResetTokens.GetValidAsync(tokenValue)
+            var decodedToken = Uri.UnescapeDataString(tokenValue);
+            var hashedToken = TokenHasher.Hash(decodedToken);
+
+            var token = await _passwordResetTokens.GetValidAsync(hashedToken)
                 ?? throw new Exception("Invalid or expired token");
 
             var user = token.User;
@@ -308,6 +314,7 @@ namespace LogisticsPlatform.Infrastructure.Services
 
             await _users.SaveChangesAsync();
             await _passwordResetTokens.SaveChangesAsync();
+
             return user.Id;
         }
         private static string GenerateSecureToken()
@@ -315,7 +322,14 @@ namespace LogisticsPlatform.Infrastructure.Services
             var bytes = System.Security.Cryptography.RandomNumberGenerator.GetBytes(64);
             return Convert.ToBase64String(bytes);
         }
-
+        public static class TokenHasher
+        {
+            public static string Hash(string value)
+            {
+                var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(value));
+                return Convert.ToBase64String(bytes);
+            }
+        }
 
     }
 }

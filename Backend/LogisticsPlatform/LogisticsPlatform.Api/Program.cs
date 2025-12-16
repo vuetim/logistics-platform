@@ -9,6 +9,7 @@ using LogisticsPlatform.Application.Interfaces.Repositories.Orders;
 using LogisticsPlatform.Application.Interfaces.Repositories.Queries;
 using LogisticsPlatform.Application.Interfaces.Repositories.Security;
 using LogisticsPlatform.Application.Interfaces.Repositories.Users;
+using LogisticsPlatform.Application.Interfaces.Services;
 using LogisticsPlatform.Application.Interfaces.Services.ActivityLog;
 using LogisticsPlatform.Application.Interfaces.Services.Auth;
 using LogisticsPlatform.Application.Interfaces.Services.Carriers;
@@ -25,6 +26,7 @@ using LogisticsPlatform.Infrastructure.Persistence;
 using LogisticsPlatform.Infrastructure.Persistence.Repositories.Queries;
 using LogisticsPlatform.Infrastructure.Repositories;
 using LogisticsPlatform.Infrastructure.Repositories.Financial;
+using LogisticsPlatform.Infrastructure.Repositories.Security;
 using LogisticsPlatform.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder.Extensions;
@@ -59,6 +61,21 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 //email
 builder.Services.Configure<SmtpOptions>(
     builder.Configuration.GetSection("Smtp"));
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy
+            .WithOrigins(
+                "http://localhost:4200" // Angular dev
+                                        // 
+                                        // "https://app.logisticsplatform.com"
+            )
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+    });
+});
 
 
 // 3. Repositories
@@ -110,6 +127,7 @@ builder.Services.AddScoped<IDelayFaultAttributionService, DelayFaultAttributionS
 builder.Services.AddScoped<IDelayResponsibilityService, DelayResponsibilityService>();
 
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+builder.Services.AddScoped<IAuthAuditLogRepository, AuthAuditLogRepository>();
 
 
 
@@ -177,6 +195,7 @@ builder.Services.AddScoped<ILoadDelayResponsibilityRepository, LoadDelayResponsi
 builder.Services.AddScoped<IDelayResponsibilityRepository, DelayResponsibilityRepository>();
 builder.Services.AddScoped<IPasswordResetTokenRepository, PasswordResetTokenRepository>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+builder.Services.AddScoped<IAuthAuditService, AuthAuditService>();
 
 
 
@@ -244,7 +263,7 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 //app.UseHangfireDashboard("/hangfire");
-
+app.UseCors("AllowFrontend");
 // Middleware
 if (app.Environment.IsDevelopment())
 {
