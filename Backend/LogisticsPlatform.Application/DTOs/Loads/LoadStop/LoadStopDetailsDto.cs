@@ -1,54 +1,94 @@
-﻿using LogisticsPlatform.Domain.Enums;
+﻿using LogisticsPlatform.Domain.Entities;
+using LogisticsPlatform.Domain.Enums;
 
-namespace LogisticsPlatform.Application.DTOs.Loads.LoadStop
+public class LoadStopDetailsDto
 {
-    public class LoadStopDetailsDto
+    // ======================
+    // CORE
+    // ======================
+    public Guid Id { get; set; }
+    public int Sequence { get; set; }
+    public StopType StopType { get; set; }
+    public StopStatus Status { get; set; }
+
+    // ======================
+    // LOCATION SNAPSHOT
+    // ======================
+    public string LocationName { get; set; } = string.Empty;
+    public string AddressLine1 { get; set; } = string.Empty;
+    public string? AddressLine2 { get; set; }
+    public string City { get; set; } = string.Empty;
+    public string State { get; set; } = string.Empty;
+    public string PostalCode { get; set; } = string.Empty;
+    public string Country { get; set; } = string.Empty;
+
+    // ======================
+    // PLANNED (order snapshot)
+    // ======================
+    public DateTime? PlannedArrivalFrom { get; set; }
+    public DateTime? PlannedArrivalTo { get; set; }
+    public AppointmentType AppointmentType { get; set; }
+    public int? FlexMinutes { get; set; }
+    public string? AppointmentNumber { get; set; }
+    public string? StopReference { get; set; }
+
+    // ======================
+    // REVISED (dispatcher)
+    // ======================
+    public DateTime? RevisedArrivalFrom { get; set; }
+    public DateTime? RevisedArrivalTo { get; set; }
+
+    // ======================
+    // ACTUAL (execution truth)
+    // ======================
+    public DateTime? ActualArrival { get; set; }
+    public DateTime? ActualDeparture { get; set; }
+
+    // ======================
+    // KPI
+    // ======================
+    public bool? IsOnTime { get; set; }
+    public int? MinutesLate { get; set; }
+
+
+    // ======================
+    // META
+    // ======================
+    public string? Notes { get; set; }
+
+    public static LoadStopDetailsDto FromEntity(LoadStop stop)
     {
-        // ======================
-        // CORE
-        // ======================
-        public Guid Id { get; set; }
+        return new LoadStopDetailsDto
+        {
+            Id = stop.Id,
+            Sequence = stop.Sequence,
+            StopType = stop.StopType,
+            Status = stop.Status,
 
-        public int Sequence { get; set; }
-        public StopType StopType { get; set; }          // Pickup / Delivery
-        public StopStatus Status { get; set; }          // Pending / Arrived / Completed
+            LocationName = stop.LocationName,
+            AddressLine1 = stop.AddressLine1,
+            AddressLine2 = stop.AddressLine2,
+            City = stop.City,
+            State = stop.State,
+            PostalCode = stop.PostalCode,
+            Country = stop.Country,
 
-        // ======================
-        // LOCATION SNAPSHOT
-        // ======================
-        public string LocationName { get; set; } = string.Empty;
-        public string AddressLine1 { get; set; } = string.Empty;
-        public string? AddressLine2 { get; set; }
+            PlannedArrivalFrom = stop.PlannedArrivalFrom,
+            PlannedArrivalTo = stop.PlannedArrivalTo,
+            AppointmentType = stop.AppointmentType,
+            FlexMinutes = stop.FlexMinutes,
+            AppointmentNumber = stop.AppointmentNumber,
+            StopReference = stop.StopReference,
 
-        public string City { get; set; } = string.Empty;
-        public string State { get; set; } = string.Empty;
-        public string PostalCode { get; set; } = string.Empty;
-        public string Country { get; set; } = string.Empty;
+            RevisedArrivalFrom = stop.RevisedArrivalFrom,
+            RevisedArrivalTo = stop.RevisedArrivalTo,
 
-        // ======================
-        // PLANNED (from OrderRoute snapshot)
-        // ======================
-        public DateTime? PlannedArrivalFrom { get; set; }
-        public DateTime? PlannedArrivalTo { get; set; }
+            ActualArrival = stop.ActualArrival,
+            ActualDeparture = stop.ActualDeparture,
 
-        public AppointmentType AppointmentType { get; set; }
-        public int? FlexMinutes { get; set; }
-
-        // ======================
-        // REVISED (dispatcher updates)
-        // ======================
-        public DateTime? RevisedArrivalFrom { get; set; }
-        public DateTime? RevisedArrivalTo { get; set; }
-
-        // ======================
-        // ACTUAL (execution truth)
-        // ======================
-        public DateTime? ActualArrival { get; set; }
-        public DateTime? ActualDeparture { get; set; }
-
-        // ======================
-        // META
-        // ======================
-        public string? Notes { get; set; }
+            IsOnTime = stop.IsOnTime,
+            MinutesLate = stop.MinutesLate,
+            Notes = stop.Notes
+        };
     }
 }

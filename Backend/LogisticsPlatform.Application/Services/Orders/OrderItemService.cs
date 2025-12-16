@@ -1,7 +1,7 @@
 ﻿using LogisticsPlatform.Application.Common.Exceptions;
 using LogisticsPlatform.Application.DTOs.Orders;
-using LogisticsPlatform.Application.Interfaces.Repositories;
-using LogisticsPlatform.Application.Interfaces.Services;
+using LogisticsPlatform.Application.Interfaces.Repositories.Orders;
+using LogisticsPlatform.Application.Interfaces.Services.Orders;
 using LogisticsPlatform.Domain.Entities;
 using LogisticsPlatform.Domain.Enums;
 using SendGrid.Helpers.Errors.Model;
@@ -30,13 +30,21 @@ public class OrderItemService : IOrderItemService
 
         var item = new OrderItem
         {
-            OrderId = order.Id,
+            OrderId = orderId,
             Name = dto.Name,
+            CustomerReference = dto.CustomerReference,
+
             Quantity = dto.Quantity,
             QuantityUnit = dto.QuantityUnit,
+
             IsHazmat = dto.IsHazmat,
+            HazardClass = dto.HazardClass,
+            IdentificationNumber = dto.IdentificationNumber,
+
             FreightClass = dto.FreightClass,
             Notes = dto.Notes
+
+
         };
 
         await _items.AddAsync(item);
@@ -54,10 +62,13 @@ public class OrderItemService : IOrderItemService
         {
             Id = i.Id,
             Name = i.Name,
+            CustomerReference = i.CustomerReference,
+            IdentificationNumber = i.IdentificationNumber,
             Quantity = i.Quantity,
             QuantityUnit = i.QuantityUnit,
             IsHazmat = i.IsHazmat,
             FreightClass = i.FreightClass,
+            HazardClass = i.HazardClass,
             Notes = i.Notes
         }).ToList();
     }

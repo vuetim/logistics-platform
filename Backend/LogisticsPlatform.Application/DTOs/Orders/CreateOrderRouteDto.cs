@@ -19,6 +19,8 @@ public class CreateOrderRouteDto
 
     public bool HasTime { get; set; } = true;
     public bool CopyToLoad { get; set; } = true;
+    public string? StopReference { get; set; }      // pickup / delivery ref
+    public string? AppointmentNumber { get; set; }  // known at planning
 
     public string? Notes { get; set; }
 }

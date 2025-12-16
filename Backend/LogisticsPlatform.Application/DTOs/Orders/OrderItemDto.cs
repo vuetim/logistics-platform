@@ -5,6 +5,8 @@
         public Guid Id { get; set; }
 
         public string Name { get; set; } = string.Empty;
+        public string? CustomerReference { get; set; }
+        public string? IdentificationNumber { get; set; }
         public string? Category { get; set; }
 
         public decimal Quantity { get; set; }

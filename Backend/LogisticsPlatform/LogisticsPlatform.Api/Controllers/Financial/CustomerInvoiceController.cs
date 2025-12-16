@@ -1,6 +1,7 @@
 ﻿using LogisticsPlatform.Application.DTOs;
 using LogisticsPlatform.Application.DTOs.Financial;
-using LogisticsPlatform.Application.Interfaces.Services;
+using LogisticsPlatform.Application.Interfaces.Services.Customers;
+using LogisticsPlatform.Application.Interfaces.Services.Security;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;

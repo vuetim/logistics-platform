@@ -1,5 +1,5 @@
 ﻿using LogisticsPlatform.Application.DTOs.Customers.Notes;
-using LogisticsPlatform.Application.Interfaces.Services;
+using LogisticsPlatform.Application.Interfaces.Services.Customers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;

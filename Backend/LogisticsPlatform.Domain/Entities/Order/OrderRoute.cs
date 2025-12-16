@@ -38,6 +38,8 @@ namespace LogisticsPlatform.Domain.Entities
         public AppointmentType AppointmentType { get; set; } = AppointmentType.Appointment;
         public int? FlexMinutes { get; set; }
         public bool HasTime { get; set; } = true;
+        public string? StopReference { get; set; }      // pickup / delivery ref
+        public string? AppointmentNumber { get; set; }  // known at planning
 
         //  Order-specific metadata
         public string? PONumbers { get; set; }

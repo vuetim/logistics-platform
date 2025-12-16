@@ -8,7 +8,9 @@ public enum Permission
     Load_Update,
     Load_ChangeStatus,
     Load_Archive,
-
+    Load_Dispatch,
+    Load_Tender,
+    Load_AssignDelayResponsibility,
     // LOAD NOTES
     LoadNote_View,
     LoadNote_Create_Internal,

@@ -1,4 +1,4 @@
-﻿using LogisticsPlatform.Application.Interfaces.Repositories;
+﻿using LogisticsPlatform.Application.Interfaces.Repositories.Orders;
 using LogisticsPlatform.Domain.Entities;
 using SendGrid.Helpers.Errors.Model;
 
@@ -33,7 +33,8 @@ public class OrderRouteService : IOrderRouteService
             State = dto.State,
             PostalCode = dto.PostalCode,
             Country = dto.Country,
-
+            StopReference = dto.StopReference,
+            AppointmentNumber = dto.AppointmentNumber,
             PlannedArrivalFrom = dto.PlannedArrivalFrom,
             PlannedArrivalTo = dto.PlannedArrivalTo,
 
@@ -65,6 +66,8 @@ public class OrderRouteService : IOrderRouteService
             PlannedArrivalFrom = r.PlannedArrivalFrom,
             PlannedArrivalTo = r.PlannedArrivalTo,
             HasTime = r.HasTime,
+            StopReference = r.StopReference,
+            AppointmentNumber = r.AppointmentNumber,
             IsActive = r.IsActive
         }).ToList();
     }
@@ -87,8 +90,11 @@ public class OrderRouteService : IOrderRouteService
 
         route.PlannedArrivalFrom = dto.PlannedArrivalFrom ?? route.PlannedArrivalFrom;
         route.PlannedArrivalTo = dto.PlannedArrivalTo ?? route.PlannedArrivalTo;
+        route.StopReference = dto.StopReference ?? route.StopReference;
+        route.AppointmentNumber = dto.AppointmentNumber ?? route.AppointmentNumber;
+  
 
-        route.HasTime = dto.HasTime ?? route.HasTime;
+    route.HasTime = dto.HasTime ?? route.HasTime;
         route.CopyToLoad = dto.CopyToLoad ?? route.CopyToLoad;
         route.Notes = dto.Notes ?? route.Notes;
 

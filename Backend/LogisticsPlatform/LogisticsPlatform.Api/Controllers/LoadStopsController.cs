@@ -1,5 +1,5 @@
 ﻿using LogisticsPlatform.Application.DTOs.Loads.LoadStop;
-using LogisticsPlatform.Application.Interfaces.Services;
+using LogisticsPlatform.Application.Interfaces.Services.Loads;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

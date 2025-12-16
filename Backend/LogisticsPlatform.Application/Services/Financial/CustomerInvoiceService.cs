@@ -1,7 +1,7 @@
 ﻿using LogisticsPlatform.Application.Common.Exceptions;
 using LogisticsPlatform.Application.DTOs.Financial;
-using LogisticsPlatform.Application.Interfaces.Repositories;
-using LogisticsPlatform.Application.Interfaces.Services;
+using LogisticsPlatform.Application.Interfaces.Repositories.Loads;
+using LogisticsPlatform.Application.Interfaces.Services.Customers;
 using LogisticsPlatform.Domain.Entities;
 using LogisticsPlatform.Domain.Entities.Financial;
 using LogisticsPlatform.Domain.Enums;
@@ -229,7 +229,7 @@ namespace LogisticsPlatform.Application.Services.Financial
                 Status = invoice.Status,
                 TotalAmount = invoice.TotalAmount,
                 Notes = invoice.Notes,
-                PdfUrl = invoice.PdfUrl, // nëse e ke shtuar këtë në DTO
+                PdfUrl = invoice.PdfUrl,// nëse e ke shtuar këtë në DTO
 
                 LineItems = invoice.LineItems
                     .Select(x => new InvoiceLineItemDto

@@ -1,6 +1,9 @@
 ﻿using LogisticsPlatform.Application.DTOs.Auth;
 using LogisticsPlatform.Application.Interfaces.Repositories;
-using LogisticsPlatform.Application.Interfaces.Services;
+using LogisticsPlatform.Application.Interfaces.Repositories.Security;
+using LogisticsPlatform.Application.Interfaces.Repositories.Users;
+using LogisticsPlatform.Application.Interfaces.Services.Auth;
+using LogisticsPlatform.Application.Interfaces.Services.Security;
 using LogisticsPlatform.Domain.Entities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -16,13 +19,20 @@ namespace LogisticsPlatform.Infrastructure.Services
         private readonly IRoleRepository _roles;
         private readonly IUserRoleRepository _userRoles;
         private readonly IConfiguration _config;
+        private readonly IRefreshTokenRepository _refreshTokens;
+        private readonly IPasswordResetTokenRepository _passwordResetTokens;
+        private readonly IEmailService _email;
 
-        public AuthService(IUserRepository users, IRoleRepository roles, IUserRoleRepository userRoles, IConfiguration config)
+        public AuthService(IUserRepository users, IRoleRepository roles, IUserRoleRepository userRoles, IConfiguration config,
+            IRefreshTokenRepository refreshTokens, IEmailService email, IPasswordResetTokenRepository passwordResetTokens)
         {
             _users = users;
             _roles = roles;
             _userRoles = userRoles;
+            _refreshTokens = refreshTokens;
             _config = config;
+            _email = email;
+            _passwordResetTokens = passwordResetTokens;
         }
 
         public async Task RegisterAsync(RegisterDto dto)
@@ -42,7 +52,7 @@ namespace LogisticsPlatform.Infrastructure.Services
             await _users.SaveChangesAsync();
         }
 
-        public async Task<string> LoginAsync(LoginDto dto)
+        public async Task<LoginResponseDto> LoginAsync(LoginDto dto)
         {
             var user = await _users.GetByEmailAsync(dto.Email)
                        ?? throw new Exception("Invalid credentials");
@@ -50,7 +60,74 @@ namespace LogisticsPlatform.Infrastructure.Services
             if (!BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash))
                 throw new Exception("Invalid credentials");
 
-            return GenerateJwtToken(user);
+            var accessToken = GenerateJwtToken(user);
+            var refreshTokenValue = GenerateRefreshToken();
+
+            var refreshDays = int.Parse(_config["Jwt:RefreshTokenDays"]);
+
+            var days = dto.RememberMe
+           ? int.Parse(_config["Jwt:RefreshTokenDaysRememberMe"])
+             : int.Parse(_config["Jwt:RefreshTokenDays"]);
+            var refreshToken = new RefreshToken
+            {
+                UserId = user.Id,
+                Token = refreshTokenValue,
+                ExpiresAt = DateTime.UtcNow.AddDays(refreshDays)
+            };
+
+
+            await _refreshTokens.AddAsync(refreshToken);
+            await _refreshTokens.SaveChangesAsync();
+
+            return new LoginResponseDto
+            {
+                AccessToken = accessToken,
+                RefreshToken = refreshTokenValue
+            };
+        }
+
+        public async Task<LoginResponseDto> RefreshAsync(string refreshToken)
+        {
+            var token = await _refreshTokens.GetAsync(refreshToken)
+                ?? throw new Exception("Invalid refresh token");
+
+            if (token.IsRevoked || token.ExpiresAt < DateTime.UtcNow)
+                throw new Exception("Refresh token expired");
+
+            token.IsRevoked = true; // ROTATION
+
+            var user = token.User;
+
+            var newAccessToken = GenerateJwtToken(user);
+            var newRefreshValue = GenerateRefreshToken();
+
+            var refreshDays = int.Parse(_config["Jwt:RefreshTokenDays"]);
+
+            var newRefresh = new RefreshToken
+            {
+                UserId = user.Id,
+                Token = newRefreshValue,
+                ExpiresAt = DateTime.UtcNow.AddDays(refreshDays)
+            };
+
+
+            await _refreshTokens.AddAsync(newRefresh);
+            await _refreshTokens.SaveChangesAsync();
+
+            return new LoginResponseDto
+            {
+                AccessToken = newAccessToken,
+                RefreshToken = newRefreshValue
+            };
+        }
+        public async Task LogoutAsync(string refreshToken)
+        {
+            var token = await _refreshTokens.GetAsync(refreshToken);
+            if (token == null)
+                return; // silent logout (OK practice)
+
+            token.IsRevoked = true;
+            await _refreshTokens.SaveChangesAsync();
         }
 
         private string GenerateJwtToken(User user)
@@ -75,15 +152,23 @@ namespace LogisticsPlatform.Infrastructure.Services
                 claims.Add(new Claim("roles", string.Join(",", roleNames)));
             }
 
+            var accessMinutes = int.Parse(_config["Jwt:AccessTokenMinutes"]);
+
             var token = new JwtSecurityToken(
                 issuer: _config["Jwt:Issuer"],
                 audience: _config["Jwt:Audience"],
                 claims: claims,
-                expires: DateTime.UtcNow.AddDays(7),
+                expires: DateTime.UtcNow.AddMinutes(accessMinutes),
                 signingCredentials: creds
             );
 
+
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+        private static string GenerateRefreshToken()
+        {
+            var bytes = System.Security.Cryptography.RandomNumberGenerator.GetBytes(64);
+            return Convert.ToBase64String(bytes);
         }
 
         public async Task AssignRoleAsync(AssignRoleDto dto)
@@ -160,6 +245,9 @@ namespace LogisticsPlatform.Infrastructure.Services
 
             await _users.SaveChangesAsync();
         }
+
+
+
         public async Task DeleteUserAsync(Guid id)
         {
             var user = await _users.GetByIdAsync(id)
@@ -173,6 +261,59 @@ namespace LogisticsPlatform.Infrastructure.Services
 
             await _users.DeleteAsync(user);
             await _users.SaveChangesAsync();
+        }
+        public async Task<Guid?> ForgotPasswordAsync(string email)
+        {
+            var user = await _users.GetByEmailAsync(email);
+
+            // 
+            if (user == null)
+                return null;
+
+            var tokenValue = GenerateSecureToken();
+
+            var token = new PasswordResetToken
+            {
+                UserId = user.Id,
+                Token = tokenValue,
+                ExpiresAt = DateTime.UtcNow.AddMinutes(30)
+            };
+
+            await _passwordResetTokens.AddAsync(token);
+            await _passwordResetTokens.SaveChangesAsync();
+
+            var link = $"{_config["Frontend:BaseUrl"]}/reset-password?token={tokenValue}";
+
+            await _email.SendAsync(
+                user.Email,
+                "Reset your password",
+                $"Click the link to reset your password:\n{link}"
+            );
+
+            return user.Id; // 
+        }
+
+        public async Task<Guid> ResetPasswordAsync(string tokenValue, string newPassword)
+        {
+            var token = await _passwordResetTokens.GetValidAsync(tokenValue)
+                ?? throw new Exception("Invalid or expired token");
+
+            var user = token.User;
+
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
+
+            token.IsUsed = true;
+
+            await _refreshTokens.RevokeAllForUserAsync(user.Id);
+
+            await _users.SaveChangesAsync();
+            await _passwordResetTokens.SaveChangesAsync();
+            return user.Id;
+        }
+        private static string GenerateSecureToken()
+        {
+            var bytes = System.Security.Cryptography.RandomNumberGenerator.GetBytes(64);
+            return Convert.ToBase64String(bytes);
         }
 
 

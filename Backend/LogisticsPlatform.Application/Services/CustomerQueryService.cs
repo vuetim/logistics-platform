@@ -1,6 +1,6 @@
 ﻿using LogisticsPlatform.Application.DTOs.Pagination;
-using LogisticsPlatform.Application.Interfaces.Repositories;
-using LogisticsPlatform.Application.Interfaces.Services;
+using LogisticsPlatform.Application.Interfaces.Repositories.Queries;
+using LogisticsPlatform.Application.Interfaces.Services.Customers;
 using LogisticsPlatform.Domain.Entities;
 
 public class CustomerQueryService : ICustomerQueryService

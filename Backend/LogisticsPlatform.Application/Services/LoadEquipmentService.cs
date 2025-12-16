@@ -1,6 +1,6 @@
 ﻿using LogisticsPlatform.Application.DTOs.Loads.LoadEquipment;
-using LogisticsPlatform.Application.Interfaces.Repositories;
-using LogisticsPlatform.Application.Interfaces.Services;
+using LogisticsPlatform.Application.Interfaces.Repositories.Loads;
+using LogisticsPlatform.Application.Interfaces.Services.Loads;
 using LogisticsPlatform.Domain.Entities;
 using LogisticsPlatform.Domain.Enums;
 
@@ -32,7 +32,9 @@ public class LoadEquipmentService : ILoadEquipmentService
             WeightUnit = e.WeightUnit,
             MinTemp = e.MinTemp,
             MaxTemp = e.MaxTemp,
-            TempUnit = e.TempUnit
+            TempUnit = e.TempUnit,
+            Quantity = e.Quantity
+
         });
     }
 
@@ -58,7 +60,8 @@ public class LoadEquipmentService : ILoadEquipmentService
             WeightUnit = dto.WeightUnit,
             MinTemp = dto.MinTemp,
             MaxTemp = dto.MaxTemp,
-            TempUnit = dto.TempUnit
+            TempUnit = dto.TempUnit,
+            Quantity = dto.Quantity
         };
 
         await _equipmentRepo.AddAsync(equipment);
@@ -78,7 +81,9 @@ public class LoadEquipmentService : ILoadEquipmentService
             WeightUnit = equipment.WeightUnit,
             MinTemp = equipment.MinTemp,
             MaxTemp = equipment.MaxTemp,
-            TempUnit = equipment.TempUnit
+            TempUnit = equipment.TempUnit,
+            Quantity = equipment.Quantity,
+
         };
     }
 
@@ -94,6 +99,7 @@ public class LoadEquipmentService : ILoadEquipmentService
         equipment.MinTemp = dto.MinTemp;
         equipment.MaxTemp = dto.MaxTemp;
         equipment.TempUnit = dto.TempUnit;
+        equipment.Quantity = dto.Quantity;
 
         await _equipmentRepo.UpdateAsync(equipment);
         await _equipmentRepo.SaveChangesAsync();
@@ -104,7 +110,26 @@ public class LoadEquipmentService : ILoadEquipmentService
         var equipment = await _equipmentRepo.GetByIdAsync(id)
             ?? throw new Exception("Equipment not found");
 
+        var load = await _loadRepo.GetByIdAsync(equipment.LoadId)
+            ?? throw new Exception("Load not found");
+
         await _equipmentRepo.DeleteAsync(equipment);
+
+        var remaining = await _equipmentRepo.GetByLoadIdAsync(load.Id);
+
+        if (!remaining.Any())
+        {
+            load.HasEquipment = false;
+            load.IsTemperatureControlled = false;
+            await _loadRepo.UpdateAsync(load);
+        }
+        else if (!remaining.Any(e => e.EquipmentType == EquipmentType.Reefer))
+        {
+            load.IsTemperatureControlled = false;
+            await _loadRepo.UpdateAsync(load);
+        }
+
         await _equipmentRepo.SaveChangesAsync();
     }
+
 }

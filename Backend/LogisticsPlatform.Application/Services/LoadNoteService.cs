@@ -1,8 +1,9 @@
 ﻿using LogisticsPlatform.Application.Authorization;
 using LogisticsPlatform.Application.Common.Exceptions;
 using LogisticsPlatform.Application.DTOs.Loads.LoadNote;
-using LogisticsPlatform.Application.Interfaces.Repositories;
-using LogisticsPlatform.Application.Interfaces.Services;
+using LogisticsPlatform.Application.Interfaces.Repositories.Loads;
+using LogisticsPlatform.Application.Interfaces.Repositories.Users;
+using LogisticsPlatform.Application.Interfaces.Services.Loads;
 using LogisticsPlatform.Domain.Entities;
 using LogisticsPlatform.Domain.Security;
 

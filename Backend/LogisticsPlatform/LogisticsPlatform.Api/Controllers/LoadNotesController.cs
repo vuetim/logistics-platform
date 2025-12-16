@@ -1,5 +1,5 @@
 ﻿using LogisticsPlatform.Application.DTOs.Loads.LoadNote;
-using LogisticsPlatform.Application.Interfaces.Services;
+using LogisticsPlatform.Application.Interfaces.Services.Loads;
 using LogisticsPlatform.Domain.Entities;
 using LogisticsPlatform.Infrastructure.Extensions;
 using Microsoft.AspNetCore.Authorization;

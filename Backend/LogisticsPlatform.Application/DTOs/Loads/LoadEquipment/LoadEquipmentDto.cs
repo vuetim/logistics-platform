@@ -11,6 +11,7 @@ namespace LogisticsPlatform.Application.DTOs.Loads.LoadEquipment
     {
         public Guid Id { get; set; }
 
+        public int? Quantity { get; set; }
         public EquipmentType EquipmentType { get; set; }
 
         public decimal? Length { get; set; }

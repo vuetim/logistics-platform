@@ -3,8 +3,9 @@ using LogisticsPlatform.Application.DTOs.Loads;
 using LogisticsPlatform.Application.DTOs.Loads.LoadEquipment;
 using LogisticsPlatform.Application.DTOs.Loads.LoadStop;
 using LogisticsPlatform.Application.DTOs.Pagination;
-using LogisticsPlatform.Application.Interfaces.Repositories;
-using LogisticsPlatform.Application.Interfaces.Services;
+using LogisticsPlatform.Application.Interfaces.Repositories.Loads;
+using LogisticsPlatform.Application.Interfaces.Repositories.Queries;
+using LogisticsPlatform.Application.Interfaces.Services.Loads;
 using LogisticsPlatform.Domain.Entities;
 using LogisticsPlatform.Domain.Enums;
 

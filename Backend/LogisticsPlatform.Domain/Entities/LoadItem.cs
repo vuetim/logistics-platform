@@ -10,9 +10,15 @@ public class LoadItem : BaseEntity
 
     // SNAPSHOT BASIC
     public string Name { get; set; } = null!;
+    public string? CustomerReference { get; set; }   // SKU / PO line
+
     public decimal Quantity { get; set; }
     public string QuantityUnit { get; set; } = null!;
     public bool IsHazmat { get; set; }
+    public string? HazardClass { get; set; }
+
+    public string? IdentificationNumber { get; set; } // UN number
+
     public string? FreightClass { get; set; }
 
     // EXECUTION DETAILS (qato që po editon)
@@ -37,4 +43,6 @@ public class LoadItem : BaseEntity
 
     public bool Stackable { get; set; } = true;
     public string? Notes { get; set; }
+    public string? VolumeUnit { get; set; }
+    public decimal? Volume { get; set; }
 }

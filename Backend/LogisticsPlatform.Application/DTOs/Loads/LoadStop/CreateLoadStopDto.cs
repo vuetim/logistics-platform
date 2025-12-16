@@ -25,6 +25,8 @@ namespace LogisticsPlatform.Application.DTOs.Loads.LoadStop
 
         public AppointmentType AppointmentType { get; set; } = AppointmentType.Appointment;
         public int? FlexMinutes { get; set; }
+        public string? AppointmentNumber { get; set; }
+        public string StopReference { get; set; }
 
         public string? Notes { get; set; }
     }

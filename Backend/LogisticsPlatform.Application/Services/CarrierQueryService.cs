@@ -1,6 +1,6 @@
 ﻿using LogisticsPlatform.Application.DTOs.Pagination;
-using LogisticsPlatform.Application.Interfaces.Repositories;
-using LogisticsPlatform.Application.Interfaces.Services;
+using LogisticsPlatform.Application.Interfaces.Repositories.Queries;
+using LogisticsPlatform.Application.Interfaces.Services.Carriers;
 using LogisticsPlatform.Domain.Entities;
 
 namespace LogisticsPlatform.Application.Services

@@ -15,6 +15,8 @@ public class UpdateOrderRouteDto
 
     public DateTime? PlannedArrivalFrom { get; set; }
     public DateTime? PlannedArrivalTo { get; set; }
+    public string? StopReference { get; set; }      // pickup / delivery ref
+    public string? AppointmentNumber { get; set; }  // known at planning
 
     public bool? HasTime { get; set; }
     public bool? CopyToLoad { get; set; }

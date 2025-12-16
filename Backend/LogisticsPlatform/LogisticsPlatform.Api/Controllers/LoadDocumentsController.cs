@@ -1,5 +1,5 @@
 ﻿using LogisticsPlatform.Application.DTOs.Loads.LoadDocuments;
-using LogisticsPlatform.Application.Interfaces.Services;
+using LogisticsPlatform.Application.Interfaces.Services.Loads;
 using LogisticsPlatform.Domain.Security;
 using LogisticsPlatform.Infrastructure.Extensions; // User.GetUserId()
 using Microsoft.AspNetCore.Authorization;

@@ -19,6 +19,9 @@ public class OrderRouteDto
     public bool CopyToLoad { get; set; }
     public DateTime? AppointmentFrom { get; set; }
     public DateTime? AppointmentTo { get; set; }
+    public string? StopReference { get; set; }      // pickup / delivery ref
+    public string? AppointmentNumber { get; set; }  // known at planning
+
     public string? Notes { get; set; }
 
     public bool IsActive { get; set; }

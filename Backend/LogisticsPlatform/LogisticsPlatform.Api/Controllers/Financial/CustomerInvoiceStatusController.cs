@@ -1,5 +1,5 @@
 ﻿using LogisticsPlatform.Application.DTOs.Financial;
-using LogisticsPlatform.Application.Interfaces.Services;
+using LogisticsPlatform.Application.Interfaces.Services.Customers;
 using LogisticsPlatform.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

@@ -1,7 +1,8 @@
 ﻿using LogisticsPlatform.Application.DTOs.Loads;
 using LogisticsPlatform.Application.DTOs.Orders;
 using LogisticsPlatform.Application.DTOs.Pagination;
-using LogisticsPlatform.Application.Interfaces.Services;
+using LogisticsPlatform.Application.Interfaces.Services.Loads;
+using LogisticsPlatform.Application.Interfaces.Services.Orders;
 using LogisticsPlatform.Application.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

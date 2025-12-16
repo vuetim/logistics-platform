@@ -1,4 +1,4 @@
-﻿using LogisticsPlatform.Application.Interfaces.Repositories;
+﻿using LogisticsPlatform.Application.Interfaces.Repositories.Users;
 using LogisticsPlatform.Domain.Entities;
 using LogisticsPlatform.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;

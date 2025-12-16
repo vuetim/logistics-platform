@@ -1,6 +1,6 @@
 ﻿using LogisticsPlatform.Application.DTOs.Costs;
 using LogisticsPlatform.Application.Interfaces.Repositories;
-using LogisticsPlatform.Application.Interfaces.Services;
+using LogisticsPlatform.Application.Interfaces.Services.Loads;
 
 namespace LogisticsPlatform.Application.Services.Financial;
 

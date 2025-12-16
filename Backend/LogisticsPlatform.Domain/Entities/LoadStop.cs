@@ -57,8 +57,13 @@ namespace LogisticsPlatform.Domain.Entities
         public bool IsLateDeparture { get; set; }
 
         public string? AppointmentNumber { get; set; }
+        public string StopReference { get; set; }
         public string? ContactName { get; set; }
         public string? ContactPhone { get; set; }
+        public DateTime? PredictedArrivalAt { get; set; }
+        public bool IsAtRiskOfDelay { get; set; }
+        public DelayRiskLevel DelayRisk { get; set; } = DelayRiskLevel.None;
+        public int? MinutesLatePrediction { get; set; }
 
 
         // ======================
@@ -67,5 +72,10 @@ namespace LogisticsPlatform.Domain.Entities
         public StopStatus Status { get; set; } = StopStatus.Pending;
 
         public string? Notes { get; set; }
+        public bool? IsOnTime { get; set; }
+        public int? MinutesLate { get; set; }
+        public string? DelayRiskReason { get; set; }
+
+
     }
 }

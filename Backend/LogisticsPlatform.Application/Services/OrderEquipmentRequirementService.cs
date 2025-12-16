@@ -1,7 +1,7 @@
 ﻿using LogisticsPlatform.Application.Common.Exceptions;
 using LogisticsPlatform.Application.DTOs.Orders.Equipment;
-using LogisticsPlatform.Application.Interfaces.Repositories;
-using LogisticsPlatform.Application.Interfaces.Services;
+using LogisticsPlatform.Application.Interfaces.Repositories.Orders;
+using LogisticsPlatform.Application.Interfaces.Services.Orders;
 using LogisticsPlatform.Domain.Entities;
 using SendGrid.Helpers.Errors.Model;
 
@@ -29,18 +29,27 @@ namespace LogisticsPlatform.Application.Services.Orders
                 Id = r.Id,
                 EquipmentType = r.EquipmentType,
                 EquipmentSize = r.EquipmentSize,
+
+                Quantity = r.Quantity,
+
                 MaxWeight = r.MaxWeight,
                 WeightUnit = r.WeightUnit,
-                RequiredTemperature = r.RequiredTemperature,
+
+                MinTemperature = r.MinTemperature,
+                MaxTemperature = r.MaxTemperature,
                 TemperatureUnit = r.TemperatureUnit,
-                Quantity = r.Quantity,
+
                 IsMandatory = r.IsMandatory,
+                IsPrefered = r.IsPrefered,
+
                 CopyToLoad = r.CopyToLoad,
                 Notes = r.Notes
             });
         }
 
-        public async Task<OrderEquipmentRequirementDto> CreateAsync(Guid orderId, CreateOrderEquipmentRequirementDto dto)
+        public async Task<OrderEquipmentRequirementDto> CreateAsync(
+            Guid orderId,
+            CreateOrderEquipmentRequirementDto dto)
         {
             var order = await _orderRepo.GetByIdAsync(orderId)
                 ?? throw new NotFoundException("Order not found.");
@@ -48,14 +57,22 @@ namespace LogisticsPlatform.Application.Services.Orders
             var req = new OrderEquipmentRequirement
             {
                 OrderId = orderId,
+
                 EquipmentType = dto.EquipmentType,
                 EquipmentSize = dto.EquipmentSize,
+
+                Quantity = dto.Quantity,
+
                 MaxWeight = dto.MaxWeight,
                 WeightUnit = dto.WeightUnit,
-                RequiredTemperature = dto.RequiredTemperature,
+
+                MinTemperature = dto.MinTemperature,
+                MaxTemperature = dto.MaxTemperature,
                 TemperatureUnit = dto.TemperatureUnit,
-                Quantity = dto.Quantity,
+
                 IsMandatory = dto.IsMandatory,
+                IsPrefered = dto.IsPrefered,
+
                 CopyToLoad = dto.CopyToLoad,
                 Notes = dto.Notes
             };
@@ -68,12 +85,19 @@ namespace LogisticsPlatform.Application.Services.Orders
                 Id = req.Id,
                 EquipmentType = req.EquipmentType,
                 EquipmentSize = req.EquipmentSize,
+
+                Quantity = req.Quantity,
+
                 MaxWeight = req.MaxWeight,
                 WeightUnit = req.WeightUnit,
-                RequiredTemperature = req.RequiredTemperature,
+
+                MinTemperature = req.MinTemperature,
+                MaxTemperature = req.MaxTemperature,
                 TemperatureUnit = req.TemperatureUnit,
-                Quantity = req.Quantity,
+
                 IsMandatory = req.IsMandatory,
+                IsPrefered = req.IsPrefered,
+
                 CopyToLoad = req.CopyToLoad,
                 Notes = req.Notes
             };
@@ -86,15 +110,21 @@ namespace LogisticsPlatform.Application.Services.Orders
 
             req.EquipmentType = dto.EquipmentType;
             req.EquipmentSize = dto.EquipmentSize;
+
+            req.Quantity = dto.Quantity;
+
             req.MaxWeight = dto.MaxWeight;
             req.WeightUnit = dto.WeightUnit;
-            req.RequiredTemperature = dto.RequiredTemperature;
+
+            req.MinTemperature = dto.MinTemperature;
+            req.MaxTemperature = dto.MaxTemperature;
             req.TemperatureUnit = dto.TemperatureUnit;
-            req.Quantity = dto.Quantity;
+
             req.IsMandatory = dto.IsMandatory;
+            req.IsPrefered = dto.IsPrefered;
+
             req.CopyToLoad = dto.CopyToLoad;
             req.Notes = dto.Notes;
-
             await _equipmentRepo.UpdateAsync(req);
             await _equipmentRepo.SaveChangesAsync();
         }

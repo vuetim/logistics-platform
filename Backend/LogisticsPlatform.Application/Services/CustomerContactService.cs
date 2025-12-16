@@ -1,6 +1,6 @@
 ﻿using LogisticsPlatform.Application.DTOs.Customers.Contacts;
-using LogisticsPlatform.Application.Interfaces.Repositories;
-using LogisticsPlatform.Application.Interfaces.Services;
+using LogisticsPlatform.Application.Interfaces.Repositories.Customers;
+using LogisticsPlatform.Application.Interfaces.Services.Customers;
 using LogisticsPlatform.Domain.Enums;
 
 namespace LogisticsPlatform.Application.Services

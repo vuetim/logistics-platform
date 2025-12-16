@@ -1,6 +1,6 @@
 ﻿using LogisticsPlatform.Application.DTOs.Customers;
 using LogisticsPlatform.Application.DTOs.Pagination;
-using LogisticsPlatform.Application.Interfaces.Services;
+using LogisticsPlatform.Application.Interfaces.Services.Customers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

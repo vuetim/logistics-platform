@@ -1,5 +1,5 @@
 ﻿using LogisticsPlatform.Application.DTOs.Carriers.Addresses;
-using LogisticsPlatform.Application.Interfaces.Services;
+using LogisticsPlatform.Application.Interfaces.Services.Carriers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

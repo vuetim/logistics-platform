@@ -1,7 +1,10 @@
 ﻿using LogisticsPlatform.Application.Common.Exceptions;
 using LogisticsPlatform.Application.DTOs.Orders;
-using LogisticsPlatform.Application.Interfaces.Repositories;
-using LogisticsPlatform.Application.Interfaces.Services;
+using LogisticsPlatform.Application.Interfaces.Repositories.Carriers;
+using LogisticsPlatform.Application.Interfaces.Repositories.Customers;
+using LogisticsPlatform.Application.Interfaces.Repositories.Orders;
+using LogisticsPlatform.Application.Interfaces.Repositories.Users;
+using LogisticsPlatform.Application.Interfaces.Services.Orders;
 using LogisticsPlatform.Domain.Entities;
 using LogisticsPlatform.Domain.Enums;
 using SendGrid.Helpers.Errors.Model;

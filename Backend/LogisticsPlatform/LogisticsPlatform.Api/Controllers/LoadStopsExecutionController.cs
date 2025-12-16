@@ -1,4 +1,4 @@
-﻿using LogisticsPlatform.Application.Interfaces.Services;
+﻿using LogisticsPlatform.Application.Interfaces.Services.Loads;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;

@@ -1,5 +1,6 @@
-﻿using LogisticsPlatform.Application.Interfaces.Repositories;
+﻿using LogisticsPlatform.Application.Interfaces.Repositories.Loads;
 using LogisticsPlatform.Domain.Entities;
+using LogisticsPlatform.Domain.Enums;
 using LogisticsPlatform.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -50,4 +51,15 @@ public class LoadStopRepository : ILoadStopRepository
                 .ThenInclude(l => l.Stops)
             .FirstOrDefaultAsync(s => s.Id == id);
     }
+
+    public async Task<List<LoadStop>> GetEnRouteStopsWithLoadAsync()
+    {
+        return await _context.LoadStops
+            .Include(s => s.Load)
+            .Where(s => s.Status == StopStatus.EnRoute)
+            .ToListAsync();
+    }
+
+
+
 }

@@ -1,5 +1,5 @@
 ﻿using LogisticsPlatform.Application.DTOs.Carriers.Contacts;
-using LogisticsPlatform.Application.Interfaces.Services;
+using LogisticsPlatform.Application.Interfaces.Services.Carriers;
 using LogisticsPlatform.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

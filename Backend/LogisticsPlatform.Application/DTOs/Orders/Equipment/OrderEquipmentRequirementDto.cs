@@ -1,4 +1,6 @@
-﻿namespace LogisticsPlatform.Application.DTOs.Orders.Equipment
+﻿using LogisticsPlatform.Domain.Enums;
+
+namespace LogisticsPlatform.Application.DTOs.Orders.Equipment
 {
     public class OrderEquipmentRequirementDto
     {
@@ -8,15 +10,17 @@
         public string? EquipmentSize { get; set; }                // "53 ft", "48 ft"
 
         public decimal? MaxWeight { get; set; }
-        public string? WeightUnit { get; set; }                   // "lb", "kg"
+        public WeightUnit? WeightUnit { get; set; }
+        public decimal? MinTemperature { get; set; }
+        public decimal? MaxTemperature { get; set; }
 
-        public decimal? RequiredTemperature { get; set; }
-        public string? TemperatureUnit { get; set; }              // "F", "C"
+        public TemperatureUnit? TemperatureUnit { get; set; }              // "F", "C"
 
         public int Quantity { get; set; }
         public bool IsMandatory { get; set; }
         public bool CopyToLoad { get; set; }
 
         public string? Notes { get; set; }
+        public bool? IsPrefered { get; set; }
     }
 }

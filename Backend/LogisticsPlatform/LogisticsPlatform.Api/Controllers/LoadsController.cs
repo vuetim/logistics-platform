@@ -1,7 +1,9 @@
 ﻿using LogisticsPlatform.Application.DTOs.Loads;
 using LogisticsPlatform.Application.DTOs.Pagination;
-using LogisticsPlatform.Application.Interfaces.Services;
+using LogisticsPlatform.Application.Interfaces.Services.Loads;
+using LogisticsPlatform.Application.Services;
 using LogisticsPlatform.Domain.Enums;
+using LogisticsPlatform.Infrastructure.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -74,6 +76,15 @@ namespace LogisticsPlatform.Api.Controllers
             return Ok();
         }
 
+        //dispatch 
+        [HttpPost("{loadId:guid}/dispatch")]
+        public async Task<IActionResult> Dispatch(
+    Guid loadId,
+    [FromBody] DispatchLoadDto dto)
+        {
+            await _service.DispatchAsync(loadId, dto, User.GetUserId());
+            return NoContent();
+        }
 
 
         //  ARCHIVE LOAD

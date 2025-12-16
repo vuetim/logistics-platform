@@ -1,8 +1,8 @@
-﻿using LogisticsPlatform.Application.Interfaces.Services;
-using LogisticsPlatform.Domain.Entities.Financial;
+﻿using LogisticsPlatform.Domain.Entities.Financial;
 using LogisticsPlatform.Infrastructure.Services.Documents;
 using QuestPDF.Fluent;
 using Microsoft.AspNetCore.Hosting;
+using LogisticsPlatform.Application.Interfaces.Services.Security;
 
 
 namespace LogisticsPlatform.Infrastructure.Services

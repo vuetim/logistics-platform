@@ -1,8 +1,9 @@
 ﻿using LogisticsPlatform.Application.DTOs.ActivityLog;
 using LogisticsPlatform.Application.DTOs.Costs;
 using LogisticsPlatform.Application.Extensions;
-using LogisticsPlatform.Application.Interfaces.Repositories;
-using LogisticsPlatform.Application.Interfaces.Services;
+using LogisticsPlatform.Application.Interfaces.Repositories.Orders;
+using LogisticsPlatform.Application.Interfaces.Services.ActivityLog;
+using LogisticsPlatform.Application.Interfaces.Services.Orders;
 using LogisticsPlatform.Domain.Entities;
 using LogisticsPlatform.Domain.Enums;
 using SendGrid.Helpers.Errors.Model;

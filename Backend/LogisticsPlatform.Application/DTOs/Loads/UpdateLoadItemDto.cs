@@ -13,7 +13,8 @@
         public decimal? Width { get; set; }
         public decimal? Height { get; set; }
         public string? DimensionUnit { get; set; }
-
+        public string? VolumeUnit { get; set; }
+        public decimal? Volume { get; set; }
         public decimal? MinTemperature { get; set; }
         public decimal? MaxTemperature { get; set; }
         public string? TemperatureUnit { get; set; }

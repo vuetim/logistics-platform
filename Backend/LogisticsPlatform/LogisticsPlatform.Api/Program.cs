@@ -1,7 +1,22 @@
+﻿using Hangfire;
 using LogisticsPlatform.Application.Authorization;
+using LogisticsPlatform.Application.BackgroundJobs;
 using LogisticsPlatform.Application.Interfaces.Repositories;
+using LogisticsPlatform.Application.Interfaces.Repositories.Carriers;
+using LogisticsPlatform.Application.Interfaces.Repositories.Customers;
+using LogisticsPlatform.Application.Interfaces.Repositories.Loads;
+using LogisticsPlatform.Application.Interfaces.Repositories.Orders;
 using LogisticsPlatform.Application.Interfaces.Repositories.Queries;
-using LogisticsPlatform.Application.Interfaces.Services;
+using LogisticsPlatform.Application.Interfaces.Repositories.Security;
+using LogisticsPlatform.Application.Interfaces.Repositories.Users;
+using LogisticsPlatform.Application.Interfaces.Services.ActivityLog;
+using LogisticsPlatform.Application.Interfaces.Services.Auth;
+using LogisticsPlatform.Application.Interfaces.Services.Carriers;
+using LogisticsPlatform.Application.Interfaces.Services.Customers;
+using LogisticsPlatform.Application.Interfaces.Services.Loads;
+using LogisticsPlatform.Application.Interfaces.Services.Orders;
+using LogisticsPlatform.Application.Interfaces.Services.Security;
+using LogisticsPlatform.Application.Jobs;
 using LogisticsPlatform.Application.Options;
 using LogisticsPlatform.Application.Services;
 using LogisticsPlatform.Application.Services.Financial;
@@ -19,7 +34,16 @@ using Microsoft.OpenApi.Models;
 using QuestPDF.Infrastructure;
 using System.Text;
 
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddHangfire(x =>
+    x.UseSqlServerStorage(
+        builder.Configuration.GetConnectionString("DefaultConnection")));
+
+
+builder.Services.AddHangfireServer();
+
 //QUESTPDF LICENSE
 QuestPDF.Settings.License = LicenseType.Community;
 
@@ -35,7 +59,6 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 //email
 builder.Services.Configure<SmtpOptions>(
     builder.Configuration.GetSection("Smtp"));
-builder.Services.AddScoped<IEmailService, EmailService>();
 
 
 // 3. Repositories
@@ -74,6 +97,19 @@ builder.Services.AddScoped<IOrderEquipmentRequirementRepository, OrderEquipmentR
 builder.Services.AddScoped<ICustomerInvoiceRepository, CustomerInvoiceRepository>();
 builder.Services.AddScoped<ICarrierSettlementRepository, CarrierSettlementRepository>();
 builder.Services.AddScoped<ILoadFinancialSnapshotRepository, LoadFinancialSnapshotRepository>();
+//Carrier Assignment
+builder.Services.AddScoped<ILoadCarrierAssignmentRepository, LoadCarrierAssignmentRepository>();
+//carrier performance 
+builder.Services.AddScoped<ICarrierPerformanceRepository, CarrierPerformanceRepository>();
+builder.Services.AddScoped<ILoadAlertRepository, LoadAlertRepository>();
+builder.Services.AddHostedService<HangfireStartupJob>();
+// Delay fault (system)
+builder.Services.AddScoped<IDelayFaultAttributionService, DelayFaultAttributionService>();
+//Delay responsibility(manual)
+
+builder.Services.AddScoped<IDelayResponsibilityService, DelayResponsibilityService>();
+
+builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 
 
 
@@ -124,12 +160,23 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 
 //pdf 
 builder.Services.AddScoped<IPdfService, PdfService>();
+// Carrier Assignment 
+builder.Services.AddScoped<ICarrierAssignmentService, CarrierAssignmentService>();
+//carrierperformance 
+builder.Services.AddScoped<ICarrierPerformanceService, CarrierPerformanceService>();
+//carrier score perfromance analytics 
+builder.Services.AddScoped<CarrierScoreCardService>();
 
+builder.Services.AddScoped<IEtaPredictionService, EtaPredictionService>();
+builder.Services.AddScoped<EtaMonitoringJob>();
+builder.Services.AddScoped<ILoadAlertService, LoadAlertService>();
+// Delay fault (system)
+builder.Services.AddScoped<ILoadDelayResponsibilityRepository, LoadDelayResponsibilityRepository>();
 
-
-
-
-
+//Delay responsibility(manual)
+builder.Services.AddScoped<IDelayResponsibilityRepository, DelayResponsibilityRepository>();
+builder.Services.AddScoped<IPasswordResetTokenRepository, PasswordResetTokenRepository>();
+builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 
 
 
@@ -196,6 +243,7 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 var app = builder.Build();
+//app.UseHangfireDashboard("/hangfire");
 
 // Middleware
 if (app.Environment.IsDevelopment())
@@ -210,5 +258,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.UseStaticFiles();
 app.MapControllers();
+//  ETA background job
+
 
 app.Run();

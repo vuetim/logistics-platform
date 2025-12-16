@@ -1,8 +1,11 @@
 ﻿using LogisticsPlatform.Application.Interfaces.Repositories;
-using LogisticsPlatform.Application.Interfaces.Services;
 using LogisticsPlatform.Domain.Entities;
 using LogisticsPlatform.Domain.Enums;
 using LogisticsPlatform.Application.DTOs.Financial;
+using LogisticsPlatform.Application.Interfaces.Services.Loads;
+using LogisticsPlatform.Application.Interfaces.Services.Carriers;
+using LogisticsPlatform.Application.Interfaces.Services.Customers;
+using LogisticsPlatform.Application.Interfaces.Services.Security;
 
 namespace LogisticsPlatform.Application.Services.Financial;
 

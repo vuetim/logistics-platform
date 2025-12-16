@@ -10,7 +10,7 @@ namespace LogisticsPlatform.Application.DTOs.Loads.LoadEquipment
     public class CreateLoadEquipmentDto
     {
         public EquipmentType EquipmentType { get; set; }
-
+        public int Quantity { get; set; }
         public decimal? Length { get; set; }
 
         public decimal? Weight { get; set; }

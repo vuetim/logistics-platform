@@ -1,6 +1,6 @@
 ﻿using LogisticsPlatform.Application.DTOs.ActivityLog;
 using LogisticsPlatform.Application.Interfaces.Repositories;
-using LogisticsPlatform.Application.Interfaces.Services;
+using LogisticsPlatform.Application.Interfaces.Services.ActivityLog;
 using LogisticsPlatform.Domain.Entities;
 
 public class ActivityLogService : IActivityLogService

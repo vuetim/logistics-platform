@@ -61,6 +61,10 @@ namespace LogisticsPlatform.Domain.Entities
         public bool OnTimePickup { get; set; }
         public bool OnTimeDelivery { get; set; }
         public int? TransitTimeHours { get; set; }
+        public bool HasDelayRisk { get; set; }
+
+        public ICollection<LoadCarrierAssignment> CarrierAssignments { get; set; }
+    = new List<LoadCarrierAssignment>();
 
         // Audit
         public Guid CreatedByUserId { get; set; }

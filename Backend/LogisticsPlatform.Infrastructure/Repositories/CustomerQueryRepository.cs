@@ -1,5 +1,5 @@
 ﻿using LogisticsPlatform.Application.DTOs.Pagination;
-using LogisticsPlatform.Application.Interfaces.Repositories;
+using LogisticsPlatform.Application.Interfaces.Repositories.Queries;
 using LogisticsPlatform.Domain.Entities;
 using LogisticsPlatform.Infrastructure.Extensions;
 using LogisticsPlatform.Infrastructure.Persistence;

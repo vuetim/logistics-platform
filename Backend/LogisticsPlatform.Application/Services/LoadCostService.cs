@@ -1,14 +1,15 @@
 ﻿using LogisticsPlatform.Application.Common.Exceptions;
 using LogisticsPlatform.Application.DTOs.ActivityLog;
 using LogisticsPlatform.Application.DTOs.Costs;
-using LogisticsPlatform.Application.Interfaces.Repositories;
-using LogisticsPlatform.Application.Interfaces.Services;
 using LogisticsPlatform.Domain.Entities;
 using LogisticsPlatform.Domain.Enums;
 using SendGrid.Helpers.Errors.Model;
 using LogisticsPlatform.Application.Extensions;
 
 using System.Collections.Generic;
+using LogisticsPlatform.Application.Interfaces.Services.Loads;
+using LogisticsPlatform.Application.Interfaces.Services.ActivityLog;
+using LogisticsPlatform.Application.Interfaces.Repositories.Loads;
 
 namespace LogisticsPlatform.Application.Services;
 

@@ -1,7 +1,7 @@
 ﻿using LogisticsPlatform.Application.DTOs.Orders;
 using LogisticsPlatform.Application.DTOs.Pagination;
 using LogisticsPlatform.Application.Interfaces.Repositories.Queries;
-using LogisticsPlatform.Application.Interfaces.Services;
+using LogisticsPlatform.Application.Interfaces.Services.Orders;
 
 namespace LogisticsPlatform.Application.Services
 {

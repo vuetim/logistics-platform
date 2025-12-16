@@ -1,5 +1,5 @@
 ﻿public enum LoadStatus
-{
+{ 
     Draft = 0,
     Planned = 1,
     Dispatched = 2,
@@ -12,4 +12,7 @@
     Completed = 9,
     Cancelled = 10,
     InTransit = 11,
+    Accepted = 12,
+    Tendered = 13,
+        Rejected = 14,
 }

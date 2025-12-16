@@ -1,9 +1,8 @@
-﻿using LogisticsPlatform.Application.Interfaces.Services;
+﻿using LogisticsPlatform.Application.Interfaces.Services.Security;
 using LogisticsPlatform.Application.Options;
+using Microsoft.Extensions.Options;
 using System.Net;
 using System.Net.Mail;
-using Microsoft.Extensions.Options;
-
 
 public class EmailService : IEmailService
 {

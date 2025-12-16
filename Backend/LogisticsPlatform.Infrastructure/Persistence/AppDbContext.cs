@@ -1,6 +1,7 @@
 ﻿using LogisticsPlatform.Domain.Constants;
 using LogisticsPlatform.Domain.Entities;
 using LogisticsPlatform.Domain.Entities.Financial;
+using LogisticsPlatform.Domain.Entities.Security;
 using Microsoft.EntityFrameworkCore;
 
 namespace LogisticsPlatform.Infrastructure.Persistence;
@@ -55,6 +56,20 @@ public class AppDbContext : DbContext
 
     public DbSet<CarrierSettlement> CarrierSettlements => Set<CarrierSettlement>();
     public DbSet<CarrierSettlementLineItem> CarrierSettlementLineItems => Set<CarrierSettlementLineItem>();
+    //carrierassignment
+    public DbSet<LoadCarrierAssignment> LoadCarrierAssignments { get; set; }
+    //carrier performance 
+
+    public DbSet<CarrierStopPerformance> CarrierStopPerformances { get; set; }
+    public DbSet<LoadAlert> LoadAlerts => Set<LoadAlert>();
+
+    public DbSet<DelayResponsibility> DelayResponsibilities { get; set; }
+    public DbSet<LoadDelayResponsibility> LoadDelayResponsibilities { get; set; }
+    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+    public DbSet<PasswordResetToken> PasswordResetTokens => Set<PasswordResetToken>();
+    public DbSet<AuthAuditLog> AuthAuditLogs => Set<AuthAuditLog>();
+
+
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -117,6 +132,10 @@ public class AppDbContext : DbContext
         {
             entity.Property(x => x.CustomerRate)
                    .HasPrecision(18, 2);
+            entity.Property(x => x.TotalVolume)
+                  .HasPrecision(18, 4);
+            entity.Property(x => x.TotalWeight)
+                .HasPrecision(18, 2);
 
         });
 
@@ -159,6 +178,22 @@ public class AppDbContext : DbContext
             entity.Property(x => x.TotalAmount)
                   .HasPrecision(18, 4);
         });
+
+        //carrier assignment
+        modelBuilder.Entity<LoadCarrierAssignment>(e =>
+        {
+            e.HasOne(x => x.Load)
+                .WithMany(l => l.CarrierAssignments)
+                .HasForeignKey(x => x.LoadId);
+
+            e.HasOne(x => x.Carrier)
+                .WithMany()
+                .HasForeignKey(x => x.CarrierId);
+
+            e.Property(x => x.OfferedRate)
+                .HasPrecision(12, 2);
+        });
+
 
         modelBuilder.Entity<LoadCostLineItem>(entity =>
         {
@@ -261,8 +296,10 @@ public class AppDbContext : DbContext
             entity.Property(x => x.MaxWeight)
                 .HasPrecision(18, 3);
 
-            entity.Property(x => x.RequiredTemperature)
+            entity.Property(x => x.MinTemperature)
                 .HasPrecision(5, 2);
+            entity.Property(x => x.MaxTemperature)
+            .HasPrecision(5, 2);
         });
         modelBuilder.Entity<OrderRoute>(entity =>
         {
@@ -299,7 +336,9 @@ public class AppDbContext : DbContext
             entity.Property(x => x.Height)
                 .HasPrecision(18, 4);
 
-            
+            entity.Property(x => x.Volume)
+                .HasPrecision(18, 4);
+
 
             // Temperature
             entity.Property(x => x.MinTemperature)

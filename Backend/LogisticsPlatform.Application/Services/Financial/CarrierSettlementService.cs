@@ -1,7 +1,7 @@
 ﻿using LogisticsPlatform.Application.Common.Exceptions;
 using LogisticsPlatform.Application.DTOs.Financial;
-using LogisticsPlatform.Application.Interfaces.Repositories;
-using LogisticsPlatform.Application.Interfaces.Services;
+using LogisticsPlatform.Application.Interfaces.Repositories.Loads;
+using LogisticsPlatform.Application.Interfaces.Services.Carriers;
 using LogisticsPlatform.Domain.Entities;
 using LogisticsPlatform.Domain.Entities.Financial;
 using LogisticsPlatform.Domain.Enums;
