@@ -1,6 +1,6 @@
 export interface JwtClaims {
     sub: string;          // userId
-    email: string;
+    email?: string;
     permissions?: string;
 
     name: string;

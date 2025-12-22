@@ -42,9 +42,25 @@ export class AuthFacade {
     }
 
     logout() {
-        this.storage.clear();
-        localStorage.removeItem('remember_me');
+        const session = this.storage.get();
+
+        if (session?.refreshToken) {
+            this.api.logout(session.refreshToken).subscribe({
+                complete: () => {
+                    this.storage.clear();
+                    localStorage.removeItem('remember_me');
+                },
+                error: () => {
+                    this.storage.clear();
+                    localStorage.removeItem('remember_me');
+                }
+            });
+        } else {
+            this.storage.clear();
+            localStorage.removeItem('remember_me');
+        }
     }
+
 
     forgotPassword(email: string) {
         return this.api.forgotPassword({ email });
@@ -93,6 +109,11 @@ export class AuthFacade {
         if (!session) return null;
 
         return this.jwt.decode(session.accessToken).name ?? null;
+    }
+    getUserEmail(): string | null {
+        const session = this.storage.get();
+        if (!session) return null;
+        return this.jwt.decode(session.accessToken).email ?? null;
     }
 
     getUserInitials(): string {

@@ -1,1 +1,95 @@
-/* You can add global styles to this file, and also import other style files */
+/* =========================
+   GLOBAL RESET
+========================= */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 14px;
+}
+
+body {
+  margin: 0;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.4;
+  color: #111827;
+  background-color: #f5f4f4;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+/* =========================
+   TYPOGRAPHY TOKENS
+========================= */
+:root {
+  /* TEXT */
+  --text-xs: 11px;
+  --text-sm: 12px;
+  --text-md: 14px; /* default */
+  --text-lg: 15px;
+  --text-xl: 16px;
+
+  /* TITLES */
+  --title-xs: 16px;
+  --title-sm: 18px;
+  --title-md: 22px;
+  --title-lg: 26px;
+
+  /* LINE HEIGHT */
+  --lh-tight: 1.2;
+  --lh-normal: 1.4;
+  --lh-loose: 1.6;
+
+  /* FONT WEIGHT */
+  --fw-normal: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+}
+p {
+  margin: 0;
+  font-size: var(--text-md);
+  line-height: var(--lh-normal);
+}
+
+small {
+  font-size: var(--text-sm);
+  color: #6b7280;
+}
+
+label {
+  font-size: var(--text-sm);
+  font-weight: var(--fw-medium);
+  color: #374151;
+}
+
+input,
+button,
+textarea,
+select {
+  font-family: inherit;
+  font-size: var(--text-md);
+}
+h1 {
+  font-size: var(--title-lg);
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-tight);
+}
+
+h2 {
+  font-size: var(--title-md);
+  font-weight: var(--fw-semibold);
+}
+
+h3 {
+  font-size: var(--title-sm);
+  font-weight: var(--fw-semibold);
+}
+
+h4 {
+  font-size: var(--title-xs);
+  font-weight: var(--fw-medium);
+}

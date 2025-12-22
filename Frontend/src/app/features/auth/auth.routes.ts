@@ -7,12 +7,7 @@ export const authRoutes: Routes = [
             import('./pages/login-page/login-page.component')
                 .then(m => m.LoginPageComponent)
     },
-    {
-        path: 'forgot-password',
-        loadComponent: () =>
-            import('./pages/forgot-password/forgot-password.component')
-                .then(m => m.ForgotPasswordComponent)
-    },
+
     {
         path: 'reset-password',
         loadComponent: () =>

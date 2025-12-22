@@ -1,0 +1,63 @@
+:host {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+/* LEFT */
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  padding-left: 24px;
+}
+
+.breadcrumb-root {
+  font-weight: 600;
+}
+
+.breadcrumb-separator {
+  color: #9ca3af;
+}
+
+.breadcrumb-current {
+  color: #374151;
+}
+
+/* RIGHT */
+.header-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-right: 24px;
+}
+
+/* BUTTONS */
+.icon-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+  background: #f3f4f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+/* AVATAR */
+.avatar {
+  cursor: pointer;
+  font-size: 22px;
+}
+
+.menu button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px 12px;
+  width: 100%;
+  text-align: left;
+}

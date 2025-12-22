@@ -285,13 +285,14 @@ namespace LogisticsPlatform.Infrastructure.Services
             var encodedToken = Uri.EscapeDataString(rawToken);
 
             var link =
-                $"{_config["Frontend:BaseUrl"]}/reset-password?token={encodedToken}";
+            $"{_config["Frontend:BaseUrl"]}/auth/reset-password?token={encodedToken}";
+
 
             await _email.SendAsync(
                 user.Email,
                 "Reset your password",
                 $"Click the link to reset your password:\n{link}"
-            );
+            ); 
 
             return user.Id;
         }

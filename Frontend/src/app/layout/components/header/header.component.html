@@ -1,0 +1,25 @@
+<div class="header-left">
+  <div class="logo">
+    <img src="#" alt="Logo" />
+  </div>
+</div>
+
+<div class="header-right">
+  <button class="icon-btn">+</button>
+  <button class="icon-btn">
+    <span class="material-icons">search</span>
+  </button>
+
+  <div class="avatar" (click)="toggle()">
+    <span class="material-icons">account_circle</span>
+
+    <app-user-menu
+      *ngIf="open"
+      [name]="auth.getUserName()"
+      [email]="auth.getUserEmail()"
+      [roles]="auth.getRoles()"
+      (logout)="logout()"
+    >
+    </app-user-menu>
+  </div>
+</div>
