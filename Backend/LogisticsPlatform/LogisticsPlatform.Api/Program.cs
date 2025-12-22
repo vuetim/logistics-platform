@@ -17,6 +17,7 @@ using LogisticsPlatform.Application.Interfaces.Services.Customers;
 using LogisticsPlatform.Application.Interfaces.Services.Loads;
 using LogisticsPlatform.Application.Interfaces.Services.Orders;
 using LogisticsPlatform.Application.Interfaces.Services.Security;
+using LogisticsPlatform.Application.Interfaces.Services.Users;
 using LogisticsPlatform.Application.Jobs;
 using LogisticsPlatform.Application.Options;
 using LogisticsPlatform.Application.Services;
@@ -196,6 +197,9 @@ builder.Services.AddScoped<IDelayResponsibilityRepository, DelayResponsibilityRe
 builder.Services.AddScoped<IPasswordResetTokenRepository, PasswordResetTokenRepository>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 builder.Services.AddScoped<IAuthAuditService, AuthAuditService>();
+//users
+builder.Services.AddScoped<IUserManagementService, UserManagementService>();
+
 
 
 

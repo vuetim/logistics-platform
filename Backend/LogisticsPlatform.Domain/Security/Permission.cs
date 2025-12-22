@@ -23,5 +23,11 @@ public enum Permission
 
 
     //Load from order
-    Load_CreateFromOrder
+    Load_CreateFromOrder,
+        // USERS
+    User_View_All,
+    User_View_Self,
+    User_Update,
+    User_Delete,
+    User_AssignRole
 }

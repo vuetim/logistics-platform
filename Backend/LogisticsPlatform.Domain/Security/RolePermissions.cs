@@ -32,7 +32,9 @@ public static class RolePermissions
                 Permission.LoadNote_View,
                 Permission.LoadNote_Create_Internal,
 
-                Permission.LoadDocument_View
+                Permission.LoadDocument_View,
+                 Permission.User_View_Self,
+    Permission.User_Update
             },
 
             [RoleNames.Dispatcher] = new()

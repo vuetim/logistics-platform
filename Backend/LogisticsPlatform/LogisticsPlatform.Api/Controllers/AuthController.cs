@@ -70,44 +70,7 @@ namespace LogisticsPlatform.Api.Controllers
             await _auth.AssignRoleAsync(dto);
             return Ok();
         }
-        [HttpGet("users")]
-        [Authorize(Roles = RoleNames.Admin)]
-        public async Task<IActionResult> GetAllUsers()
-        {
-            var result = await _auth.GetAllUsersAsync();
-            return Ok(result);
-        }
-
-        [HttpGet("users/{id}")]
-        [Authorize(Roles = RoleNames.Admin)]
-        public async Task<IActionResult> GetUserById(Guid id)
-        {
-            var result = await _auth.GetUserByIdAsync(id);
-            if (result == null) return NotFound();
-            return Ok(result);
-        }
-
-        [HttpGet("users/role/{roleName}")]
-        [Authorize(Roles = RoleNames.Admin)]
-        public async Task<IActionResult> GetUsersByRole(string roleName)
-        {
-            var result = await _auth.GetUsersByRoleAsync(roleName);
-            return Ok(result);
-        }
-        [HttpPut("users/{id}")]
-        [Authorize(Roles = RoleNames.Admin)]
-        public async Task<IActionResult> UpdateUser(Guid id, UpdateUserDto dto)
-        {
-            await _auth.UpdateUserAsync(id, dto);
-            return Ok("User updated");
-        }
-        [HttpDelete("users/{id}")]
-        [Authorize(Roles = RoleNames.Admin)]
-        public async Task<IActionResult> DeleteUser(Guid id)
-        {
-            await _auth.DeleteUserAsync(id);
-            return Ok("User deleted");
-        }
+       
 
         [HttpPost("logout")]
         [Authorize]
