@@ -1,0 +1,30 @@
+<div class="menu">
+  <!-- USER INFO -->
+  <div class="user-info">
+    <div class="avatar-lg">{{ auth.getUserInitials() }}</div>
+
+    <div>
+      <div class="name">
+        {{ name }}
+      </div>
+      <div class="email">{{ email }}</div>
+    </div>
+    <span class="badge">
+      {{ roles.join(", ") }}
+    </span>
+  </div>
+
+  <hr />
+
+  <button class="item">
+    <span class="material-icons">account_circle</span>
+    My Profile
+  </button>
+
+  <hr />
+
+  <hr />
+
+  <!-- LOGOUT -->
+  <button class="logout" (click)="logout.emit()">Log out</button>
+</div>

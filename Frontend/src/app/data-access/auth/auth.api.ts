@@ -39,4 +39,11 @@ export class AuthApi {
             { refreshToken }
         );
     }
+    logout(refreshToken: string) {
+        return this.http.post<void>(
+            `${this.baseUrl}/logout`,
+            { refreshToken }
+        );
+    }
+
 }

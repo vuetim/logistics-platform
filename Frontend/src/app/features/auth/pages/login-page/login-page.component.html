@@ -1,28 +1,74 @@
-<form (ngSubmit)="submit()">
-  <input
-    type="email"
-    placeholder="Email"
-    [(ngModel)]="email"
-    name="email"
-    required
-  />
+<div class="auth-shell">
+  <!-- LEFT -->
+  <div class="auth-left">
+    <div class="logo">LOGISTICS PLATFORM</div>
 
-  <input
-    type="password"
-    placeholder="Password"
-    [(ngModel)]="password"
-    name="password"
-    required
-  />
+    <h1>Welcome!</h1>
 
-  <!--  REMEMBER ME -->
-  <label class="remember-me">
-    <input type="checkbox" [(ngModel)]="rememberMe" name="rememberMe" />
-    Remember me
-  </label>
+    <!-- STEP 1 -->
+    <ng-container *ngIf="step === 'email'">
+      <p class="subtitle">Enter your email to continue</p>
 
-  <button type="submit">Login</button>
+      <label>Email</label>
+      <input type="email" [(ngModel)]="email" (keydown.enter)="continue()" />
+      <div class="error" *ngIf="emailError">{{ emailError }}</div>
 
-  <!--  FORGOT PASSWORD LINK -->
-  <a routerLink="/forgot-password" class="forgot-link"> Forgot password? </a>
-</form>
+      <button (click)="continue()" [disabled]="!email || !isValidEmail(email)">
+        Continue
+      </button>
+    </ng-container>
+
+    <!-- STEP 2 -->
+    <ng-container *ngIf="step === 'password'">
+      <p class="subtitle">Enter your password</p>
+
+      <label>Password</label>
+      <input
+        #passwordInput
+        type="password"
+        [(ngModel)]="password"
+        (keydown.enter)="submit()"
+      />
+      <div class="error" *ngIf="passwordError">{{ passwordError }}</div>
+
+      <a class="back" (click)="backToEmail()">← Back</a>
+
+      <a class="forgot" (click)="step = 'forgot'"> Forgot password? </a>
+
+      <button (click)="submit()">Sign in</button>
+
+      <label class="remember">
+        <input type="checkbox" [(ngModel)]="rememberMe" />
+        Stay signed in
+      </label>
+    </ng-container>
+    <!-- PASSWORD FORGOT -->
+    <ng-container *ngIf="step === 'forgot'">
+      <p class="subtitle">Enter your email and we'll send you a reset link.</p>
+
+      <label>Email</label>
+      <input type="email" [(ngModel)]="email" />
+
+      <button (click)="sendResetLink()">Send reset link</button>
+
+      <a class="back" (click)="step = 'email'">← Back</a>
+    </ng-container>
+    <small class="legal">
+      I agree to the <a>Terms</a> and <a>Privacy Policy</a>
+    </small>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="auth-right">
+    <div class="overlay">
+      <div class="clock" [class.night]="isNight">
+        <span>{{ time | slice : 0 : 2 }}</span>
+        <span class="colon" [class.hidden]="!showColon">:</span>
+        <span>{{ time | slice : 2 : 4 }}</span>
+        <span class="seconds">{{ time | slice : 4 : 6 }}</span>
+      </div>
+
+      <div class="date">{{ date }}</div>
+    </div>
+  </div>
+</div>

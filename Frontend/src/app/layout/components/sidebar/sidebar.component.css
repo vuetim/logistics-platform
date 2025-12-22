@@ -1,0 +1,83 @@
+.sidebar-logo {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 5px;
+}
+
+.sidebar-logo img {
+  height: 28px;
+}
+
+.icon-sidebar {
+  height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 12px;
+  gap: 12px;
+}
+.icon-wrapper {
+  position: relative;
+}
+/* ICON BUTTON */
+.icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  color: #6b7280;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* HOVER */
+.icon-btn:hover {
+  background: #eef2ff;
+  color: #2563eb;
+}
+
+/* ACTIVE */
+.icon-btn.active {
+  background: #e0e7ff;
+  color: #2563eb;
+}
+
+.flyout {
+  position: absolute;
+  left: 52px;
+  top: 0;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  padding: 6px;
+  min-width: 180px;
+  z-index: 1000;
+}
+
+.flyout-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #111827;
+  text-decoration: none;
+}
+
+.flyout-item:hover {
+  background: #f3f4f6;
+}
+
+.flyout-item.disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
