@@ -1,11 +1,6 @@
 /* =========================
    GLOBAL RESET
 ========================= */
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
 
 html {
   font-size: 14px;
