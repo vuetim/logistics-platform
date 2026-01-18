@@ -22,6 +22,42 @@ namespace LogisticsPlatform.Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("AuthAuditLog", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("ActorUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Event")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("IpAddress")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Metadata")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("TargetUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserAgent")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AuthAuditLogs");
+                });
+
             modelBuilder.Entity("CarrierStopPerformance", b =>
                 {
                     b.Property<Guid>("Id")
@@ -2104,36 +2140,36 @@ namespace LogisticsPlatform.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa1"),
-                            CreatedAt = new DateTime(2025, 12, 16, 13, 43, 48, 564, DateTimeKind.Utc).AddTicks(7490),
+                            CreatedAt = new DateTime(2026, 1, 8, 17, 28, 52, 144, DateTimeKind.Utc).AddTicks(6522),
                             Name = "Admin"
                         },
                         new
                         {
                             Id = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa2"),
-                            CreatedAt = new DateTime(2025, 12, 16, 13, 43, 48, 564, DateTimeKind.Utc).AddTicks(7525),
+                            CreatedAt = new DateTime(2026, 1, 8, 17, 28, 52, 144, DateTimeKind.Utc).AddTicks(6545),
                             Name = "Broker"
                         },
                         new
                         {
                             Id = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa3"),
-                            CreatedAt = new DateTime(2025, 12, 16, 13, 43, 48, 564, DateTimeKind.Utc).AddTicks(7533),
+                            CreatedAt = new DateTime(2026, 1, 8, 17, 28, 52, 144, DateTimeKind.Utc).AddTicks(6549),
                             Name = "Operator"
                         },
                         new
                         {
                             Id = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa4"),
-                            CreatedAt = new DateTime(2025, 12, 16, 13, 43, 48, 564, DateTimeKind.Utc).AddTicks(7539),
+                            CreatedAt = new DateTime(2026, 1, 8, 17, 28, 52, 144, DateTimeKind.Utc).AddTicks(6553),
                             Name = "Dispatcher"
                         },
                         new
                         {
                             Id = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa5"),
-                            CreatedAt = new DateTime(2025, 12, 16, 13, 43, 48, 564, DateTimeKind.Utc).AddTicks(7546),
+                            CreatedAt = new DateTime(2026, 1, 8, 17, 28, 52, 144, DateTimeKind.Utc).AddTicks(6557),
                             Name = "Accounting"
                         });
                 });
 
-            modelBuilder.Entity("LogisticsPlatform.Domain.Entities.Security.AuthAuditLog", b =>
+            modelBuilder.Entity("LogisticsPlatform.Domain.Entities.RolePermission", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -2142,25 +2178,43 @@ namespace LogisticsPlatform.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Event")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<bool>("IsAllowed")
+                        .HasColumnType("bit");
 
-                    b.Property<string>("IpAddress")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Permission")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("UserAgent")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Id");
 
-                    b.ToTable("AuthAuditLogs");
+                    b.HasIndex("RoleId", "Permission")
+                        .IsUnique();
+
+                    b.ToTable("RolePermissions");
+                });
+
+            modelBuilder.Entity("LogisticsPlatform.Domain.Entities.Security.UserPermission", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Permission")
+                        .HasColumnType("int");
+
+                    b.Property<bool?>("IsAllowed")
+                        .HasColumnType("bit");
+
+                    b.HasKey("UserId", "Permission");
+
+                    b.HasIndex("UserId", "Permission")
+                        .IsUnique();
+
+                    b.ToTable("UserPermissions");
                 });
 
             modelBuilder.Entity("LogisticsPlatform.Domain.Entities.User", b =>
@@ -2179,6 +2233,9 @@ namespace LogisticsPlatform.Infrastructure.Migrations
                     b.Property<string>("FullName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
@@ -2688,6 +2745,28 @@ namespace LogisticsPlatform.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("LogisticsPlatform.Domain.Entities.RolePermission", b =>
+                {
+                    b.HasOne("LogisticsPlatform.Domain.Entities.Role", "Role")
+                        .WithMany("RolePermissions")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Role");
+                });
+
+            modelBuilder.Entity("LogisticsPlatform.Domain.Entities.Security.UserPermission", b =>
+                {
+                    b.HasOne("LogisticsPlatform.Domain.Entities.User", "User")
+                        .WithMany("UserPermissions")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("LogisticsPlatform.Domain.Entities.UserRole", b =>
                 {
                     b.HasOne("LogisticsPlatform.Domain.Entities.Role", "Role")
@@ -2785,11 +2864,15 @@ namespace LogisticsPlatform.Infrastructure.Migrations
 
             modelBuilder.Entity("LogisticsPlatform.Domain.Entities.Role", b =>
                 {
+                    b.Navigation("RolePermissions");
+
                     b.Navigation("UserRoles");
                 });
 
             modelBuilder.Entity("LogisticsPlatform.Domain.Entities.User", b =>
                 {
+                    b.Navigation("UserPermissions");
+
                     b.Navigation("UserRoles");
                 });
 

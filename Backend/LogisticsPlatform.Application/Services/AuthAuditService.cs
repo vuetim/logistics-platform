@@ -1,9 +1,6 @@
-﻿using LogisticsPlatform.Application.Interfaces.Repositories;
-using LogisticsPlatform.Application.Interfaces.Repositories.Security;
+﻿using LogisticsPlatform.Application.Interfaces.Repositories.Security;
 using LogisticsPlatform.Application.Interfaces.Services;
-using LogisticsPlatform.Domain.Entities.Security;
-
-namespace LogisticsPlatform.Infrastructure.Services;
+using System.Text.Json;
 
 public class AuthAuditService : IAuthAuditService
 {
@@ -15,15 +12,21 @@ public class AuthAuditService : IAuthAuditService
     }
 
     public async Task LogAsync(
-        Guid? userId,
+        Guid? actorUserId,
         string eventName,
-        string? ipAddress,
-        string? userAgent)
+        Guid? targetUserId = null,
+        object? metadata = null,
+        string? ipAddress = null,
+        string? userAgent = null)
     {
         var log = new AuthAuditLog
         {
-            UserId = userId,
+            ActorUserId = actorUserId,
+            TargetUserId = targetUserId,
             Event = eventName,
+            Metadata = metadata != null
+                ? JsonSerializer.Serialize(metadata)
+                : null,
             IpAddress = ipAddress,
             UserAgent = userAgent
         };

@@ -1,0 +1,132 @@
+.users-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Filters button */
+.filters-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  background: #fff;
+  cursor: pointer;
+}
+
+/* FILTER ROW */
+.filters-row {
+  margin-top: 12px;
+  padding: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+}
+
+.filter-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.filter-item label {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+/* ACTIONS */
+.filter-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-clear {
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  background: #fff;
+}
+
+.btn-apply {
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1px solid #111827;
+  background: #111827;
+  color: #fff;
+}
+
+.active-filters {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 10px 0;
+}
+
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px;
+  background: transparent;
+  font-size: 12px;
+  color: #2d6ffe;
+}
+.filter-chip-main {
+  border-bottom: 1px solid #eee;
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  align-items: center;
+}
+.filter-count {
+  color: #2d6ffe;
+}
+.chip-label {
+  color: #6b7280;
+}
+
+.chip-value {
+  font-weight: 500;
+}
+
+.chip-remove {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  color: #6b7280;
+}
+
+.chip-remove:hover {
+  color: #111827;
+}
+
+button {
+  border: none;
+  background: transparent;
+  color: #111827;
+  cursor: pointer;
+}
+.badge {
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.badge.active {
+  background: #e6f6ed;
+  color: #1e8e3e;
+}
+
+.badge.inactive {
+  background: #fdecea;
+  color: #d93025;
+}

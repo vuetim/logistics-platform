@@ -2,12 +2,15 @@
 using LogisticsPlatform.Application.Interfaces.Repositories;
 using LogisticsPlatform.Application.Interfaces.Repositories.Security;
 using LogisticsPlatform.Application.Interfaces.Repositories.Users;
+using LogisticsPlatform.Application.Interfaces.Services;
 using LogisticsPlatform.Application.Interfaces.Services.Auth;
 using LogisticsPlatform.Application.Interfaces.Services.Security;
 using LogisticsPlatform.Domain.Entities;
+using LogisticsPlatform.Domain.Security;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
@@ -23,9 +26,13 @@ namespace LogisticsPlatform.Infrastructure.Services
         private readonly IRefreshTokenRepository _refreshTokens;
         private readonly IPasswordResetTokenRepository _passwordResetTokens;
         private readonly IEmailService _email;
+        private readonly IAuthAuditService _audit;
+        private readonly IPermissionService _permissions;
+
+
 
         public AuthService(IUserRepository users, IRoleRepository roles, IUserRoleRepository userRoles, IConfiguration config,
-            IRefreshTokenRepository refreshTokens, IEmailService email, IPasswordResetTokenRepository passwordResetTokens)
+            IRefreshTokenRepository refreshTokens, IEmailService email, IPasswordResetTokenRepository passwordResetTokens,IAuthAuditService audit, IPermissionService permissions)
         {
             _users = users;
             _roles = roles;
@@ -34,6 +41,8 @@ namespace LogisticsPlatform.Infrastructure.Services
             _config = config;
             _email = email;
             _passwordResetTokens = passwordResetTokens;
+            _audit = audit;
+            _permissions = permissions;
         }
 
         public async Task RegisterAsync(RegisterDto dto)
@@ -46,29 +55,68 @@ namespace LogisticsPlatform.Infrastructure.Services
             {
                 FullName = dto.FullName,
                 Email = dto.Email,
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password)
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
+                IsActive = true
             };
 
             await _users.AddAsync(user);
             await _users.SaveChangesAsync();
         }
 
-        public async Task<LoginResponseDto> LoginAsync(LoginDto dto)
+        public async Task<LoginResponseDto> LoginAsync(
+        LoginDto dto,
+        string? ipAddress,
+        string? userAgent)
         {
-            var user = await _users.GetByEmailAsync(dto.Email)
-                       ?? throw new Exception("Invalid credentials");
+            var user = await _users.GetByEmailAsync(dto.Email);
 
-            if (!BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash))
+            //  USER NOT FOUND
+            if (user == null)
+            {
+                await _audit.LogAsync(
+                    null,
+                    "Auth.Login.Failed",
+                    ipAddress: ipAddress,
+                    userAgent: userAgent
+                );
+
                 throw new Exception("Invalid credentials");
+            }
 
+            //  USER DISABLED
+            if (!user.IsActive)
+            {
+                await _audit.LogAsync(
+                    user.Id,
+                    "Auth.Login.Failed.Disabled",
+                    ipAddress: ipAddress,
+                    userAgent: userAgent
+                );
+
+                throw new Exception("User is disabled");
+            }
+
+            //  PASSWORD WRONG
+            if (!BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash))
+            {
+                await _audit.LogAsync(
+                    user.Id,
+                    "Auth.Login.Failed.InvalidPassword",
+                    ipAddress: ipAddress,
+                    userAgent: userAgent
+                );
+
+                throw new Exception("Invalid credentials");
+            }
+
+            //  SUCCESS
             var accessToken = GenerateJwtToken(user);
             var refreshTokenValue = GenerateRefreshToken();
 
-            var refreshDays = int.Parse(_config["Jwt:RefreshTokenDays"]);
+            var refreshDays = dto.RememberMe
+                ? int.Parse(_config["Jwt:RefreshTokenDaysRememberMe"])
+                : int.Parse(_config["Jwt:RefreshTokenDays"]);
 
-            var days = dto.RememberMe
-           ? int.Parse(_config["Jwt:RefreshTokenDaysRememberMe"])
-             : int.Parse(_config["Jwt:RefreshTokenDays"]);
             var refreshToken = new RefreshToken
             {
                 UserId = user.Id,
@@ -76,9 +124,15 @@ namespace LogisticsPlatform.Infrastructure.Services
                 ExpiresAt = DateTime.UtcNow.AddDays(refreshDays)
             };
 
-
             await _refreshTokens.AddAsync(refreshToken);
             await _refreshTokens.SaveChangesAsync();
+
+            await _audit.LogAsync(
+                user.Id,
+                "Auth.Login.Success",
+                ipAddress: ipAddress,
+                userAgent: userAgent
+            );
 
             return new LoginResponseDto
             {
@@ -87,7 +141,11 @@ namespace LogisticsPlatform.Infrastructure.Services
             };
         }
 
-        public async Task<LoginResponseDto> RefreshAsync(string refreshToken)
+
+        public async Task<LoginResponseDto> RefreshAsync(
+            string refreshToken,
+            string? ip,
+            string? ua)
         {
             var token = await _refreshTokens.GetAsync(refreshToken)
                 ?? throw new Exception("Invalid refresh token");
@@ -95,65 +153,92 @@ namespace LogisticsPlatform.Infrastructure.Services
             if (token.IsRevoked || token.ExpiresAt < DateTime.UtcNow)
                 throw new Exception("Refresh token expired");
 
-            token.IsRevoked = true; // ROTATION
+            token.IsRevoked = true;
 
             var user = token.User;
 
-            var newAccessToken = GenerateJwtToken(user);
-            var newRefreshValue = GenerateRefreshToken();
+            var newAccess = GenerateJwtToken(user);
+            var newRefresh = GenerateRefreshToken();
 
-            var refreshDays = int.Parse(_config["Jwt:RefreshTokenDays"]);
-
-            var newRefresh = new RefreshToken
+            await _refreshTokens.AddAsync(new RefreshToken
             {
                 UserId = user.Id,
-                Token = newRefreshValue,
-                ExpiresAt = DateTime.UtcNow.AddDays(refreshDays)
-            };
+                Token = newRefresh,
+                ExpiresAt = DateTime.UtcNow.AddDays(7)
+            });
 
-
-            await _refreshTokens.AddAsync(newRefresh);
             await _refreshTokens.SaveChangesAsync();
+
+        
 
             return new LoginResponseDto
             {
-                AccessToken = newAccessToken,
-                RefreshToken = newRefreshValue
+                AccessToken = newAccess,
+                RefreshToken = newRefresh
             };
         }
-        public async Task LogoutAsync(string refreshToken)
+        public async Task LogoutAsync(
+            string refreshToken,
+            Guid userId,
+            string? ip,
+            string? ua)
         {
             var token = await _refreshTokens.GetAsync(refreshToken);
-            if (token == null)
-                return; // silent logout (OK practice)
+            if (token == null) return;
 
             token.IsRevoked = true;
             await _refreshTokens.SaveChangesAsync();
-        }
 
+        }
         private string GenerateJwtToken(User user)
         {
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            var key = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(_config["Jwt:Key"])
+            );
+
+            var creds = new SigningCredentials(
+                key,
+                SecurityAlgorithms.HmacSha256
+            );
 
             var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(JwtRegisteredClaimNames.Email, user.Email),
-                new Claim("name", user.FullName)
-            };
+    {
+        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+        new Claim(JwtRegisteredClaimNames.Email, user.Email),
+        new Claim("name", user.FullName)
+    };
 
             if (user.UserRoles != null && user.UserRoles.Any())
             {
-                var roleNames = user.UserRoles.Select(ur => ur.Role.Name).ToList();
+                var roleNames = user.UserRoles
+                    .Select(ur => ur.Role.Name)
+                    .ToList();
 
                 foreach (var role in roleNames)
                     claims.Add(new Claim(ClaimTypes.Role, role));
 
                 claims.Add(new Claim("roles", string.Join(",", roleNames)));
+
+                //  
+                var effectivePermissions =
+                    _permissions.GetEffectivePermissionsAsync(user.Id)
+                                .GetAwaiter()
+                                .GetResult();
+                if (user.UserRoles.Any(r => r.Role.Name == "Admin"))
+                {
+                    effectivePermissions = Enum
+                        .GetValues<Permission>()
+                        .ToHashSet();
+                }
+
+                claims.Add(new Claim(
+                    "permissions",
+                    string.Join(",", effectivePermissions.Select(p => p.ToString()))
+                ));
             }
 
-            var accessMinutes = int.Parse(_config["Jwt:AccessTokenMinutes"]);
+            var accessMinutes =
+                int.Parse(_config["Jwt:AccessTokenMinutes"]);
 
             var token = new JwtSecurityToken(
                 issuer: _config["Jwt:Issuer"],
@@ -163,7 +248,6 @@ namespace LogisticsPlatform.Infrastructure.Services
                 signingCredentials: creds
             );
 
-
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
         private static string GenerateRefreshToken()
@@ -172,70 +256,9 @@ namespace LogisticsPlatform.Infrastructure.Services
             return Convert.ToBase64String(bytes);
         }
 
-        public async Task AssignRoleAsync(AssignRoleDto dto)
-        {
-            var user = await _users.GetByIdAsync(dto.UserId)
-                       ?? throw new Exception("User not found");
+      
 
-            var role = await _roles.GetByNameAsync(dto.RoleName)
-                       ?? throw new Exception("Role not found");
 
-            // Remove existing roles 
-            if (user.UserRoles != null && user.UserRoles.Any())
-            {
-                var existingRoles = user.UserRoles.ToList();
-                await _userRoles.RemoveRangeAsync(existingRoles);
-            }
-
-            var userRole = new UserRole
-            {
-                UserId = user.Id,
-                RoleId = role.Id
-            };
-
-            await _userRoles.AddAsync(userRole);
-            await _users.SaveChangesAsync();
-        }
-
-        public async Task<List<UserDto>> GetAllUsersAsync()
-        {
-            var users = await _users.GetAllAsync();
-
-            return users.Select(u => new UserDto
-            {
-                Id = u.Id,
-                FullName = u.FullName,
-                Email = u.Email,
-                Roles = u.UserRoles?.Select(ur => ur.Role.Name).ToList() ?? new()
-            }).ToList();
-        }
-
-        public async Task<UserDto?> GetUserByIdAsync(Guid id)
-        {
-            var user = await _users.GetByIdAsync(id);
-            if (user == null) return null;
-
-            return new UserDto
-            {
-                Id = user.Id,
-                FullName = user.FullName,
-                Email = user.Email,
-                Roles = user.UserRoles?.Select(ur => ur.Role.Name).ToList() ?? new()
-            };
-        }
-
-        public async Task<List<UserDto>> GetUsersByRoleAsync(string roleName)
-        {
-            var users = await _users.GetByRoleAsync(roleName);
-
-            return users.Select(u => new UserDto
-            {
-                Id = u.Id,
-                FullName = u.FullName,
-                Email = u.Email,
-                Roles = u.UserRoles?.Select(ur => ur.Role.Name).ToList() ?? new()
-            }).ToList();
-        }
         public async Task UpdateUserAsync(Guid userId, UpdateUserDto dto)
         {
             var user = await _users.GetByIdAsync(userId)
@@ -243,6 +266,12 @@ namespace LogisticsPlatform.Infrastructure.Services
 
             user.FullName = dto.FullName;
             user.Email = dto.Email;
+            user.IsActive= dto.IsActive;
+            if(!string.IsNullOrWhiteSpace(dto.NewPassword))
+            {
+                user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
+                await _refreshTokens.RevokeAllForUserAsync(user.Id);
+            }
 
             await _users.SaveChangesAsync();
         }
@@ -263,11 +292,11 @@ namespace LogisticsPlatform.Infrastructure.Services
             await _users.DeleteAsync(user);
             await _users.SaveChangesAsync();
         }
-        public async Task<Guid?> ForgotPasswordAsync(string email)
+        public async Task ForgotPasswordAsync(string email)
         {
             var user = await _users.GetByEmailAsync(email);
             if (user == null)
-                return null;
+                return; // silent fail (security best practice)
 
             var rawToken = GenerateSecureToken();
             var hashedToken = TokenHasher.Hash(rawToken);
@@ -275,7 +304,7 @@ namespace LogisticsPlatform.Infrastructure.Services
             var token = new PasswordResetToken
             {
                 UserId = user.Id,
-                Token = hashedToken, 
+                Token = hashedToken,
                 ExpiresAt = DateTime.UtcNow.AddMinutes(30)
             };
 
@@ -285,19 +314,20 @@ namespace LogisticsPlatform.Infrastructure.Services
             var encodedToken = Uri.EscapeDataString(rawToken);
 
             var link =
-            $"{_config["Frontend:BaseUrl"]}/auth/reset-password?token={encodedToken}";
-
+                $"{_config["Frontend:BaseUrl"]}/auth/reset-password?token={encodedToken}";
 
             await _email.SendAsync(
                 user.Email,
                 "Reset your password",
                 $"Click the link to reset your password:\n{link}"
-            ); 
-
-            return user.Id;
+            );
         }
 
-        public async Task<Guid> ResetPasswordAsync(string tokenValue, string newPassword)
+        public async Task ResetPasswordAsync(
+            string tokenValue,
+            string newPassword,
+            string? ip,
+            string? ua)
         {
             var decodedToken = Uri.UnescapeDataString(tokenValue);
             var hashedToken = TokenHasher.Hash(decodedToken);
@@ -308,7 +338,6 @@ namespace LogisticsPlatform.Infrastructure.Services
             var user = token.User;
 
             user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
-
             token.IsUsed = true;
 
             await _refreshTokens.RevokeAllForUserAsync(user.Id);
@@ -316,7 +345,7 @@ namespace LogisticsPlatform.Infrastructure.Services
             await _users.SaveChangesAsync();
             await _passwordResetTokens.SaveChangesAsync();
 
-            return user.Id;
+         
         }
         private static string GenerateSecureToken()
         {

@@ -1,5 +1,4 @@
-﻿using LogisticsPlatform.Application.Authorization;
-using LogisticsPlatform.Application.Common.Exceptions;
+﻿using LogisticsPlatform.Application.Common.Exceptions;
 using LogisticsPlatform.Application.DTOs;
 using LogisticsPlatform.Application.Interfaces.Repositories.Carriers;
 using LogisticsPlatform.Application.Interfaces.Repositories.Loads;
@@ -22,18 +21,17 @@ namespace LogisticsPlatform.Application.Services
         private readonly ILoadRepository _loadRepo;
         private readonly ICarrierRepository _carrierRepo;
         private readonly ILoadCarrierAssignmentRepository _assignmentRepo;
-        private readonly IAuthorizationService _auth;
 
         public CarrierAssignmentService(
             ILoadRepository loadRepo,
             ICarrierRepository carrierRepo,
-            ILoadCarrierAssignmentRepository assignmentRepo,
-            IAuthorizationService auth)
+            ILoadCarrierAssignmentRepository assignmentRepo
+           )
         {
             _loadRepo = loadRepo;
             _carrierRepo = carrierRepo;
             _assignmentRepo = assignmentRepo;
-            _auth = auth;
+           
         }
 
         // ============================

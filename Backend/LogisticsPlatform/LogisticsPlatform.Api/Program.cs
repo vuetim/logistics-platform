@@ -1,5 +1,4 @@
 ﻿using Hangfire;
-using LogisticsPlatform.Application.Authorization;
 using LogisticsPlatform.Application.BackgroundJobs;
 using LogisticsPlatform.Application.Interfaces.Repositories;
 using LogisticsPlatform.Application.Interfaces.Repositories.Carriers;
@@ -20,9 +19,11 @@ using LogisticsPlatform.Application.Interfaces.Services.Security;
 using LogisticsPlatform.Application.Interfaces.Services.Users;
 using LogisticsPlatform.Application.Jobs;
 using LogisticsPlatform.Application.Options;
+using LogisticsPlatform.Application.Security;
 using LogisticsPlatform.Application.Services;
 using LogisticsPlatform.Application.Services.Financial;
 using LogisticsPlatform.Application.Services.Orders;
+using LogisticsPlatform.Application.Services.Users;
 using LogisticsPlatform.Infrastructure.Persistence;
 using LogisticsPlatform.Infrastructure.Persistence.Repositories.Queries;
 using LogisticsPlatform.Infrastructure.Repositories;
@@ -36,6 +37,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using QuestPDF.Infrastructure;
 using System.Text;
+using System.Text.Json.Serialization;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -129,6 +131,7 @@ builder.Services.AddScoped<IDelayResponsibilityService, DelayResponsibilityServi
 
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 builder.Services.AddScoped<IAuthAuditLogRepository, AuthAuditLogRepository>();
+builder.Services.AddScoped<IUserQueryRepository, UserQueryRepository>();
 
 
 
@@ -157,7 +160,6 @@ builder.Services.AddScoped<ILoadStopService, LoadStopService>();
 builder.Services.AddScoped<ILoadEquipmentService, LoadEquipmentService>();
 builder.Services.AddScoped<ILoadDocumentService, LoadDocumentService>();
 builder.Services.AddScoped<ILoadNoteService, LoadNoteService>();
-builder.Services.AddScoped<IAuthorizationService, AuthorizationService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IOrderQueryService, OrderQueryService>();
 builder.Services.AddScoped<IOrderRouteService, OrderRouteService>();
@@ -200,8 +202,21 @@ builder.Services.AddScoped<IAuthAuditService, AuthAuditService>();
 //users
 builder.Services.AddScoped<IUserManagementService, UserManagementService>();
 
+builder.Services.AddScoped<IPermissionReadModel, PermissionReadModel>();
+builder.Services.AddScoped<IPermissionService, PermissionService>();
 
 
+builder.Services
+    .AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(
+            new JsonStringEnumConverter()
+        );
+    });
+
+builder.Services.AddScoped<IUserQueryService, UserQueryService>();
+builder.Services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
 
 
 

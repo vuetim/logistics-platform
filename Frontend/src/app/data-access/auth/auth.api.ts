@@ -5,6 +5,7 @@ import { LoginResponseDto } from '../../core/auth/dto/Responses/login-response.d
 import { ResetPasswordRequestDto } from '../../core/auth/dto/Requests/reset-password-request.dto';
 import { ForgotPasswordRequestDto } from '../../core/auth/dto/Requests/forgot-password-request.dto';
 import { API_ENDPOINTS } from '../../core/config/endpoints';
+import { CreateUserDto } from '../../core/auth/dto/Requests/create-user.dto';
 
 @Injectable({ providedIn: 'root' })
 export class AuthApi {
@@ -16,6 +17,16 @@ export class AuthApi {
         return this.http.post<LoginResponseDto>(
             `${this.baseUrl}/login`,
             dto
+        );
+    }
+    register(dto: CreateUserDto) {
+        return this.http.post<void>(
+            `${this.baseUrl}/register`,
+            {
+                fullName: dto.fullName,
+                email: dto.email,
+                password: dto.password
+            }
         );
     }
 

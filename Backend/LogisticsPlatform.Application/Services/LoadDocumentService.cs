@@ -1,9 +1,9 @@
-﻿using LogisticsPlatform.Application.Authorization;
-using LogisticsPlatform.Application.Common.Exceptions;
+﻿using LogisticsPlatform.Application.Common.Exceptions;
 using LogisticsPlatform.Application.DTOs.Loads.LoadDocuments;
 using LogisticsPlatform.Application.Interfaces.Repositories.Loads;
 using LogisticsPlatform.Application.Interfaces.Repositories.Users;
 using LogisticsPlatform.Application.Interfaces.Services.Loads;
+using LogisticsPlatform.Application.Interfaces.Services.Security;
 using LogisticsPlatform.Domain.Entities;
 using LogisticsPlatform.Domain.Security;
 
@@ -13,16 +13,16 @@ namespace LogisticsPlatform.Application.Services
     {
         private readonly ILoadDocumentRepository _documents;
         private readonly IUserRepository _users;
-        private readonly IAuthorizationService _auth;
+        private readonly IPermissionService _permission;
 
         public LoadDocumentService(
             ILoadDocumentRepository documents,
             IUserRepository users,
-            IAuthorizationService auth)
+            IPermissionService permission)
         {
             _documents = documents;
             _users = users;
-            _auth = auth;
+            _permission = permission;
         }
 
         // UPLOAD DOCUMENT
@@ -31,7 +31,7 @@ namespace LogisticsPlatform.Application.Services
             var user = await _users.GetByIdAsync(userId)
                 ?? throw new ForbiddenException("User not found");
 
-            if (!_auth.HasPermission(user, Permission.LoadDocument_Upload))
+            if (!await _permission.HasPermissionAsync(userId, Permission.LoadDocument_Upload))
                 throw new ForbiddenException("You are not allowed to upload load documents.");
 
             var document = new LoadDocument
@@ -55,7 +55,7 @@ namespace LogisticsPlatform.Application.Services
             var docs = await _documents.GetByLoadAsync(loadId);
 
             // Nëse s'ka permission për internal → shfaq vetëm public
-            if (!_auth.HasPermission(user, Permission.LoadDocument_View))
+            if (!await _permission.HasPermissionAsync(userId, Permission.LoadDocument_View))
             {
                 docs = docs.Where(d => !d.IsInternal).ToList();
             }
@@ -76,7 +76,7 @@ namespace LogisticsPlatform.Application.Services
             var user = await _users.GetByIdAsync(userId)
                 ?? throw new ForbiddenException("User not found");
 
-            if (!_auth.HasPermission(user, Permission.LoadDocument_Delete))
+            if (!await _permission.HasPermissionAsync(userId, Permission.LoadDocument_Delete))
                 throw new ForbiddenException("You are not allowed to delete documents.");
 
             var document = await _documents.GetByIdAsync(documentId)

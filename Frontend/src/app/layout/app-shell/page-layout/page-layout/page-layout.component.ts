@@ -11,6 +11,6 @@ import { NgFor, NgIf } from '@angular/common';
   styleUrl: './page-layout.component.css'
 })
 export class PageLayoutComponent {
-  @Input() title = '';
+  @Input() title = 'Logistics Platform';
   constructor(public breadcrumb: BreadcrumbService) { }
 }

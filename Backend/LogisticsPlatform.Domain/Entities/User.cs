@@ -1,4 +1,5 @@
 ﻿using LogisticsPlatform.Domain.Common;
+using LogisticsPlatform.Domain.Entities.Security;
 
 namespace LogisticsPlatform.Domain.Entities;
 
@@ -7,6 +8,9 @@ public class User : BaseEntity
     public string FullName { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
     public string PasswordHash { get; set; } = string.Empty;
+
+    public bool IsActive { get; set; } = true;
+    public ICollection<UserPermission>? UserPermissions { get; set; }
 
     public ICollection<UserRole>? UserRoles { get; set; }
 }

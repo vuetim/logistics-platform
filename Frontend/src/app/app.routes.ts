@@ -11,8 +11,10 @@ export const routes: Routes = [
             import('./features/auth/auth.routes')
                 .then(m => m.authRoutes)
     },
+    //users
 
-    //  APP SHELL
+
+    // APP SHELL
     {
         path: '',
         component: AppShellComponent,
@@ -31,7 +33,25 @@ export const routes: Routes = [
                 data: {
                     breadcrumb: ['Dashboard']
                 }
-            }
+            },
+            {
+                path: 'profile',
+                loadChildren: () =>
+                    import('./features/pages/profile/profile.routes')
+                        .then(m => m.default),
+                data: {
+                    breadcrumb: ['Profile']
+                }
+            },
+            {
+                path: 'admin/users',
+                loadChildren: () =>
+                    import('./features/pages/users/users.routes')
+                        .then(m => m.default),
+                data: {
+                    breadcrumb: ['Users']
+                }
+            },
 
         ]
     },

@@ -1,0 +1,19 @@
+<div class="ui-card">
+  <div class="ui-card-header" *ngIf="cardTitle">
+    <div class="ui-card-title">
+      <h3>{{ cardTitle }}</h3>
+    </div>
+
+    <div class="ui-card-actions">
+      <ng-content select="[card-actions]"></ng-content>
+    </div>
+  </div>
+
+  <div class="ui-card-body">
+    <ng-content></ng-content>
+  </div>
+
+  <div class="ui-card-footer">
+    <ng-content select="[card-footer]"></ng-content>
+  </div>
+</div>

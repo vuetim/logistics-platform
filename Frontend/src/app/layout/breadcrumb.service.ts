@@ -8,11 +8,11 @@ export class BreadcrumbService {
 
     constructor(private router: Router) {
 
-        // 1️⃣ BUILD ON INITIAL LOAD (refresh fix)
+        //  BUILD ON INITIAL LOAD (refresh fix)
         const root = this.router.routerState.root;
         this.breadcrumbs = this.build(root);
 
-        // 2️⃣ BUILD ON EVERY NAVIGATION
+        //  BUILD ON EVERY NAVIGATION
         this.router.events
             .pipe(filter(e => e instanceof NavigationEnd))
             .subscribe(() => {
