@@ -14,12 +14,14 @@ namespace LogisticsPlatform.Infrastructure.Repositories
             _context.Users
                 .Include(u => u.UserRoles)
                 .ThenInclude(ur => ur.Role)
+            .Include(u => u.UserPermissions)
                 .FirstOrDefaultAsync(u => u.Email == email);
 
         public Task<User?> GetByIdAsync(Guid id) =>
             _context.Users
                 .Include(u => u.UserRoles)
                 .ThenInclude(ur => ur.Role)
+            .Include(u => u.UserPermissions)
                 .FirstOrDefaultAsync(u => u.Id == id);
 
         public async Task AddAsync(User user) =>
@@ -38,6 +40,7 @@ namespace LogisticsPlatform.Infrastructure.Repositories
             _context.Users
                 .Include(u => u.UserRoles)
                 .ThenInclude(ur => ur.Role)
+            .Include(u => u.UserPermissions)
                 .Where(u => u.UserRoles.Any(ur => ur.Role.Name == roleName))
                 .ToListAsync();
         public async Task DeleteAsync(User user)

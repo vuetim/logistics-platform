@@ -4,6 +4,7 @@ using LogisticsPlatform.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LogisticsPlatform.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251229072533_fixpermissions")]
+    partial class fixpermissions
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -2140,31 +2143,31 @@ namespace LogisticsPlatform.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa1"),
-                            CreatedAt = new DateTime(2026, 1, 8, 17, 28, 52, 144, DateTimeKind.Utc).AddTicks(6522),
+                            CreatedAt = new DateTime(2025, 12, 29, 7, 25, 33, 111, DateTimeKind.Utc).AddTicks(2546),
                             Name = "Admin"
                         },
                         new
                         {
                             Id = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa2"),
-                            CreatedAt = new DateTime(2026, 1, 8, 17, 28, 52, 144, DateTimeKind.Utc).AddTicks(6545),
+                            CreatedAt = new DateTime(2025, 12, 29, 7, 25, 33, 111, DateTimeKind.Utc).AddTicks(2559),
                             Name = "Broker"
                         },
                         new
                         {
                             Id = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa3"),
-                            CreatedAt = new DateTime(2026, 1, 8, 17, 28, 52, 144, DateTimeKind.Utc).AddTicks(6549),
+                            CreatedAt = new DateTime(2025, 12, 29, 7, 25, 33, 111, DateTimeKind.Utc).AddTicks(2562),
                             Name = "Operator"
                         },
                         new
                         {
                             Id = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa4"),
-                            CreatedAt = new DateTime(2026, 1, 8, 17, 28, 52, 144, DateTimeKind.Utc).AddTicks(6553),
+                            CreatedAt = new DateTime(2025, 12, 29, 7, 25, 33, 111, DateTimeKind.Utc).AddTicks(2564),
                             Name = "Dispatcher"
                         },
                         new
                         {
                             Id = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa5"),
-                            CreatedAt = new DateTime(2026, 1, 8, 17, 28, 52, 144, DateTimeKind.Utc).AddTicks(6557),
+                            CreatedAt = new DateTime(2025, 12, 29, 7, 25, 33, 111, DateTimeKind.Utc).AddTicks(2675),
                             Name = "Accounting"
                         });
                 });

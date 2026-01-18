@@ -68,26 +68,28 @@ public class AppDbContext : DbContext
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
     public DbSet<PasswordResetToken> PasswordResetTokens => Set<PasswordResetToken>();
     public DbSet<AuthAuditLog> AuthAuditLogs => Set<AuthAuditLog>();
-
-
+    public DbSet<UserPermission> UserPermissions => Set<UserPermission>();
+     public DbSet<RolePermission> RolePermissions => Set<RolePermission>();
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+       
+
 
         modelBuilder.Entity<UserRole>()
-            .HasKey(ur => new { ur.UserId, ur.RoleId });
+            .HasKey(x => new { x.UserId, x.RoleId });
 
         modelBuilder.Entity<UserRole>()
-            .HasOne(ur => ur.User)
-            .WithMany(u => u.UserRoles)   // ✔ navigation property in User
-            .HasForeignKey(ur => ur.UserId);
+            .HasOne(x => x.User)
+            .WithMany(u => u.UserRoles)   
+            .HasForeignKey(x => x.UserId);
 
         modelBuilder.Entity<UserRole>()
-            .HasOne(ur => ur.Role)
-            .WithMany(r => r.UserRoles)   // ✔ navigation property in Role
-            .HasForeignKey(ur => ur.RoleId);
+           .HasOne(x => x.Role)
+    .WithMany(r => r.UserRoles)
+    .HasForeignKey(x => x.RoleId);
 
         modelBuilder.Entity<Role>().HasData(
            new Role { Id = Guid.Parse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa1"), Name = RoleNames.Admin },
@@ -96,6 +98,16 @@ public class AppDbContext : DbContext
            new Role { Id = Guid.Parse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa4"), Name = RoleNames.Dispatcher },
            new Role { Id = Guid.Parse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa5"), Name = RoleNames.Accounting }
        );
+
+        modelBuilder.Entity<RolePermission>()
+     .HasIndex(x => new { x.RoleId, x.Permission })
+     .IsUnique();
+
+        modelBuilder.Entity<UserPermission>()
+            .HasIndex(x => new { x.UserId, x.Permission })
+            .IsUnique();
+
+
         modelBuilder.Entity<LoadEquipment>(entity =>
         {
             entity.Property(x => x.Weight)
@@ -288,6 +300,16 @@ public class AppDbContext : DbContext
 
             entity.Property(e => e.Longitude)
                 .HasPrecision(9, 6);
+        });
+        //permisions 
+        modelBuilder.Entity<UserPermission>(entity =>
+        {
+            entity.HasKey(up => new { up.UserId, up.Permission });
+
+            entity.HasOne(up => up.User)
+                  .WithMany(u => u.UserPermissions)
+                  .HasForeignKey(up => up.UserId)
+                  .OnDelete(DeleteBehavior.Cascade);
         });
 
 

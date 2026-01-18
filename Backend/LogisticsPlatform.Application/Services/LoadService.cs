@@ -1,5 +1,4 @@
-﻿using LogisticsPlatform.Application.Authorization;
-using LogisticsPlatform.Application.Common.Exceptions;
+﻿using LogisticsPlatform.Application.Common.Exceptions;
 using LogisticsPlatform.Application.DTOs.Loads;
 using LogisticsPlatform.Application.Interfaces.Repositories.Carriers;
 using LogisticsPlatform.Application.Interfaces.Repositories.Customers;
@@ -7,6 +6,7 @@ using LogisticsPlatform.Application.Interfaces.Repositories.Loads;
 using LogisticsPlatform.Application.Interfaces.Repositories.Orders;
 using LogisticsPlatform.Application.Interfaces.Repositories.Users;
 using LogisticsPlatform.Application.Interfaces.Services.Loads;
+using LogisticsPlatform.Application.Interfaces.Services.Security;
 using LogisticsPlatform.Domain.Entities;
 using LogisticsPlatform.Domain.Enums;
 using LogisticsPlatform.Domain.Security;
@@ -21,7 +21,7 @@ namespace LogisticsPlatform.Application.Services
         private readonly ICustomerRepository _customers;
         private readonly ICarrierRepository _carriers;
         private readonly IUserRepository _users;
-        private readonly IAuthorizationService _auth;
+        private readonly IPermissionService _permission;
         private readonly IOrderRepository _orders;
         private readonly ILoadFinancialAutomationService _financialAutomationService;
 
@@ -30,7 +30,7 @@ namespace LogisticsPlatform.Application.Services
             ICustomerRepository customers,
             ICarrierRepository carriers,
             IUserRepository users,
-            IAuthorizationService auth,
+            IPermissionService permission,
             IOrderRepository orders,
             ILoadFinancialAutomationService loadFinancialAutomationService)
         {
@@ -38,7 +38,7 @@ namespace LogisticsPlatform.Application.Services
             _customers = customers;
             _carriers = carriers;
             _users = users;
-            _auth = auth;
+            _permission = permission;
             _orders = orders;
             _financialAutomationService = loadFinancialAutomationService;
         }
@@ -50,7 +50,7 @@ namespace LogisticsPlatform.Application.Services
         {
             var user = await GetUserOrThrow(userId);
 
-            if (!_auth.HasPermission(user, Permission.Load_Create))
+            if (!await _permission.HasPermissionAsync(userId, Permission.Load_Create))
                 throw new Common.Exceptions.ForbiddenException("You are not allowed to create loads.");
 
             var customer = await _customers.GetByIdAsync(dto.CustomerId)
@@ -102,7 +102,7 @@ namespace LogisticsPlatform.Application.Services
 
             var user = await GetUserOrThrow(userId);
 
-            if (!_auth.HasPermission(user, Permission.Load_Update, load))
+            if (!await _permission.HasPermissionAsync(userId, Permission.Load_Update))
                 throw new Common.Exceptions.ForbiddenException("You are not allowed to update this load.");
 
             load.Origin = dto.Origin ?? load.Origin;
@@ -154,7 +154,7 @@ namespace LogisticsPlatform.Application.Services
 
             var user = await GetUserOrThrow(userId);
 
-            if (!_auth.HasPermission(user, Permission.Load_ChangeStatus, load))
+            if (!await _permission.HasPermissionAsync(userId, Permission.Load_ChangeStatus))
                 throw new Common.Exceptions.ForbiddenException("You are not allowed to change load status.");
 
             if (load.Status == LoadStatus.Completed)
@@ -181,7 +181,7 @@ namespace LogisticsPlatform.Application.Services
             // 1️⃣ Load user & permissions
             var user = await GetUserOrThrow(userId);
 
-            if (!_auth.HasPermission(user, Permission.Load_CreateFromOrder))
+            if (!await _permission.HasPermissionAsync(userId, Permission.Load_CreateFromOrder))
                 throw new Common.Exceptions.ForbiddenException("Not allowed to create load from order.");
 
             // 2️⃣ Load order with routes + items
@@ -388,7 +388,7 @@ namespace LogisticsPlatform.Application.Services
 
             var user = await GetUserOrThrow(userId);
 
-            if (!_auth.HasPermission(user, Permission.Load_Archive, load))
+            if (!await _permission.HasPermissionAsync(userId, Permission.Load_Archive))
                 throw new Common.Exceptions.ForbiddenException("You are not allowed to archive this load.");
 
             load.IsArchived = true;
@@ -445,7 +445,7 @@ namespace LogisticsPlatform.Application.Services
 
             var user = await GetUserOrThrow(userId);
 
-            if (!_auth.HasPermission(user, Permission.Load_Dispatch, load))
+            if (!await _permission.HasPermissionAsync(userId, Permission.Load_Dispatch))
                 throw new ForbiddenException("You are not allowed to dispatch this load.");
 
             // 🔒 Business rules

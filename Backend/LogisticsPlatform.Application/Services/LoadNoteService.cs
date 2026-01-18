@@ -1,9 +1,9 @@
-﻿using LogisticsPlatform.Application.Authorization;
-using LogisticsPlatform.Application.Common.Exceptions;
+﻿using LogisticsPlatform.Application.Common.Exceptions;
 using LogisticsPlatform.Application.DTOs.Loads.LoadNote;
 using LogisticsPlatform.Application.Interfaces.Repositories.Loads;
 using LogisticsPlatform.Application.Interfaces.Repositories.Users;
 using LogisticsPlatform.Application.Interfaces.Services.Loads;
+using LogisticsPlatform.Application.Interfaces.Services.Security;
 using LogisticsPlatform.Domain.Entities;
 using LogisticsPlatform.Domain.Security;
 
@@ -13,16 +13,16 @@ namespace LogisticsPlatform.Application.Services
     {
         private readonly ILoadNoteRepository _repo;
         private readonly IUserRepository _users;
-        private readonly IAuthorizationService _auth;
+        private readonly IPermissionService _permission;
 
         public LoadNoteService(
             ILoadNoteRepository repo,
             IUserRepository users,
-            IAuthorizationService auth)
+            IPermissionService permission)
         {
             _repo = repo;
             _users = users;
-            _auth = auth;
+            _permission = permission;
         }
 
         public async Task AddAsync(Guid loadId, CreateLoadNoteDto dto, Guid userId)
@@ -35,7 +35,7 @@ namespace LogisticsPlatform.Application.Services
                 ? Permission.LoadNote_Create_Internal
                 : Permission.LoadNote_Create_Public;
 
-            if (!_auth.HasPermission(user, permission))
+            if (!await _permission.HasPermissionAsync(userId, permission))
                 throw new ForbiddenException("You are not allowed to add this note.");
 
             var note = new LoadNote
@@ -57,7 +57,7 @@ namespace LogisticsPlatform.Application.Services
             var notes = await _repo.GetByLoadIdAsync(loadId);
 
             // ✅ hide internal notes if no permission
-            if (!_auth.HasPermission(user, Permission.LoadNote_View))
+            if (!await _permission.HasPermissionAsync(userId, Permission.LoadNote_View))
             {
                 notes = notes.Where(n => !n.IsInternal).ToList();
             }

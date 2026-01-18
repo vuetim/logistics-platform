@@ -29,5 +29,6 @@ public enum Permission
     User_View_Self,
     User_Update,
     User_Delete,
-    User_AssignRole
+    User_AssignRole,
+    User_Disable,
 }
