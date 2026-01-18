@@ -1,0 +1,30 @@
+.filter-builder {
+  padding: 12px 16px;
+  border-bottom: 1px solid #eee;
+}
+
+.filters-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  background: #fff;
+  padding: 20px;
+  border-bottom: 1px solid #eee;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.filter-item {
+  height: 36px;
+  padding: 0 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.clear-btn {
+  background: transparent;
+  border: none;
+  color: #666;
+  cursor: pointer;
+}

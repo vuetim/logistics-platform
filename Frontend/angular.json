@@ -19,7 +19,11 @@
             "polyfills": ["zone.js"],
             "tsConfig": "tsconfig.app.json",
             "assets": ["src/favicon.ico", "src/assets"],
-            "styles": ["node_modules/ngx-toastr/toastr.css", "src/styles.css"],
+            "styles": [
+              "node_modules/ngx-toastr/toastr.css",
+              "src/styles.css",
+              "src/app/styles/badges.css"
+            ],
             "scripts": []
           },
           "configurations": {

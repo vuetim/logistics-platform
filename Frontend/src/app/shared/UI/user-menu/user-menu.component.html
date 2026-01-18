@@ -5,23 +5,35 @@
 
     <div>
       <div class="name">
-        {{ name }}
+        {{ auth.getUserName() }}
       </div>
-      <div class="email">{{ email }}</div>
+      <div class="email">
+        {{ auth.getUserEmail() }}
+      </div>
     </div>
+
     <span class="badge">
-      {{ roles.join(", ") }}
+      {{ auth.getRoles().join(", ") }}
     </span>
   </div>
 
   <hr />
 
-  <button class="item">
+  <!-- MY PROFILE (ALL USERS) -->
+  <button routerLink="/profile" class="item">
     <span class="material-icons">account_circle</span>
     My Profile
   </button>
 
-  <hr />
+  <!-- USER MANAGEMENT (ADMIN ONLY) -->
+  <button
+    *ngIf="auth.hasPermission('User_View_All')"
+    routerLink="/admin/users"
+    class="item"
+  >
+    <span class="material-icons">group</span>
+    User Management
+  </button>
 
   <hr />
 

@@ -1,0 +1,70 @@
+<div class="modal-overlay">
+  <div class="modal-container">
+    <!-- HEADER -->
+    <div class="modal-header">
+      <h2>Edit User</h2>
+      <app-ui-button variant="ghost" (click)="cancel()">✕</app-ui-button>
+    </div>
+
+    <!-- BODY -->
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Full Name</label>
+        <input [(ngModel)]="fullName" />
+      </div>
+
+      <div class="form-group">
+        <label>Email</label>
+        <input [(ngModel)]="email" />
+      </div>
+
+      <div class="form-group">
+        <label>Role</label>
+        <select [(ngModel)]="role">
+          <option *ngFor="let r of roles" [value]="r">{{ r }}</option>
+        </select>
+      </div>
+      <div class="form-group" *ngIf="canUpdate">
+        <label>New Password</label>
+        <input
+          [(ngModel)]="newPassword"
+          placeholder="Leave empty to keep current password"
+        />
+      </div>
+
+      <div class="status-row">
+        <span>Status</span>
+
+        <label class="switch">
+          <input type="checkbox" [(ngModel)]="isActive" />
+          <span class="slider"></span>
+        </label>
+
+        <span class="status-label">
+          {{ isActive ? "Active" : "Inactive" }}
+        </span>
+      </div>
+
+      <div class="permissions">
+        <h3>Permissions</h3>
+
+        <div class="permission-row" *ngFor="let p of permissions">
+          <span>{{ p }}</span>
+          <select [(ngModel)]="permissionState[p]">
+            <option [ngValue]="null">Default</option>
+            <option [ngValue]="true">Allow</option>
+            <option [ngValue]="false">Deny</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="modal-footer">
+      <app-ui-button variant="ghost" (click)="cancel()">Close</app-ui-button>
+      <app-ui-button variant="primary" (click)="save()"
+        >Save Changes</app-ui-button
+      >
+    </div>
+  </div>
+</div>

@@ -3,8 +3,10 @@
 public interface IAuthAuditService
 {
     Task LogAsync(
-        Guid? userId,
+        Guid? actorUserId,
         string eventName,
-        string? ipAddress,
-        string? userAgent);
+        Guid? targetUserId = null,
+        object? metadata = null,
+        string? ipAddress = null,
+        string? userAgent = null);
 }

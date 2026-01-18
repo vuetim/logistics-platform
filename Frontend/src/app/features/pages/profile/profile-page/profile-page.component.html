@@ -1,0 +1,53 @@
+<app-page-layout>
+  <div page-actions></div>
+  <app-ui-card cardTitle="My Profile">
+    <div class="profile-card">
+      <h3>General Info</h3>
+
+      <div class="info-row">
+        <span class="label">Email:</span>
+        <span class="value">{{ email }}</span>
+      </div>
+
+      <div class="info-row">
+        <span class="label">Roles:</span>
+        <span class="value">{{ roles.join(", ") }}</span>
+      </div>
+
+      <div class="info-row" *ngIf="canEdit">
+        <span class="label"> New Password</span>
+
+        <span class="value">
+          <input
+            type="password"
+            [(ngModel)]="newPassword"
+            placeholder="New password"
+          />
+        </span>
+      </div>
+
+      <div class="info-row">
+        <span class="label">Status:</span>
+        <span
+          class="badge"
+          [class.active]="isActive"
+          [class.inactive]="!isActive"
+        >
+          {{ isActive ? "Active" : "Inactive" }}
+        </span>
+      </div>
+
+      <div class="info-row">
+        <span class="label">Account Type:</span>
+        <span class="value">
+          {{ isAdmin ? "Administrator" : "User" }}
+        </span>
+      </div>
+      <div class="button-row">
+        <app-ui-button *ngIf="canEdit" variant="secondary" (click)="save()"
+          >Save Changes</app-ui-button
+        >
+      </div>
+    </div>
+  </app-ui-card>
+</app-page-layout>

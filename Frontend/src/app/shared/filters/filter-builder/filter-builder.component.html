@@ -1,0 +1,28 @@
+<div class="filters-row">
+  <ng-container *ngFor="let f of filters">
+    <!-- TEXT -->
+    <input
+      *ngIf="f.type === 'text'"
+      type="text"
+      class="filter-item"
+      [placeholder]="f.label"
+      [(ngModel)]="values[f.key]"
+      (input)="onChange(f.key)"
+    />
+
+    <!-- DROPDOWN -->
+    <select
+      *ngIf="f.type === 'dropdown'"
+      [(ngModel)]="values[f.key]"
+      (change)="onChange(f.key)"
+      class="filter-item"
+    >
+      <option [ngValue]="null">All</option>
+      <option *ngFor="let o of f.options" [ngValue]="o.value">
+        {{ o.label }}
+      </option>
+    </select>
+  </ng-container>
+
+  <button class="clear-btn" (click)="clear()">Clear</button>
+</div>

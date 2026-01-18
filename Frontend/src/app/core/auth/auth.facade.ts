@@ -4,6 +4,7 @@ import { AuthApi } from '../../data-access/auth/auth.api';
 import { TokenStorage } from './infrastructure/token-storage.service';
 import { mapLoginResponseToSession } from './mappers/auth.mapper';
 import { JwtDecoderService } from './services/jwt-decoder.service';
+import { CreateUserDto } from './dto/Requests/create-user.dto';
 
 
 @Injectable({ providedIn: 'root' })
@@ -26,7 +27,9 @@ export class AuthFacade {
             })
         );
     }
-
+    createUser(dto: CreateUserDto) {
+        return this.api.register(dto);
+    }
     refresh() {
         const session = this.storage.get();
         if (!session) {
@@ -74,7 +77,11 @@ export class AuthFacade {
         const session = this.storage.get();
         if (!session) return null;
 
-        return this.jwt.decode(session.accessToken).sub;
+        const claims = this.jwt.decode(session.accessToken);
+
+        return claims[
+            'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'
+        ] ?? null;
     }
 
     hasRole(role: string): boolean {
@@ -96,10 +103,12 @@ export class AuthFacade {
         const session = this.storage.get();
         if (!session) return [];
 
-        return this.jwt
+        return (this.jwt
             .decode(session.accessToken)
-            .permissions?.split(',') ?? [];
+            .permissions?.split(',') ?? [])
+            .filter(p => !!p);
     }
+
 
     hasPermission(permission: string): boolean {
         return this.getPermissions().includes(permission);

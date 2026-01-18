@@ -5,11 +5,11 @@
     <!-- ITEM PA CHILDREN -->
     <a
       *ngIf="!item.children"
-      class="icon-btn"
+      class="icon-btn has-tooltip"
       [routerLink]="item.route"
       routerLinkActive="active"
       [routerLinkActiveOptions]="{ exact: true }"
-      [title]="item.label"
+      [attr.data-tooltip]="item.label"
     >
       <span class="material-icons">{{ item.icon }}</span>
     </a>
@@ -17,11 +17,11 @@
     <!-- ITEM ME CHILDREN -->
     <div *ngIf="item.children" class="icon-wrapper">
       <button
-        class="icon-btn"
+        class="icon-btn has-tooltip"
         type="button"
         (click)="toggle(item)"
         [class.active]="expanded === item"
-        [title]="item.label"
+        [attr.data-tooltip]="item.label"
       >
         <span class="material-icons">{{ item.icon }}</span>
       </button>

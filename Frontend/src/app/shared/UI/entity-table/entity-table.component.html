@@ -1,0 +1,49 @@
+<table class="entity-table">
+  <thead>
+    <tr>
+      <th
+        *ngFor="let col of columns"
+        (click)="sort(col)"
+        [class.sortable]="col.sortable"
+      >
+        {{ col.label }}
+        <span *ngIf="sortKey === col.key">
+          {{ sortDir === "asc" ? "▲" : "▼" }}
+        </span>
+      </th>
+
+      <th *ngIf="actions.length">Actions</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr *ngFor="let row of sortedRows">
+      <td *ngFor="let col of columns">
+        <span
+          *ngIf="col.classFn; else plainCell"
+          class="badge"
+          [ngClass]="col.classFn(row)"
+        >
+          {{ getCellValue(row, col) }}
+        </span>
+
+        <!-- normal cell -->
+        <ng-template #plainCell>
+          {{ getCellValue(row, col) }}
+        </ng-template>
+      </td>
+
+      <td *ngIf="actions.length" class="actions">
+        <ng-container *ngFor="let action of actions">
+          <app-ui-button
+            *ngIf="!action.visible || action.visible(row)"
+            [variant]="action.variant ?? 'primary'"
+            (click)="action.handler(row)"
+          >
+            {{ action.label }}
+          </app-ui-button>
+        </ng-container>
+      </td>
+    </tr>
+  </tbody>
+</table>

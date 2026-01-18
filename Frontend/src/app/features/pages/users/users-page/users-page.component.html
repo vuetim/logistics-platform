@@ -1,0 +1,78 @@
+<app-page-layout>
+  <div page-actions></div>
+
+  <!--  FILTER PANEL (MBI UI CARD) -->
+
+  <div *ngIf="filtersOpen">
+    <app-filter-builder
+      [filters]="filtersConfig"
+      (filterChange)="onFilterChange($event)"
+    >
+    </app-filter-builder>
+  </div>
+
+  <!-- USERS CARD -->
+  <app-ui-card cardTitle="Users">
+    <!-- HEADER -->
+    <div card-actions class="card-header">
+      <div class="users-toolbar">
+        <button class="material-icons" (click)="toggleFilter()">tune</button>
+        <app-ui-button
+          variant="primary"
+          *ngIf="auth.hasRole('Admin')"
+          (click)="openCreateUser()"
+        >
+          Add User
+        </app-ui-button>
+      </div>
+    </div>
+    <div class="filter-chip-main">
+      <span *ngIf="activeFiltersCount > 0">
+        Filters:
+        <span
+          >(<span class="filter-count">{{ activeFiltersCount }}</span
+          >)</span
+        >
+      </span>
+      <div
+        class="filter-chip"
+        *ngFor="let item of activeFilters | keyvalue"
+        [hidden]="item.key == null || item.value == null"
+      >
+        <span class="chip-label">{{ item.key }}:</span>
+        <span class="chip-value">
+          {{ formatFilterValue(item.key, item.value) }}
+        </span>
+
+        <button class="chip-remove" (click)="removeFilter(item.key)">×</button>
+      </div>
+    </div>
+
+    <!-- TABLE -->
+    <app-entity-table [columns]="columns" [rows]="users" [actions]="actions">
+    </app-entity-table>
+
+    <!-- FOOTER -->
+    <div card-footer>
+      <app-pagination
+        [page]="page"
+        [totalPages]="totalCount"
+        (pageChange)="onPageChange($event)"
+      >
+      </app-pagination>
+    </div>
+  </app-ui-card>
+
+  <!-- EDIT MODAL (MBETET SIÇ E KE) -->
+  <app-edit-user-modal
+    *ngIf="selectedUser"
+    [user]="selectedUser"
+    (close)="onModalClose($event)"
+  >
+  </app-edit-user-modal>
+  <app-create-user-modal
+    *ngIf="creatingUser"
+    (close)="onCreateUserClose($event)"
+  >
+  </app-create-user-modal>
+</app-page-layout>
