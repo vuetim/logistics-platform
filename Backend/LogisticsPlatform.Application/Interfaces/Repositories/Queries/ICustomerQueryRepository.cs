@@ -1,10 +1,11 @@
-﻿using LogisticsPlatform.Application.DTOs.Pagination;
+﻿using LogisticsPlatform.Application.DTOs.Customers;
+using LogisticsPlatform.Application.DTOs.Pagination;
 using LogisticsPlatform.Domain.Entities;
 
 namespace LogisticsPlatform.Application.Interfaces.Repositories.Queries
 {
     public interface ICustomerQueryRepository
     {
-        Task<PagedResult<Customer>> GetPagedAsync(QueryParameters parameters);
+        Task<PagedResult<CustomerListItemDto>> GetPagedAsync(QueryParameters parameters);
     }
 }

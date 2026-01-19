@@ -1,4 +1,5 @@
-﻿using LogisticsPlatform.Application.DTOs.Pagination;
+﻿using LogisticsPlatform.Application.DTOs.Customers;
+using LogisticsPlatform.Application.DTOs.Pagination;
 using LogisticsPlatform.Application.Interfaces.Repositories.Queries;
 using LogisticsPlatform.Application.Interfaces.Services.Customers;
 using LogisticsPlatform.Domain.Entities;
@@ -12,7 +13,7 @@ public class CustomerQueryService : ICustomerQueryService
         _repo = repo;
     }
 
-    public async Task<PagedResult<Customer>> GetPagedAsync(QueryParameters parameters)
+    public async Task<PagedResult<CustomerListItemDto>> GetPagedAsync(QueryParameters parameters)
     {
         return await _repo.GetPagedAsync(parameters);
     }
