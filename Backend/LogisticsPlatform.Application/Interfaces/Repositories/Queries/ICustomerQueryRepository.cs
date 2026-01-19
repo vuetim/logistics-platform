@@ -6,6 +6,6 @@ namespace LogisticsPlatform.Application.Interfaces.Repositories.Queries
 {
     public interface ICustomerQueryRepository
     {
-        Task<PagedResult<CustomerListItemDto>> GetPagedAsync(QueryParameters parameters);
+        Task<PagedResult<CustomerListItemDto>> GetPagedAsync(CustomersQueryParameters parameters);
     }
 }

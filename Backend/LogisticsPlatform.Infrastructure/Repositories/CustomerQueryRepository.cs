@@ -17,50 +17,44 @@ namespace LogisticsPlatform.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<PagedResult<CustomerListItemDto>> GetPagedAsync(
-            QueryParameters parameters
-        )
+        public async Task<PagedResult<CustomerListItemDto>> GetPagedAsync(CustomersQueryParameters p)
         {
             var query = _context.Customers.AsNoTracking();
 
-            if (!string.IsNullOrWhiteSpace(parameters.Search))
+            if (!string.IsNullOrWhiteSpace(p.Search))
             {
-                var s = parameters.Search.ToLower();
+                var s = p.Search.ToLower();
                 query = query.Where(c =>
                     c.Name.ToLower().Contains(s) ||
-                    c.Email!.ToLower().Contains(s) ||
-                    c.Phone!.ToLower().Contains(s)
+                    c.Email!.ToLower().Contains(s)
                 );
             }
 
-            if (!string.IsNullOrEmpty(parameters.SortBy))
+            if (p.IsActive.HasValue)
+                query = query.Where(c => c.IsActive == p.IsActive);
+            if (!string.IsNullOrWhiteSpace(p.SortBy))
             {
-                query = parameters.SortDir == "desc"
-                    ? query.OrderByDescendingDynamic(parameters.SortBy)
-                    : query.OrderByDynamic(parameters.SortBy);
+                query = p.SortDir == "desc"
+                    ? query.OrderByDescendingDynamic(p.SortBy)
+                    : query.OrderByDynamic(p.SortBy);
             }
-
             var total = await query.CountAsync();
 
             var items = await query
-                .Skip((parameters.Page - 1) * parameters.PageSize)
-                .Take(parameters.PageSize)
+                .Skip((p.Page - 1) * p.PageSize)
+                .Take(p.PageSize)
                 .Select(c => new CustomerListItemDto
                 {
                     Id = c.Id,
                     Name = c.Name,
                     Email = c.Email,
                     Phone = c.Phone,
-                    IsActive = true // ose nga column
+                    IsActive = c.IsActive
                 })
                 .ToListAsync();
 
-            return new PagedResult<CustomerListItemDto>(
-                items,
-                total,
-                parameters.Page,
-                parameters.PageSize
-            );
+            return new PagedResult<CustomerListItemDto>(items, total, p.Page, p.PageSize);
         }
+
     }
 }

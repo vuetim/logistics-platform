@@ -3,6 +3,7 @@ using LogisticsPlatform.Application.DTOs.Pagination;
 using LogisticsPlatform.Application.Interfaces.Services.Customers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace LogisticsPlatform.Api.Controllers
 {
@@ -71,10 +72,16 @@ namespace LogisticsPlatform.Api.Controllers
         }
 
         [HttpGet("paged")]
-        public async Task<IActionResult> GetPaged([FromQuery] QueryParameters parameters)
+        public async Task<IActionResult> GetPaged([FromQuery] CustomersQueryParameters p)
         {
-            var result = await _queries.GetPagedAsync(parameters);
-            return Ok(result);
+            return Ok(await _queries.GetPagedAsync(p));
+        }
+
+        [HttpPost("full")]
+        public async Task<IActionResult> CreateFull(CreateCustomerFullDto dto)
+        {
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            return Ok(await _customers.CreateFullAsync(dto, userId));
         }
 
     }

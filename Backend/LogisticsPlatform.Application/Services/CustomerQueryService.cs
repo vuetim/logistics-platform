@@ -13,7 +13,7 @@ public class CustomerQueryService : ICustomerQueryService
         _repo = repo;
     }
 
-    public async Task<PagedResult<CustomerListItemDto>> GetPagedAsync(QueryParameters parameters)
+    public async Task<PagedResult<CustomerListItemDto>> GetPagedAsync(CustomersQueryParameters parameters)
     {
         return await _repo.GetPagedAsync(parameters);
     }

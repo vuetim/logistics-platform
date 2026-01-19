@@ -16,7 +16,7 @@ namespace LogisticsPlatform.Application.Services
             _customers = customers;
         }
 
-        public async Task<CustomerNote> CreateAsync(Guid userId, CreateCustomerNoteDto dto)
+        public async Task<CustomerNote> CreateAsync( CreateCustomerNoteDto dto, Guid userId)
         {
             var customer = await _customers.GetByIdAsync(dto.CustomerId);
             if (customer == null)
@@ -27,7 +27,9 @@ namespace LogisticsPlatform.Application.Services
                 CustomerId = dto.CustomerId,
                 CreatedByUserId = userId,
                 Title = dto.Title,
-                Message = dto.Message
+                Message = dto.Message,
+                CreatedAt = DateTime.UtcNow
+
             };
 
             await _notes.AddAsync(note);

@@ -32,7 +32,7 @@ namespace LogisticsPlatform.Api.Controllers
         public async Task<IActionResult> Create(CreateCustomerNoteDto dto)
         {
             var userId = GetUserId();
-            var note = await _service.CreateAsync(userId, dto);
+            var note = await _service.CreateAsync(dto, userId);
             return Ok(note);
         }
 

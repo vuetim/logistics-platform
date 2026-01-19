@@ -5,6 +5,8 @@ namespace LogisticsPlatform.Application.Interfaces.Services.Customers
 {
     public interface ICustomerService
     {
+        public Task<Customer> CreateFullAsync(CreateCustomerFullDto dto, Guid userId
+            );
         Task<IEnumerable<Customer>> GetAllAsync();
         Task<Customer?> GetByIdAsync(Guid id);
         Task<Customer> CreateAsync(CreateCustomerDto dto);

@@ -5,7 +5,10 @@ namespace LogisticsPlatform.Application.Interfaces.Services.Customers
 {
     public interface ICustomerNoteService
     {
-        Task<CustomerNote> CreateAsync(Guid userId, CreateCustomerNoteDto dto);
+        Task<CustomerNote> CreateAsync(
+            CreateCustomerNoteDto dto,
+            Guid userId
+        );
         Task<CustomerNote?> UpdateAsync(Guid id, UpdateCustomerNoteDto dto);
         Task<bool> DeleteAsync(Guid id);
         Task<IEnumerable<CustomerNote>> GetByCustomerAsync(Guid customerId);

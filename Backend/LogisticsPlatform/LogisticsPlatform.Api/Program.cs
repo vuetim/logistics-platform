@@ -1,5 +1,6 @@
 ﻿using Hangfire;
 using LogisticsPlatform.Application.BackgroundJobs;
+using LogisticsPlatform.Application.DTOs.Common;
 using LogisticsPlatform.Application.Interfaces.Repositories;
 using LogisticsPlatform.Application.Interfaces.Repositories.Carriers;
 using LogisticsPlatform.Application.Interfaces.Repositories.Customers;
@@ -217,7 +218,7 @@ builder.Services
 
 builder.Services.AddScoped<IUserQueryService, UserQueryService>();
 builder.Services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
-
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 
 
