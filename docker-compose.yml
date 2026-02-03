@@ -1,0 +1,41 @@
+services:
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      SA_PASSWORD: ${DB_PASSWORD}
+      ACCEPT_EULA: "Y"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sql_data:/var/opt/mssql
+
+  api:
+    build:
+      context: ./Backend
+      dockerfile: LogisticsPlatform/LogisticsPlatform.Api/Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:5000
+
+      ConnectionStrings__DefaultConnection: "Server=db;Database=LogisticsPlatformDb;User Id=sa;Password=Password123!;TrustServerCertificate=True;"
+
+      Jwt__Key: ${JWT_KEY}
+
+      Smtp__User: ${SMTP_USER}
+      Smtp__Password: ${SMTP_PASSWORD}
+
+      Frontend__BaseUrl: ${FRONTEND_URL}
+
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: ./Frontend
+    ports:
+      - "4200:80"
+
+volumes:
+  sql_data:
