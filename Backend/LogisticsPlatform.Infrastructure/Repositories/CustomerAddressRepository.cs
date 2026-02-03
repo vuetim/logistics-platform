@@ -22,20 +22,6 @@ public class CustomerAddressRepository : ICustomerAddressRepository
         return await _context.CustomerAddresses.FindAsync(id);
     }
 
-    public async Task AddAsync(CustomerAddress address)
-    {
-        await _context.CustomerAddresses.AddAsync(address);
-    }
-
-    public async Task UpdateAsync(CustomerAddress address)
-    {
-        _context.CustomerAddresses.Update(address);
-    }
-
-    public async Task DeleteAsync(CustomerAddress address)
-    {
-        _context.CustomerAddresses.Remove(address);
-    }
     public async Task<List<CustomerAddress>> GetPrimaryByCustomerAsync(Guid customerId)
     {
         return await _context.CustomerAddresses
@@ -43,8 +29,18 @@ public class CustomerAddressRepository : ICustomerAddressRepository
             .ToListAsync();
     }
 
-    public async Task SaveChangesAsync()
+    public async Task AddAsync(CustomerAddress address)
     {
-        await _context.SaveChangesAsync();
+        await _context.CustomerAddresses.AddAsync(address);
+    }
+
+    public void Update(CustomerAddress address)
+    {
+        _context.CustomerAddresses.Update(address);
+    }
+
+    public void Remove(CustomerAddress address)
+    {
+        _context.CustomerAddresses.Remove(address);
     }
 }

@@ -1,0 +1,28 @@
+<div class="step-grid">
+  <div class="form">
+    <h3>Customer details</h3>
+
+    <input [(ngModel)]="data.name" placeholder="Name *" />
+    <input [(ngModel)]="data.email" placeholder="Email" />
+    <input [(ngModel)]="data.phone" placeholder="Phone" />
+
+    <input
+      type="number"
+      [(ngModel)]="data.paymentTermsDays"
+      placeholder="Payment terms (days)"
+    />
+
+    <label class="checkbox">
+      <input type="checkbox" [(ngModel)]="data.isActive" />
+      Active
+    </label>
+
+    <button class="btn primary" (click)="submit()" [disabled]="!isValid()">
+      Next
+    </button>
+  </div>
+</div>
+<!-- NAV -->
+<div class="step-actions">
+  <button (click)="next.emit()">Next</button>
+</div>

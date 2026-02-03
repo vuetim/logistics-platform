@@ -1,0 +1,64 @@
+<div class="tab-card">
+  <div class="toolbar">
+    <h3>Addresses</h3>
+
+    <app-ui-button *ngIf="canCreate" variant="primary" (click)="openAddModal()">
+      Add address
+    </app-ui-button>
+  </div>
+
+  <table class="simple-table" *ngIf="items.length; else empty">
+    <thead>
+      <tr>
+        <th>Address</th>
+        <th>City</th>
+        <th>Country</th>
+        <th>Type</th>
+        <th>Primary</th>
+        <th *ngIf="canUpdate || canDelete">Actions</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let a of items">
+        <td>{{ a.addressLine1 }}</td>
+        <td>{{ a.city }}</td>
+        <td>{{ a.country }}</td>
+        <td>{{ a.type }}</td>
+        <td>
+          <span *ngIf="a.isPrimary">✔</span>
+        </td>
+
+        <td *ngIf="canUpdate || canDelete">
+          <app-ui-button
+            *ngIf="canUpdate"
+            variant="ghost"
+            (click)="openEditModal(a)"
+          >
+            Edit
+          </app-ui-button>
+
+          <app-ui-button
+            *ngIf="canDelete"
+            variant="danger"
+            (click)="deleteItem(a.id)"
+          >
+            Delete
+          </app-ui-button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <ng-template #empty>
+    <div class="muted">No addresses.</div>
+  </ng-template>
+
+  <app-create-address-modal
+    *ngIf="showModal"
+    [customerId]="customerId"
+    [editing]="editing"
+    (close)="onModalClose($event)"
+  >
+  </app-create-address-modal>
+</div>

@@ -11,6 +11,7 @@ namespace LogisticsPlatform.Application.DTOs.Common
         Task BeginAsync();
         Task CommitAsync();
         Task RollbackAsync();
+        Task SaveChangesAsync();
     }
 
 }

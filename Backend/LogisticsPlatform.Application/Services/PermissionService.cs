@@ -1,6 +1,5 @@
 ﻿using LogisticsPlatform.Domain.Security;
 using LogisticsPlatform.Application.Interfaces.Services.Security;
-using LogisticsPlatform.Application.Security;
 
 namespace LogisticsPlatform.Application.Security;
 

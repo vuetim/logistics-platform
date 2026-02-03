@@ -1,0 +1,60 @@
+<div class="step-grid">
+  <!-- FORM -->
+  <div class="form">
+    <h3>Add Address</h3>
+
+    <input [(ngModel)]="draft.addressLine1" placeholder="Address line 1 *" />
+
+    <input [(ngModel)]="draft.addressLine2" placeholder="Address line 2" />
+
+    <input [(ngModel)]="draft.city" placeholder="City *" />
+
+    <input [(ngModel)]="draft.state" placeholder="State" />
+
+    <input [(ngModel)]="draft.country" placeholder="Country *" />
+
+    <input [(ngModel)]="draft.postalCode" placeholder="Postal code" />
+
+    <select [(ngModel)]="draft.type">
+      <option *ngFor="let t of addressTypes" [value]="t">
+        {{ t }}
+      </option>
+    </select>
+
+    <label class="checkbox">
+      <input type="checkbox" [(ngModel)]="draft.isPrimary" />
+      Primary address
+    </label>
+
+    <button class="btn primary" [disabled]="!isValid()" (click)="add()">
+      + Add Address
+    </button>
+  </div>
+
+  <!-- LIST -->
+  <div class="list">
+    <h3>Addresses</h3>
+
+    <div class="card" *ngFor="let a of addresses; let i = index">
+      <div class="card-header">
+        <strong>{{ a.addressLine1 }}</strong>
+        <span *ngIf="a.isPrimary" class="badge">Primary</span>
+      </div>
+
+      <div class="card-body">
+        {{ a.city }}, {{ a.country }}
+        <div class="muted">{{ a.type }}</div>
+      </div>
+
+      <div class="card-actions">
+        <button class="danger" (click)="remove(i)">Remove</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<div class="step-actions">
+  <button (click)="back.emit()">Back</button>
+  <button (click)="next.emit()" [disabled]="!addresses.length">Next</button>
+</div>

@@ -1,0 +1,49 @@
+<div class="tab-card">
+  <div class="toolbar">
+    <h3>Notes</h3>
+
+    <app-ui-button *ngIf="canCreate" variant="primary" (click)="openAddModal()">
+      Add Notes
+    </app-ui-button>
+  </div>
+
+  <table class="simple-table" *ngIf="items.length; else empty">
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Message</th>
+
+        <th *ngIf="canUpdate || canDelete">Actions</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let n of items">
+        <td>{{ n.title }}</td>
+        <td>{{ n.message }}</td>
+        <td>{{ n.createdByName }}</td>
+
+        <td>
+          <app-ui-button variant="ghost" (click)="openEditModal(n)"
+            >Edit</app-ui-button
+          >
+          <app-ui-button variant="danger" (click)="deleteItem(n.id)"
+            >Delete</app-ui-button
+          >
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <ng-template #empty>
+    <div class="muted">No contacts.</div>
+  </ng-template>
+
+  <app-create-customer-note
+    *ngIf="showModal"
+    [customerId]="customerId"
+    [editing]="editing"
+    (close)="onModalClose($event)"
+  >
+  </app-create-customer-note>
+</div>

@@ -1,0 +1,122 @@
+<app-page-layout>
+  <div page-actions></div>
+  <div class="page">
+    <div class="header" *ngIf="customer as c; else loadingTpl">
+      <div class="title">
+        <div class="name-row">
+          <h1>{{ c.name }}</h1>
+          <span
+            class="pill"
+            [class.active]="c.isActive"
+            [class.inactive]="!c.isActive"
+          >
+            {{ c.isActive ? "Active" : "Inactive" }}
+          </span>
+        </div>
+
+        <div class="meta">
+          <span *ngIf="c.email">{{ c.email }}</span>
+          <span *ngIf="c.phone">• {{ c.phone }}</span>
+          <span>• NET {{ c.paymentTermsDays }}</span>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <!-- këtu mundesh me qit button Edit basic info nëse don -->
+        <button class="btn ghost" routerLink="/customers">Back</button>
+      </div>
+    </div>
+
+    <ng-template #loadingTpl>
+      <div class="skeleton">Loading...</div>
+    </ng-template>
+
+    <div class="tabs" *ngIf="customer as c">
+      <button
+        class="tab"
+        [class.active]="tab === 'overview'"
+        (click)="setTab('overview')"
+      >
+        Overview
+      </button>
+
+      <button
+        class="tab"
+        [class.active]="tab === 'addresses'"
+        (click)="setTab('addresses')"
+      >
+        Addresses <span class="count">{{ c.addresses?.length || 0 }}</span>
+      </button>
+
+      <button
+        class="tab"
+        [class.active]="tab === 'contacts'"
+        (click)="setTab('contacts')"
+      >
+        Contacts <span class="count">{{ c.contacts?.length || 0 }}</span>
+      </button>
+
+      <button
+        class="tab"
+        [class.active]="tab === 'notes'"
+        (click)="setTab('notes')"
+      >
+        Notes <span class="count">{{ c.notes?.length || 0 }}</span>
+      </button>
+    </div>
+
+    <!-- TAB CONTENT -->
+    <div class="content" *ngIf="customer as c">
+      <!-- OVERVIEW -->
+      <div *ngIf="tab === 'overview'" class="overview">
+        <div class="card">
+          <h3>Quick summary</h3>
+          <div class="grid">
+            <div class="kv">
+              <label>Email</label>
+              <div>{{ c.email || "—" }}</div>
+            </div>
+            <div class="kv">
+              <label>Phone</label>
+              <div>{{ c.phone || "—" }}</div>
+            </div>
+            <div class="kv">
+              <label>Payment terms</label>
+              <div>NET {{ c.paymentTermsDays }}</div>
+            </div>
+            <div class="kv">
+              <label>Status</label>
+              <div>{{ c.isActive ? "Active" : "Inactive" }}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Primary address</h3>
+          <div class="muted" *ngIf="!c.addresses?.length">No addresses.</div>
+          <div *ngIf="c.addresses?.length">
+            <ng-container *ngFor="let a of c.addresses">
+              <div *ngIf="a.isPrimary" class="addr">
+                <strong>{{ a.addressLine1 }}</strong>
+                <div class="muted">
+                  {{ a.city }}, {{ a.country }} {{ a.type }}
+                </div>
+              </div>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+      <!-- ADDRESSES -->
+      <app-customer-addresses *ngIf="tab === 'addresses'" [customerId]="c.id">
+      </app-customer-addresses>
+      <app-customer-contacts
+        *ngIf="tab === 'contacts'"
+        [customerId]="c.id"
+      ></app-customer-contacts>
+      <app-customer-notes
+        *ngIf="tab === 'notes'"
+        [customerId]="c.id"
+      ></app-customer-notes>
+    </div>
+  </div>
+</app-page-layout>

@@ -1,0 +1,37 @@
+<div *ngFor="let n of notes; let i = index">
+  <input [(ngModel)]="n.title" placeholder="Title" />
+  <input [(ngModel)]="n.message" placeholder="Message" />
+</div>
+<button (click)="add()">Add NOTES</button>
+
+<div class="step-grid">
+  <div class="form">
+    <h3>Add Notes</h3>
+
+    <input [(ngModel)]="draft.title" placeholder="Full name *" />
+    <input [(ngModel)]="draft.message" placeholder="Email *" />
+
+    <button class="btn primary" (click)="add()" [disabled]="!isValid()">
+      + Add Note
+    </button>
+  </div>
+
+  <div class="list">
+    <h3>Notes</h3>
+
+    <div class="card" *ngFor="let n of notes; let i = index">
+      <strong>{{ n.title }}</strong>
+
+      <div class="muted">{{ n.message }}</div>
+
+      <div class="card-actions">
+        <button class="danger" (click)="remove(i)">Remove</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="step-actions">
+  <button (click)="back.emit()">Back</button>
+  <button (click)="next.emit()">Next</button>
+</div>

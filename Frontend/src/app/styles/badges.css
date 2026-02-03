@@ -1,13 +1,14 @@
 .badge {
-  padding: 4px 10px;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 12px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid #e5e7eb;
 }
 
 .badge.success {
-  background: #e6f6ed;
-  color: #1e8e3e;
+  background: #ecfdf5;
+  border-color: #a7f3d0;
+  color: #065f46;
 }
 .badge.danger {
   background: #fdecea;

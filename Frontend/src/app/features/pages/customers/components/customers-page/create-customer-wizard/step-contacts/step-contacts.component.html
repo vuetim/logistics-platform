@@ -1,0 +1,47 @@
+<div class="step-grid">
+  <!-- FORM -->
+  <div class="form">
+    <h3>Add Address</h3>
+
+    <input [(ngModel)]="draft.fullName" placeholder="fullName*" />
+
+    <input [(ngModel)]="draft.email" type="email" placeholder="Email" />
+
+    <input [(ngModel)]="draft.phone" placeholder="Phone *" />
+
+    <input [(ngModel)]="draft.position" placeholder="Position" />
+
+    <label class="checkbox">
+      <input type="checkbox" [(ngModel)]="draft.isPrimary" />
+      Primary Contact
+    </label>
+
+    <button class="btn primary" [disabled]="!isValid()" (click)="add()">
+      + Add Contact
+    </button>
+  </div>
+
+  <!-- LIST -->
+  <div class="list">
+    <h3>Contacts</h3>
+
+    <div class="card" *ngFor="let c of contacts; let i = index">
+      <div class="card-header">
+        <strong>{{ c.fullName }}</strong>
+        <span *ngIf="c.isPrimary" class="badge">Primary</span>
+      </div>
+
+      <div class="card-body">{{ c.email }}, {{ c.phone }}</div>
+
+      <div class="card-actions">
+        <button class="danger" (click)="remove(i)">Remove</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<div class="step-actions">
+  <button (click)="back.emit()">Back</button>
+  <button (click)="next.emit()" [disabled]="!contacts.length">Next</button>
+</div>

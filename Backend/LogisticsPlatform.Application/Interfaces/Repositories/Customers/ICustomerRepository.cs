@@ -4,13 +4,16 @@ namespace LogisticsPlatform.Application.Interfaces.Repositories.Customers
 {
     public interface ICustomerRepository
     {
-
         Task<Customer?> GetByIdAsync(Guid id);
-        Task<IEnumerable<Customer>> GetAllAsync();
-        Task AddAsync(Customer customer);
-        Task UpdateAsync(Customer customer);
-        Task DeleteAsync(Customer customer);
-        Task SaveChangesAsync();
 
+        Task<Customer?> GetDetailsAsync(Guid id); // aggregate
+
+        Task<IEnumerable<Customer>> GetAllAsync();
+
+        Task AddAsync(Customer customer);
+
+        void Update(Customer customer);
+
+       
     }
 }

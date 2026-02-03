@@ -1,0 +1,53 @@
+<div class="tab-card">
+  <div class="toolbar">
+    <h3>Contacts</h3>
+
+    <app-ui-button *ngIf="canCreate" variant="primary" (click)="openAddModal()">
+      Add contact
+    </app-ui-button>
+  </div>
+
+  <table class="simple-table" *ngIf="items.length; else empty">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Role</th>
+        <th>Primary</th>
+        <th *ngIf="canUpdate || canDelete">Actions</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let c of items">
+        <td>{{ c.fullName }}</td>
+        <td>{{ c.email }}</td>
+        <td>{{ c.phone }}</td>
+        <td>{{ c.position }}</td>
+        <td>{{ c.isPrimary ? "✔" : "" }}</td>
+
+        <td>
+          <app-ui-button variant="ghost" (click)="openEditModal(c)"
+            >Edit</app-ui-button
+          >
+          <app-ui-button variant="danger" (click)="deleteItem(c.id)"
+            >Delete</app-ui-button
+          >
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <ng-template #empty>
+    <div class="muted">No contacts.</div>
+  </ng-template>
+
+  <app-create-contact-modal
+    *ngIf="showModal"
+    [customerId]="customerId"
+    [editing]="editing"
+    (close)="onModalClose($event)"
+  >
+  </app-create-contact-modal>
+</div>

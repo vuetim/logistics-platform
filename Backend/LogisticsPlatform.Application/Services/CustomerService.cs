@@ -1,135 +1,241 @@
 ﻿using LogisticsPlatform.Application.DTOs.Common;
 using LogisticsPlatform.Application.DTOs.Customers;
+using LogisticsPlatform.Application.DTOs.Customers.Addresses;
+using LogisticsPlatform.Application.DTOs.Customers.Contacts;
+using LogisticsPlatform.Application.DTOs.Customers.Notes;
 using LogisticsPlatform.Application.Interfaces.Repositories.Customers;
 using LogisticsPlatform.Application.Interfaces.Services.Customers;
 using LogisticsPlatform.Domain.Entities;
-using SendGrid.Helpers.Mail;
 
 namespace LogisticsPlatform.Application.Services
 {
     public class CustomerService : ICustomerService
     {
         private readonly ICustomerRepository _customers;
-        private readonly ICustomerAddressService _addressService;
-        private readonly ICustomerContactService _contactService;
-        private readonly ICustomerNoteService _noteService;
         private readonly IUnitOfWork _uow;
 
         public CustomerService(
             ICustomerRepository customers,
-            ICustomerAddressService addressService,
-            ICustomerContactService contactService,
-            ICustomerNoteService noteService,
-            IUnitOfWork uow
-        )
+            IUnitOfWork uow)
         {
             _customers = customers;
-            _addressService = addressService;
-            _contactService = contactService;
-            _noteService = noteService;
             _uow = uow;
         }
 
-        public async Task<IEnumerable<Customer>> GetAllAsync()
+        // ======================
+        // GET ALL
+        // ======================
+        public async Task<IEnumerable<CustomerListItemDto>> GetAllAsync()
         {
-            return await _customers.GetAllAsync();
-        }
+            var list = await _customers.GetAllAsync();
 
-        public async Task<Customer?> GetByIdAsync(Guid id)
-        {
-            return await _customers.GetByIdAsync(id);
-        }
-
-        public async Task<Customer> CreateAsync(CreateCustomerDto dto)
-        {
-            var customer = new Customer
+            return list.Select(c => new CustomerListItemDto
             {
-                Name = dto.Name,
-                Email = dto.Email,
-                Phone = dto.Phone,
-                Address = dto.Address,
-                PaymentTermsDays = dto.PaymentTermsDays
+                Id = c.Id,
+                Name = c.Name,
+                Email = c.Email,
+                Phone = c.Phone,
+                IsActive = c.IsActive
+            });
+        }
+
+        // ======================
+        // GET BY ID
+        // ======================
+        public async Task<CustomerListItemDto?> GetByIdAsync(Guid id)
+        {
+            var c = await _customers.GetByIdAsync(id);
+            if (c == null) return null;
+
+            return new CustomerListItemDto
+            {
+                Id = c.Id,
+                Name = c.Name,
+                Email = c.Email,
+                Phone = c.Phone,
+                IsActive = c.IsActive
             };
+        }
+
+        // ======================
+        // GET DETAILS (aggregate)
+        // ======================
+        public async Task<CustomerDetailsDto?> GetDetailsAsync(Guid id)
+        {
+            var c = await _customers.GetDetailsAsync(id);
+            if (c == null) return null;
+
+            return new CustomerDetailsDto
+            {
+                Id = c.Id,
+                Name = c.Name,
+                Email = c.Email,
+                Phone = c.Phone,
+                PaymentTermsDays = c.PaymentTermsDays,
+                IsActive = c.IsActive,
+
+                Addresses = c.Addresses
+                    .Where(a => a.IsActive)
+                    .Select(a => new CustomerAddressDto
+                    {
+                        Id = a.Id,
+                        AddressLine1 = a.AddressLine1,
+                        City = a.City,
+                        Country = a.Country,
+                        IsPrimary = a.IsPrimary,
+                        Type = a.Type
+                    }).ToList(),
+
+                Contacts = c.Contacts
+                    .Where(x => x.IsActive)
+                    .Select(x => new CustomerContactDto
+                    {
+                        Id = x.Id,
+                        FullName = x.FullName,
+                        Email = x.Email,
+                        Phone = x.Phone,
+                        Position = x.Position,
+                        IsPrimary = x.IsPrimary
+                    }).ToList(),
+
+                Notes = c.Notes
+                    .OrderByDescending(n => n.CreatedAt)
+                    .Select(n => new CustomerNoteDto
+                    {
+                        Id = n.Id,
+                        Title = n.Title,
+                        Message = n.Message,
+                        CreatedAt = n.CreatedAt
+                    }).ToList()
+            };
+        }
+
+        // ======================
+        // CREATE BASIC
+        // ======================
+        public async Task<Guid> CreateAsync(CreateCustomerDto dto)
+        {
+            var customer = new Customer(
+                dto.Name,
+                dto.Email,
+                dto.Phone,
+                dto.PaymentTermsDays,
+                true
+            );
 
             await _customers.AddAsync(customer);
-            await _customers.SaveChangesAsync();
+            await _uow.SaveChangesAsync();
 
-            return customer;
+            return customer.Id;
         }
 
-        public async Task<Customer?> UpdateAsync(Guid id, UpdateCustomerDto dto)
+        // ======================
+        // UPDATE
+        // ======================
+        public async Task<bool> UpdateAsync(Guid id, UpdateCustomerDto dto)
         {
             var customer = await _customers.GetByIdAsync(id);
-            if (customer == null) return null;
+            if (customer == null) return false;
 
-            customer.Name = dto.Name ?? customer.Name;
-            customer.Email = dto.Email ?? customer.Email;
-            customer.Phone = dto.Phone ?? customer.Phone;
-            customer.Address = dto.Address ?? customer.Address;
-            customer.PaymentTermsDays = dto.PaymentTermsDays;
-            await _customers.UpdateAsync(customer);
-            await _customers.SaveChangesAsync();
+            customer.UpdateBasicInfo(
+                dto.Name,
+                dto.Email,
+                dto.Phone,
+                dto.PaymentTermsDays
+            );
 
-            return customer;
+            _customers.Update(customer);
+            await _uow.SaveChangesAsync();
+
+            return true;
         }
-        public async Task<Customer> CreateFullAsync(CreateCustomerFullDto dto, Guid userId)
+
+        // ======================
+        // DELETE (soft)
+        // ======================
+        public async Task<bool> DeleteAsync(Guid id)
+        {
+            var customer = await _customers.GetByIdAsync(id);
+            if (customer == null) return false;
+
+            customer.Deactivate();
+
+            _customers.Update(customer);
+            await _uow.SaveChangesAsync();
+
+            return true;
+        }
+
+        // ======================
+        // CREATE FULL (DDD aggregate)
+        // ======================
+        public async Task<Guid> CreateFullAsync(CreateCustomerFullDto dto, Guid userId)
         {
             await _uow.BeginAsync();
 
             try
             {
-                var customer = new Customer
-                {
-                    Name = dto.Customer.Name,
-                    Email = dto.Customer.Email,
-                    Phone = dto.Customer.Phone,
-                    Address = dto.Customer.Address,
-                    PaymentTermsDays = dto.Customer.PaymentTermsDays,
-                    IsActive = dto.Customer.IsActive
-                };
+                var customer = new Customer(
+                    dto.Customer.Name,
+                    dto.Customer.Email,
+                    dto.Customer.Phone,
+                    dto.Customer.PaymentTermsDays,
+                    dto.Customer.IsActive
+                );
 
-                await _customers.AddAsync(customer);
-                await _customers.SaveChangesAsync();
-
-                foreach (var address in dto.Addresses)
+                // Addresses
+                foreach (var a in dto.Addresses)
                 {
-                    address.CustomerId = customer.Id;
-                    await _addressService.CreateAsync(address);
+                    customer.AddAddress(new CustomerAddress
+                    {
+                        AddressLine1 = a.AddressLine1,
+                        AddressLine2 = a.AddressLine2,
+                        City = a.City,
+                        State = a.State,
+                        Country = a.Country,
+                        PostalCode = a.PostalCode,
+                        Type = a.Type,
+                        IsPrimary = a.IsPrimary,
+                        IsActive = true
+                    });
                 }
 
+                // Contacts
                 foreach (var c in dto.Contacts)
                 {
-                    c.CustomerId = customer.Id;
-                    await _contactService.CreateAsync(c);
+                    customer.AddContact(new CustomerContact
+                    {
+                        FullName = c.FullName,
+                        Email = c.Email,
+                        Phone = c.Phone,
+                        Position = c.Position,
+                        IsPrimary = c.IsPrimary,
+                        IsActive = true
+                    });
                 }
 
+                // Notes
                 foreach (var n in dto.Notes)
                 {
-                    n.CustomerId = customer.Id;
-                    await _noteService.CreateAsync(n, userId);
+                    customer.AddNote(new CustomerNote
+                    {
+                        Title = n.Title,
+                        Message = n.Message,
+                        CreatedByUserId = userId
+                    });
                 }
 
+                await _customers.AddAsync(customer);
 
                 await _uow.CommitAsync();
-                return customer;
+
+                return customer.Id;
             }
             catch
             {
                 await _uow.RollbackAsync();
                 throw;
             }
-        }
-
-
-        public async Task<bool> DeleteAsync(Guid id)
-        {
-            var customer = await _customers.GetByIdAsync(id);
-            if (customer == null) return false;
-
-            await _customers.DeleteAsync(customer);
-            await _customers.SaveChangesAsync();
-
-            return true;
         }
     }
 }

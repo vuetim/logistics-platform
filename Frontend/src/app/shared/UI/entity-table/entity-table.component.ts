@@ -2,12 +2,13 @@ import { Component, Input } from '@angular/core';
 import { NgFor, NgIf, NgClass } from '@angular/common';
 import { TableColumn, TableAction } from './entity-table.models';
 import { UiButtonComponent } from '../ui-button/ui-button.component';
+import { RouterLink } from '@angular/router';
 
 
 @Component({
   selector: 'app-entity-table',
   standalone: true,
-  imports: [NgFor, NgIf, UiButtonComponent, NgClass, NgClass],
+  imports: [NgFor, NgIf, UiButtonComponent, NgClass, NgClass, RouterLink],
   templateUrl: './entity-table.component.html',
   styleUrl: './entity-table.component.css'
 })

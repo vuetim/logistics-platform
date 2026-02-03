@@ -21,6 +21,7 @@ namespace LogisticsPlatform.Infrastructure.Persistence
 
         public async Task CommitAsync()
         {
+            await _context.SaveChangesAsync();
             if (_tx != null)
                 await _tx.CommitAsync();
         }
@@ -30,6 +31,8 @@ namespace LogisticsPlatform.Infrastructure.Persistence
             if (_tx != null)
                 await _tx.RollbackAsync();
         }
+        public async Task SaveChangesAsync()
+        => await _context.SaveChangesAsync();
     }
 
 }

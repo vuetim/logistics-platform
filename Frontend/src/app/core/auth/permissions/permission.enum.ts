@@ -18,5 +18,10 @@ export enum Permission {
     User_Update = 'User_Update',
     User_Delete = 'User_Delete',
     User_AssignRole = 'User_AssignRole',
-    User_Disable = 'User_Disable'
+    User_Disable = 'User_Disable',
+    Customer_View = 'Customer_View',
+    Customer_Create = 'Customer_Create',
+    Customer_Update = 'Customer_Update',
+    Customer_Delete = 'Customer_Delete',
+
 }

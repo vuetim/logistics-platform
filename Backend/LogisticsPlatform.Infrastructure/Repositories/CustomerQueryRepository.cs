@@ -21,23 +21,30 @@ namespace LogisticsPlatform.Infrastructure.Repositories
         {
             var query = _context.Customers.AsNoTracking();
 
+            // SEARCH
             if (!string.IsNullOrWhiteSpace(p.Search))
             {
                 var s = p.Search.ToLower();
                 query = query.Where(c =>
                     c.Name.ToLower().Contains(s) ||
-                    c.Email!.ToLower().Contains(s)
+                    (c.Email != null && c.Email.ToLower().Contains(s))
                 );
             }
 
+            // STATUS FILTER (KRYESORE)
             if (p.IsActive.HasValue)
-                query = query.Where(c => c.IsActive == p.IsActive);
+            {
+                query = query.Where(c => c.IsActive == p.IsActive.Value);
+            }
+
+            // SORT
             if (!string.IsNullOrWhiteSpace(p.SortBy))
             {
                 query = p.SortDir == "desc"
                     ? query.OrderByDescendingDynamic(p.SortBy)
                     : query.OrderByDynamic(p.SortBy);
             }
+
             var total = await query.CountAsync();
 
             var items = await query
@@ -53,7 +60,12 @@ namespace LogisticsPlatform.Infrastructure.Repositories
                 })
                 .ToListAsync();
 
-            return new PagedResult<CustomerListItemDto>(items, total, p.Page, p.PageSize);
+            return new PagedResult<CustomerListItemDto>(
+                items,
+                total,
+                p.Page,
+                p.PageSize
+            );
         }
 
     }
