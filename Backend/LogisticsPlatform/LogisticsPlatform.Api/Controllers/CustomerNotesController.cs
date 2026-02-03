@@ -32,7 +32,7 @@ namespace LogisticsPlatform.Api.Controllers
         public async Task<IActionResult> Create(CreateCustomerNoteDto dto)
         {
             var userId = GetUserId();
-            var note = await _service.CreateAsync(userId, dto);
+            var note = await _service.CreateAsync(dto, userId);
             return Ok(note);
         }
 
@@ -48,7 +48,8 @@ namespace LogisticsPlatform.Api.Controllers
         public async Task<IActionResult> Delete(Guid id)
         {
             var deleted = await _service.DeleteAsync(id);
-            return deleted ? Ok("Deleted") : NotFound();
+            if (!deleted) return NotFound();
+            return NoContent();
         }
     }
 }

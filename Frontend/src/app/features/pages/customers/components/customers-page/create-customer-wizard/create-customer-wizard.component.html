@@ -1,0 +1,61 @@
+<div class="wizard-header">
+  <div class="stepper">
+    <div class="step" [class.active]="step >= 1">
+      <span>1</span>
+      <label>Customer</label>
+    </div>
+
+    <div class="line" [class.active]="step >= 2"></div>
+
+    <div class="step" [class.active]="step >= 2">
+      <span>2</span>
+      <label>Addresses</label>
+    </div>
+
+    <div class="line" [class.active]="step >= 3"></div>
+
+    <div class="step" [class.active]="step >= 3">
+      <span>3</span>
+      <label>Contacts</label>
+    </div>
+
+    <div class="line" [class.active]="step >= 4"></div>
+
+    <div class="step" [class.active]="step >= 4">
+      <span>4</span>
+      <label>Notes</label>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 1 -->
+<app-step-customer
+  *ngIf="step === 1"
+  [data]="state.customer"
+  (next)="step = 2"
+/>
+
+<!-- STEP 2 -->
+<app-step-addresses
+  *ngIf="step === 2"
+  [addresses]="state.addresses"
+  (back)="step = 1"
+  (next)="step = 3"
+/>
+
+<!-- STEP 3 -->
+<app-step-contacts
+  *ngIf="step === 3"
+  [contacts]="state.contacts"
+  (back)="step = 2"
+  (next)="step = 4"
+/>
+
+<!-- STEP 4 -->
+<app-step-notes *ngIf="step === 4" [notes]="state.notes" (back)="step = 3" />
+
+<div class="wizard-actions" *ngIf="step === 4">
+  <button class="btn btn-primary" (click)="submit()">Create Customer</button>
+
+  <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
+</div>

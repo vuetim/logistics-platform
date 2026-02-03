@@ -108,6 +108,39 @@ namespace LogisticsPlatform.Infrastructure.Migrations
                     b.ToTable("CarrierStopPerformances");
                 });
 
+            modelBuilder.Entity("Customer", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PaymentTermsDays")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Phone")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Customers");
+                });
+
             modelBuilder.Entity("CustomerAddress", b =>
                 {
                     b.Property<Guid>("Id")
@@ -644,39 +677,6 @@ namespace LogisticsPlatform.Infrastructure.Migrations
                     b.HasIndex("CreatedByUserId");
 
                     b.ToTable("CarrierNotes");
-                });
-
-            modelBuilder.Entity("LogisticsPlatform.Domain.Entities.Customer", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Address")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Email")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("PaymentTermsDays")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Phone")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Customers");
                 });
 
             modelBuilder.Entity("LogisticsPlatform.Domain.Entities.CustomerNote", b =>
@@ -2140,31 +2140,31 @@ namespace LogisticsPlatform.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa1"),
-                            CreatedAt = new DateTime(2026, 1, 8, 17, 28, 52, 144, DateTimeKind.Utc).AddTicks(6522),
+                            CreatedAt = new DateTime(2026, 1, 26, 0, 24, 9, 758, DateTimeKind.Utc).AddTicks(8893),
                             Name = "Admin"
                         },
                         new
                         {
                             Id = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa2"),
-                            CreatedAt = new DateTime(2026, 1, 8, 17, 28, 52, 144, DateTimeKind.Utc).AddTicks(6545),
+                            CreatedAt = new DateTime(2026, 1, 26, 0, 24, 9, 758, DateTimeKind.Utc).AddTicks(8906),
                             Name = "Broker"
                         },
                         new
                         {
                             Id = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa3"),
-                            CreatedAt = new DateTime(2026, 1, 8, 17, 28, 52, 144, DateTimeKind.Utc).AddTicks(6549),
+                            CreatedAt = new DateTime(2026, 1, 26, 0, 24, 9, 758, DateTimeKind.Utc).AddTicks(8909),
                             Name = "Operator"
                         },
                         new
                         {
                             Id = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa4"),
-                            CreatedAt = new DateTime(2026, 1, 8, 17, 28, 52, 144, DateTimeKind.Utc).AddTicks(6553),
+                            CreatedAt = new DateTime(2026, 1, 26, 0, 24, 9, 758, DateTimeKind.Utc).AddTicks(8911),
                             Name = "Dispatcher"
                         },
                         new
                         {
                             Id = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa5"),
-                            CreatedAt = new DateTime(2026, 1, 8, 17, 28, 52, 144, DateTimeKind.Utc).AddTicks(6557),
+                            CreatedAt = new DateTime(2026, 1, 26, 0, 24, 9, 758, DateTimeKind.Utc).AddTicks(8926),
                             Name = "Accounting"
                         });
                 });
@@ -2297,7 +2297,7 @@ namespace LogisticsPlatform.Infrastructure.Migrations
 
             modelBuilder.Entity("CustomerAddress", b =>
                 {
-                    b.HasOne("LogisticsPlatform.Domain.Entities.Customer", "Customer")
+                    b.HasOne("Customer", "Customer")
                         .WithMany("Addresses")
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -2308,8 +2308,8 @@ namespace LogisticsPlatform.Infrastructure.Migrations
 
             modelBuilder.Entity("CustomerContact", b =>
                 {
-                    b.HasOne("LogisticsPlatform.Domain.Entities.Customer", "Customer")
-                        .WithMany()
+                    b.HasOne("Customer", "Customer")
+                        .WithMany("Contacts")
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -2415,8 +2415,8 @@ namespace LogisticsPlatform.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("LogisticsPlatform.Domain.Entities.Customer", "Customer")
-                        .WithMany()
+                    b.HasOne("Customer", "Customer")
+                        .WithMany("Notes")
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -2458,7 +2458,7 @@ namespace LogisticsPlatform.Infrastructure.Migrations
 
             modelBuilder.Entity("LogisticsPlatform.Domain.Entities.Financial.CustomerInvoice", b =>
                 {
-                    b.HasOne("LogisticsPlatform.Domain.Entities.Customer", "Customer")
+                    b.HasOne("Customer", "Customer")
                         .WithMany()
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -2498,7 +2498,7 @@ namespace LogisticsPlatform.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("LogisticsPlatform.Domain.Entities.Customer", "Customer")
+                    b.HasOne("Customer", "Customer")
                         .WithMany()
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -2623,7 +2623,7 @@ namespace LogisticsPlatform.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("LogisticsPlatform.Domain.Entities.Customer", "Customer")
+                    b.HasOne("Customer", "Customer")
                         .WithMany()
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -2797,16 +2797,20 @@ namespace LogisticsPlatform.Infrastructure.Migrations
                     b.Navigation("Order");
                 });
 
-            modelBuilder.Entity("LogisticsPlatform.Domain.Entities.Carrier", b =>
+            modelBuilder.Entity("Customer", b =>
                 {
+                    b.Navigation("Addresses");
+
                     b.Navigation("Contacts");
 
                     b.Navigation("Notes");
                 });
 
-            modelBuilder.Entity("LogisticsPlatform.Domain.Entities.Customer", b =>
+            modelBuilder.Entity("LogisticsPlatform.Domain.Entities.Carrier", b =>
                 {
-                    b.Navigation("Addresses");
+                    b.Navigation("Contacts");
+
+                    b.Navigation("Notes");
                 });
 
             modelBuilder.Entity("LogisticsPlatform.Domain.Entities.Financial.CarrierSettlement", b =>

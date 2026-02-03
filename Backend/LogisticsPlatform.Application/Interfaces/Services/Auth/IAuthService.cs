@@ -28,9 +28,9 @@ public interface IAuthService
     Task ForgotPasswordAsync(string email);
 
     Task ResetPasswordAsync(
-      string token,
-      string newPassword,
-      string? ip,
-      string? ua
-  );
+        string token,
+        string newPassword,
+        string? ip,
+        string? ua
+    );
 }

@@ -14,8 +14,8 @@ public class CustomerAddressesController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create(CreateCustomerAddressDto dto)
     {
-        var result = await _service.CreateAsync(dto);
-        return Ok(result);
+        await _service.CreateAsync(dto);
+        return NoContent();
     }
 
     [HttpGet("customer/{customerId}")]
@@ -38,6 +38,6 @@ public class CustomerAddressesController : ControllerBase
     {
         var success = await _service.DeleteAsync(id);
         if (!success) return NotFound();
-        return Ok("Deleted");
+        return NoContent();
     }
 }

@@ -1,0 +1,58 @@
+<app-page-layout>
+  <div page-actions></div>
+
+  <!-- FILTER PANEL -->
+  <div *ngIf="filtersOpen">
+    <app-filter-builder
+      [filters]="filtersConfig"
+      (filterChange)="onFilterChange($event)"
+    >
+    </app-filter-builder>
+  </div>
+
+  <app-ui-card cardTitle="Customers">
+    <!-- HEADER -->
+    <div card-actions class="card-header">
+      <div class="toolbar">
+        <button class="material-icons" (click)="toggleFilter()">tune</button>
+
+        <app-ui-button
+          variant="primary"
+          *ngIf="auth.hasRole('Admin')"
+          (click)="openCreateCustomer()"
+        >
+          Add Customer
+        </app-ui-button>
+      </div>
+    </div>
+
+    <!-- FILTER CHIPS -->
+    <div class="filter-chip-main" *ngIf="activeFiltersCount > 0">
+      Filters (<span class="filter-count">{{ activeFiltersCount }}</span
+      >)
+    </div>
+
+    <!-- TABLE -->
+    <app-entity-table
+      [columns]="columns"
+      [rows]="customers"
+      [actions]="actions"
+    >
+    </app-entity-table>
+
+    <!-- PAGINATION -->
+    <div card-footer>
+      <app-pagination
+        [page]="page"
+        [totalPages]="totalCount"
+        (pageChange)="onPageChange($event)"
+      >
+      </app-pagination>
+    </div>
+  </app-ui-card>
+  <app-create-customer-modal
+    *ngIf="creatingCustomer"
+    (close)="onCreateCustomerClose($event)"
+  >
+  </app-create-customer-modal>
+</app-page-layout>

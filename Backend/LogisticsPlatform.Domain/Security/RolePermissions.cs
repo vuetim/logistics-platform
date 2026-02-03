@@ -18,13 +18,19 @@ public static class RolePermissions
                 Permission.Load_Update,
                 Permission.Load_ChangeStatus,
                 Permission.Load_Archive,
+                Permission.Customer_View,
+                Permission.Customer_Create,
+                Permission.Customer_Update,
+
 
                 Permission.LoadNote_View,
                 Permission.LoadNote_Create_Internal,
                 Permission.LoadNote_Create_Public,
 
                 Permission.LoadDocument_View,
-                Permission.LoadDocument_Upload
+                Permission.LoadDocument_Upload,
+
+                  Permission.User_View_Self,
             },
 
             [RoleNames.Operator] = new()
@@ -37,7 +43,9 @@ public static class RolePermissions
                 Permission.LoadDocument_View,
 
                 Permission.User_View_Self,
-                Permission.User_Update
+                Permission.User_Update,
+                Permission.Customer_View,
+
             },
 
             [RoleNames.Dispatcher] = new()
@@ -46,7 +54,12 @@ public static class RolePermissions
                 Permission.Load_ChangeStatus,
 
                 Permission.LoadNote_View,
-                Permission.LoadNote_Create_Internal
+                Permission.LoadNote_Create_Internal,
+                                Permission.Customer_View,
+                Permission.Customer_Update,
+                Permission.User_View_Self,
+
+
             }
         };
 

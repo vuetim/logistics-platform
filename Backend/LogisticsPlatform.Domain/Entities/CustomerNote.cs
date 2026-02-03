@@ -9,7 +9,6 @@ namespace LogisticsPlatform.Domain.Entities
 
         public string Title { get; set; } = string.Empty;
         public string Message { get; set; } = string.Empty;
-
         public Guid CreatedByUserId { get; set; }
         public User CreatedByUser { get; set; } = null!;
     }

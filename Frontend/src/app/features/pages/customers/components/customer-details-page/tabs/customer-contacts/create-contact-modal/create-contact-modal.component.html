@@ -1,0 +1,44 @@
+<div class="modal-backdrop">
+  <div class="modal-card">
+    <h2>
+      {{ editing ? "Edit Contact" : "Add Contact" }}
+    </h2>
+
+    <div class="form-grid">
+      <div>
+        <label>Full Name</label>
+        <input [(ngModel)]="model.fullName" />
+      </div>
+
+      <div>
+        <label>Email</label>
+        <input [(ngModel)]="model.email" />
+      </div>
+      <div>
+        <label>Phone</label>
+        <input [(ngModel)]="model.phone" />
+      </div>
+      <div>
+        <label>Position</label>
+        <input [(ngModel)]="model.position" />
+      </div>
+
+      <div class="checkbox">
+        <input type="checkbox" [(ngModel)]="model.isPrimary" />
+        <label>Primary address</label>
+      </div>
+    </div>
+
+    <div class="checkbox">
+      <input type="checkbox" [(ngModel)]="model.isActive" />
+      <label>Is Active</label>
+    </div>
+    <div class="actions">
+      <button variant="ghost" (click)="cancel()">Cancel</button>
+
+      <button variant="primary" [disabled]="loading" (click)="save()">
+        {{ editing ? "Save changes" : "Create Contact" }}
+      </button>
+    </div>
+  </div>
+</div>

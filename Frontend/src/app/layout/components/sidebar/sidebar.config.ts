@@ -15,7 +15,7 @@ export const SIDEBAR_ITEMS: SidebarItem[] = [
         ]
     },
     { label: 'Loads', route: '/loads', icon: 'local_shipping', disabled: true },
-    { label: 'Customers', route: '/customers', icon: 'groups', disabled: true },
+    { label: 'Customers', route: 'admin/customers', icon: 'groups', disabled: false },
     { label: 'Carriers', route: '/carriers', icon: 'warehouse', disabled: true },
     { label: 'Documents', route: '/documents', icon: 'description', disabled: true },
     { label: 'Stops', route: '/stops', icon: 'place', disabled: true }

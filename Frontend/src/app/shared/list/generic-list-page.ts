@@ -18,8 +18,8 @@ export abstract class GenericListPage<
         return {
             page: this.page,
             pageSize: this.pageSize,
-            sortBy: this.sortBy,
-            sortDir: this.sortDir,
+            ...(this.sortBy ? { sortBy: this.sortBy } : {}),
+            ...(this.sortDir ? { sortDir: this.sortDir } : {}),
             ...this.activeFilters
         } as TQuery;
     }

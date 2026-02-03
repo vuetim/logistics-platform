@@ -1,0 +1,61 @@
+<div class="modal-backdrop">
+  <div class="modal-card">
+    <h2>
+      {{ editing ? "Edit address" : "Add address" }}
+    </h2>
+
+    <div class="form-grid">
+      <div>
+        <label>Address line 1</label>
+        <input [(ngModel)]="model.addressLine1" />
+      </div>
+
+      <div>
+        <label>Address line 2</label>
+        <input [(ngModel)]="model.addressLine2" />
+      </div>
+
+      <div>
+        <label>City</label>
+        <input [(ngModel)]="model.city" />
+      </div>
+
+      <div>
+        <label>State</label>
+        <input [(ngModel)]="model.state" />
+      </div>
+
+      <div>
+        <label>Country</label>
+        <input [(ngModel)]="model.country" />
+      </div>
+
+      <div>
+        <label>Postal code</label>
+        <input [(ngModel)]="model.postalCode" />
+      </div>
+
+      <div>
+        <label>Type</label>
+        <select [(ngModel)]="model.type">
+          <option value="Billing">Billing</option>
+          <option value="Shipping">Shipping</option>
+          <option value="Office">Office</option>
+        </select>
+      </div>
+
+      <div class="checkbox">
+        <input type="checkbox" [(ngModel)]="model.isPrimary" />
+        <label>Primary address</label>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button variant="ghost" (click)="cancel()">Cancel</button>
+
+      <button variant="primary" [disabled]="loading" (click)="save()">
+        {{ editing ? "Save changes" : "Create address" }}
+      </button>
+    </div>
+  </div>
+</div>

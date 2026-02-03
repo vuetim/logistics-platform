@@ -4,9 +4,10 @@ namespace LogisticsPlatform.Application.Interfaces.Services.Customers
 {
     public interface ICustomerContactService
     {
-        Task<CustomerContact> CreateAsync(CreateCustomerContactDto dto);
-        Task<CustomerContact?> UpdateAsync(Guid id, UpdateCustomerContactDto dto);
+        Task<CustomerContactDto> CreateAsync(CreateCustomerContactDto dto);
+        Task<CustomerContactDto?> UpdateAsync(Guid id, UpdateCustomerContactDto dto);
         Task<bool> DeleteAsync(Guid id);
-        Task<IEnumerable<CustomerContact>> GetByCustomerAsync(Guid customerId);
+        Task<IReadOnlyList<CustomerContactDto>> GetByCustomerAsync(Guid customerId);
     }
+
 }

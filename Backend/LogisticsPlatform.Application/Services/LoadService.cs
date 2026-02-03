@@ -188,7 +188,7 @@ namespace LogisticsPlatform.Application.Services
             var order = await _orders.GetByIdWithRoutesAsync(dto.OrderId)
                 ?? throw new NotFoundException("Order not found.");
 
-            // SHËNIM:
+            // NOTE:
             // GetByIdWithRoutesAsync duhet të përfshij:
             //  .Include(o => o.OrderRoutes)
             //  .Include(o => o.Items)
@@ -201,7 +201,7 @@ namespace LogisticsPlatform.Application.Services
             if (!routes.Any())
                 throw new BusinessRuleException("No active routes to copy.");
 
-            // (opsionale) nëse biznesi kërkon patjetër items:
+            // (opsionale) nese biznesi kerkon patjeter items:
             // if (!order.Items.Any())
             //     throw new BusinessRuleException("Order has no items.");
 
@@ -217,7 +217,7 @@ namespace LogisticsPlatform.Application.Services
                 CarrierId = dto.CarrierId ?? order.PreferredCarrierId,
 
                 Status = LoadStatus.Draft,
-                Mode = ModeType.TL, // TODO: më vonë mund të vijë nga Order/DTO
+                Mode = ModeType.TL, // TODO: me vone mund të vije nga Order/DTO
 
                 CustomerRate = order.CustomerRate,
                 CarrierRate = dto.CarrierRate ?? 0,

@@ -31,4 +31,10 @@ public enum Permission
     User_Delete,
     User_AssignRole,
     User_Disable,
+    // CUSTOMERS
+    Customer_View,
+    Customer_Create,
+    Customer_Update,
+    Customer_Delete,
 }
+

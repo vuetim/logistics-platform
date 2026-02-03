@@ -1,0 +1,78 @@
+.step-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.form,
+.list {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.form input,
+.form select {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+}
+
+.checkbox {
+  display: flex;
+  gap: 8px;
+  margin: 10px 0;
+}
+
+.btn.primary {
+  background: #2563eb;
+  color: #fff;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  width: 100%;
+}
+
+.btn.primary:disabled {
+  opacity: 0.5;
+}
+
+.card {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 12px;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.badge {
+  background: #2563eb;
+  color: white;
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.card-actions {
+  text-align: right;
+}
+
+.danger {
+  color: #dc2626;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.step-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}

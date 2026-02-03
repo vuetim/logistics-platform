@@ -13,5 +13,6 @@ export interface TableAction<T> {
     icon?: string;
     visible?: (row: T) => boolean;
     variant?: ButtonVariant | null;
-    handler: (row: T) => void;
+    handler?: (row: T) => void;
+    routerLink?: (row: T) => string;
 }

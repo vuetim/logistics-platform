@@ -45,9 +45,9 @@ public class UserManagementService : IUserManagementService
 
     //TODO: USER WITH PERMISION USER UPDATE CAN EDIT USER DETALS BUT CANT DISABLE USER THATS JUST FOR ADMIN
 
-    // -----------------------------
+   
     // Helpers
-    // -----------------------------
+   
     private static bool IsAdmin(User u)
         => u.UserRoles?.Any(r => r.Role.Name == "Admin") == true;
 
@@ -80,7 +80,7 @@ public class UserManagementService : IUserManagementService
 
         var users = await _users.GetAllAsync();
 
-        // zakonisht s’ka nevojë me pa veten në listë
+        // zakonisht s’ka nevoj me pa veten në list
         users = users.Where(u => u.Id != currentUserId).ToList();
 
         return users.Select(MapToDto).ToList();
@@ -100,7 +100,7 @@ public class UserManagementService : IUserManagementService
 
         if (id == currentUserId)
         {
-            // asnjë permission check
+            // asnj permission check
         }
         //  OTHER USERS
         else
@@ -208,7 +208,7 @@ public class UserManagementService : IUserManagementService
 
     // -----------------------------
     // SET PERMISSION OVERRIDE
-    // - Needs User_AssignRole (ose krijo Permission.User_SetPermission nëse don ma pastër)
+    // - Needs User_AssignRole ( Permission.User_SetPermission ma pastër)
     // - Non admin cannot change Admin
     // -----------------------------
     public async Task SetPermissionAsync(Guid targetUserId, Permission permission, bool? isAllowed, Guid currentUserId)

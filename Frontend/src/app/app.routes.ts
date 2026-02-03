@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { AuthGuard } from './core/auth/auth.guard';
 import { AppShellComponent } from './layout/app-shell/app-shell.component';
+import { CustomerDetailsPageComponent } from './features/pages/customers/components/customer-details-page/customer-details-page.component';
 
 export const routes: Routes = [
 
@@ -52,6 +53,19 @@ export const routes: Routes = [
                     breadcrumb: ['Users']
                 }
             },
+            {
+                path: 'admin/customers',
+                loadChildren: () =>
+                    import('./features/pages/customers/customers.routes')
+                        .then(m => m.default),
+                data: {
+                    breadcrumb: ['Customers']
+                }
+            },
+            {
+                path: 'customers/:id',
+                component: CustomerDetailsPageComponent
+            }
 
         ]
     },

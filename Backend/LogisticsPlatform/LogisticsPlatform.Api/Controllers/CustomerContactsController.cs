@@ -45,7 +45,7 @@ namespace LogisticsPlatform.Api.Controllers
         public async Task<IActionResult> Delete(Guid id)
         {
             var deleted = await _service.DeleteAsync(id);
-            return deleted ? Ok("Deleted") : NotFound();
+            return deleted ?NoContent() : NotFound();
         }
 
         [HttpGet("positions")]

@@ -35,10 +35,25 @@
 
       <td *ngIf="actions.length" class="actions">
         <ng-container *ngFor="let action of actions">
+          <!-- ROUTER LINK ACTION -->
+          <a
+            *ngIf="
+              action.routerLink && (!action.visible || action.visible(row))
+            "
+            [routerLink]="action.routerLink(row)"
+            class="link-btn"
+            [ngClass]="action.variant ?? 'ghost'"
+          >
+            {{ action.label }}
+          </a>
+
+          <!-- HANDLER ACTION -->
           <app-ui-button
-            *ngIf="!action.visible || action.visible(row)"
+            *ngIf="
+              !action.routerLink && (!action.visible || action.visible(row))
+            "
             [variant]="action.variant ?? 'primary'"
-            (click)="action.handler(row)"
+            (click)="action.handler?.(row)"
           >
             {{ action.label }}
           </app-ui-button>

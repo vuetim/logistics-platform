@@ -1,0 +1,26 @@
+<div class="modal-backdrop">
+  <div class="modal-card">
+    <h2>
+      {{ editing ? "Edit Note" : "Add Note" }}
+    </h2>
+
+    <div class="form-grid">
+      <div>
+        <label>Note Ttile</label>
+        <input [(ngModel)]="model.title" />
+      </div>
+
+      <div>
+        <label>Note Message</label>
+        <input [(ngModel)]="model.message" />
+      </div>
+    </div>
+    <div class="actions">
+      <button variant="ghost" (click)="cancel()">Cancel</button>
+
+      <button variant="primary" [disabled]="loading" (click)="save()">
+        {{ editing ? "Save changes" : "Create Note" }}
+      </button>
+    </div>
+  </div>
+</div>

@@ -7,5 +7,6 @@
         public string? Phone { get; set; }
         public string? Position { get; set; }
         public bool IsPrimary { get; internal set; }
+        public bool IsActive { get; internal set; }
     }
 }

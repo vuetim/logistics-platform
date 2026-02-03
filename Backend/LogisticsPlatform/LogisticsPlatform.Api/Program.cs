@@ -1,5 +1,7 @@
 ﻿using Hangfire;
 using LogisticsPlatform.Application.BackgroundJobs;
+using LogisticsPlatform.Application.DTOs.Common;
+using LogisticsPlatform.Application.Interfaces.Common;
 using LogisticsPlatform.Application.Interfaces.Repositories;
 using LogisticsPlatform.Application.Interfaces.Repositories.Carriers;
 using LogisticsPlatform.Application.Interfaces.Repositories.Customers;
@@ -8,6 +10,7 @@ using LogisticsPlatform.Application.Interfaces.Repositories.Orders;
 using LogisticsPlatform.Application.Interfaces.Repositories.Queries;
 using LogisticsPlatform.Application.Interfaces.Repositories.Security;
 using LogisticsPlatform.Application.Interfaces.Repositories.Users;
+using LogisticsPlatform.Application.Interfaces.Security;
 using LogisticsPlatform.Application.Interfaces.Services;
 using LogisticsPlatform.Application.Interfaces.Services.ActivityLog;
 using LogisticsPlatform.Application.Interfaces.Services.Auth;
@@ -21,14 +24,17 @@ using LogisticsPlatform.Application.Jobs;
 using LogisticsPlatform.Application.Options;
 using LogisticsPlatform.Application.Security;
 using LogisticsPlatform.Application.Services;
+using LogisticsPlatform.Application.Services.Auth;
 using LogisticsPlatform.Application.Services.Financial;
 using LogisticsPlatform.Application.Services.Orders;
 using LogisticsPlatform.Application.Services.Users;
+using LogisticsPlatform.Infrastructure.Common;
 using LogisticsPlatform.Infrastructure.Persistence;
 using LogisticsPlatform.Infrastructure.Persistence.Repositories.Queries;
 using LogisticsPlatform.Infrastructure.Repositories;
 using LogisticsPlatform.Infrastructure.Repositories.Financial;
 using LogisticsPlatform.Infrastructure.Repositories.Security;
+using LogisticsPlatform.Infrastructure.Security;
 using LogisticsPlatform.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder.Extensions;
@@ -64,6 +70,12 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 //email
 builder.Services.Configure<SmtpOptions>(
     builder.Configuration.GetSection("Smtp"));
+builder.Services.Configure<JwtOptions>(
+    builder.Configuration.GetSection("Jwt"));
+
+builder.Services.Configure<FrontendOptions>(
+    builder.Configuration.GetSection("Frontend"));
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
@@ -204,6 +216,10 @@ builder.Services.AddScoped<IUserManagementService, UserManagementService>();
 
 builder.Services.AddScoped<IPermissionReadModel, PermissionReadModel>();
 builder.Services.AddScoped<IPermissionService, PermissionService>();
+builder.Services.AddScoped<IJwtProvider, JwtProvider>();
+builder.Services.AddScoped<IPasswordHasher, BcryptPasswordHasher>();
+builder.Services.AddScoped<IClock, SystemClock>();
+
 
 
 builder.Services
@@ -216,8 +232,8 @@ builder.Services
     });
 
 builder.Services.AddScoped<IUserQueryService, UserQueryService>();
-builder.Services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
-
+builder.Services.AddScoped<IPasswordHasher, BcryptPasswordHasher>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 
 
