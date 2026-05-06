@@ -5,7 +5,7 @@ using LogisticsPlatform.Domain.Enums;
 namespace LogisticsPlatform.Application.Interfaces.Services.Customers
 {
     /// <summary>
-    /// Customer invoice service – Turvo-style:
+    /// Customer invoice service 
     /// - GetAsync(loadId) => Get or Auto-Create Draft Invoice for that load
     /// - CreateAsync(...)  => Manual create (nëse don explicit)
     /// </summary>
@@ -19,6 +19,11 @@ namespace LogisticsPlatform.Application.Interfaces.Services.Customers
         Task<CustomerInvoiceDto> GetAsync(Guid loadId);
 
         /// <summary>
+        /// Lists existing invoices only. Does not auto-create invoices.
+        /// </summary>
+        Task<List<CustomerInvoiceDto>> ListAsync();
+
+        /// <summary>
         /// Manually creates a customer invoice for a load.
         /// Usually used only if you want explicit creation, besides the auto GetOrCreate.
         /// </summary>
@@ -28,6 +33,7 @@ namespace LogisticsPlatform.Application.Interfaces.Services.Customers
         /// Updates invoice status (Draft, Sent, Paid, etc.).
         /// </summary>
         Task UpdateStatusAsync(Guid invoiceId, InvoiceStatus status, Guid userId);
+        Task<CustomerInvoiceDto> RecordPaymentAsync(Guid invoiceId, RecordInvoicePaymentDto dto, Guid userId);
 
         /// <summary>
         /// Returns the full entity – needed for PDF generation, emails, etc.

@@ -2,6 +2,7 @@
 using LogisticsPlatform.Application.DTOs.Loads.LoadStop;
 using LogisticsPlatform.Application.Interfaces.Repositories.Loads;
 using LogisticsPlatform.Application.Interfaces.Services.Loads;
+using LogisticsPlatform.Application.Interfaces.Services.Orders;
 using LogisticsPlatform.Domain.Entities;
 using LogisticsPlatform.Domain.Enums;
 using System;
@@ -17,13 +18,19 @@ namespace LogisticsPlatform.Application.Services
         private readonly ILoadStopRepository _repository;
         private readonly ILoadRepository _loadRepo;
         private readonly ILoadStatusCalculatorService _statusCalculator;
+        private readonly IOrderLoadSyncService _orderLoadSyncService;
 
 
-        public LoadStopService(ILoadStopRepository repository, ILoadRepository loadRepo, ILoadStatusCalculatorService statusCalculator)
+        public LoadStopService(
+            ILoadStopRepository repository,
+            ILoadRepository loadRepo,
+            ILoadStatusCalculatorService statusCalculator,
+            IOrderLoadSyncService orderLoadSyncService)
         {
             _repository = repository;
             _loadRepo = loadRepo;
             _statusCalculator = statusCalculator;
+            _orderLoadSyncService = orderLoadSyncService;
         }
 
         public async Task AddAsync(Guid loadId, CreateLoadStopDto dto)
@@ -105,24 +112,24 @@ namespace LogisticsPlatform.Application.Services
             var load = await _loadRepo.GetByIdAsync(stop.LoadId)
                 ?? throw new Exception("Load not found");
 
-            // 🔒 Execution fillon vetëm pas dispatch
+            //  Execution fillon vetëm pas dispatch
             if (load.Status < LoadStatus.Dispatched)
                 throw new BusinessRuleException(
                     "Load must be dispatched before updating stop status.");
 
-            // 🔒 Pickup vs Delivery rule
+            //  Pickup vs Delivery rule
             if (stop.StopType == StopType.Delivery &&
                 newStatus == StopStatus.Loaded)
                 throw new BusinessRuleException(
                     "Delivery stop cannot be marked as loaded.");
 
-            // 🔒 Status order rule
+            // Status order rule
             if (newStatus == StopStatus.Completed &&
                 stop.Status != StopStatus.Arrived)
                 throw new BusinessRuleException(
                     "Stop must be arrived before completed.");
 
-            // 🔒 No backward transitions
+            //  No backward transitions
             if (newStatus < stop.Status)
                 throw new BusinessRuleException(
                     "Stop status cannot be reverted.");
@@ -135,12 +142,13 @@ namespace LogisticsPlatform.Application.Services
             // Apply
             stop.Status = newStatus;
 
-            // 🔥 AUTO calculate load status
+            //  AUTO calculate load status
             load.Status = _statusCalculator.Calculate(load);
 
             await _repository.UpdateAsync(stop);
             await _loadRepo.UpdateAsync(load);
             await _loadRepo.SaveChangesAsync();
+            await _orderLoadSyncService.SyncFromLoadAsync(load);
         }
 
 

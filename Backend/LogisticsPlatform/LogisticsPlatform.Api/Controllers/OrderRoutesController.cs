@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+namespace LogisticsPlatform.Api.Controllers;
+
 [ApiController]
-[Route("api/orders/{orderId}/routes")]
+[Route("api/orders/{orderId:guid}/routes")]
 [Authorize]
 public class OrderRoutesController : ControllerBase
 {
@@ -13,21 +15,35 @@ public class OrderRoutesController : ControllerBase
         _service = service;
     }
 
-    // ➕ ADD ROUTE
     [HttpPost]
     public async Task<IActionResult> Create(
         Guid orderId,
-        CreateOrderRouteDto dto)
+        [FromBody] CreateOrderRouteDto dto)
     {
-        var id = await _service.CreateAsync(orderId, dto);
+        await _service.CreateAsync(orderId, dto);
         return CreatedAtAction(nameof(GetAll), new { orderId }, null);
     }
 
-    // 📄 GET ROUTES
     [HttpGet]
     public async Task<IActionResult> GetAll(Guid orderId)
     {
         var routes = await _service.GetByOrderIdAsync(orderId);
         return Ok(routes);
+    }
+
+    [HttpPut("{routeId:guid}")]
+    public async Task<IActionResult> Update(
+        Guid routeId,
+        [FromBody] UpdateOrderRouteDto dto)
+    {
+        await _service.UpdateAsync(routeId, dto);
+        return NoContent();
+    }
+
+    [HttpDelete("{routeId:guid}")]
+    public async Task<IActionResult> Delete(Guid routeId)
+    {
+        await _service.DeleteAsync(routeId);
+        return NoContent();
     }
 }

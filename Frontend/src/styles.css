@@ -68,6 +68,13 @@ select {
   font-family: inherit;
   font-size: var(--text-md);
 }
+
+label[title],
+.field-help[title] {
+  cursor: help;
+  text-decoration: underline dotted rgba(100, 116, 139, 0.6);
+  text-underline-offset: 2px;
+}
 h1 {
   font-size: var(--title-lg);
   font-weight: var(--fw-semibold);
@@ -87,4 +94,46 @@ h3 {
 h4 {
   font-size: var(--title-xs);
   font-weight: var(--fw-medium);
+}
+
+/* =========================
+   MODAL ACTION BUTTONS
+========================= */
+
+.actions button,
+.modal-footer button {
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  background: #ffffff;
+  color: #0f172a;
+}
+
+.actions button:hover,
+.modal-footer button:hover {
+  border-color: #94a3b8;
+  background: #f8fafc;
+}
+
+.actions button[disabled],
+.modal-footer button[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.actions button:last-child,
+.modal-footer button:last-child {
+  border-color: #0f172a;
+  background: #0f172a;
+  color: #ffffff;
+}
+
+.actions button:last-child:hover,
+.modal-footer button:last-child:hover {
+  background: #111827;
 }

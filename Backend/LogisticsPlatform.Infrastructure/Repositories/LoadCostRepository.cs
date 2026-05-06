@@ -21,6 +21,24 @@ public class LoadCostRepository : ILoadCostRepository
             .FirstOrDefaultAsync(c => c.LoadId == loadId);
     }
 
+    public Task<LoadCost?> GetByLoadIdForUpdateAsync(Guid loadId)
+    {
+        return _context.LoadCosts
+            .FirstOrDefaultAsync(c => c.LoadId == loadId);
+    }
+
+    public Task DeleteLineItemsByLoadCostIdAsync(Guid loadCostId)
+    {
+        return _context.LoadCostLineItems
+            .Where(li => li.LoadCostId == loadCostId)
+            .ExecuteDeleteAsync();
+    }
+
+    public Task AddLineItemsAsync(IEnumerable<LoadCostLineItem> lineItems)
+    {
+        return _context.LoadCostLineItems.AddRangeAsync(lineItems);
+    }
+
     public Task AddAsync(LoadCost cost)
     {
         return _context.LoadCosts.AddAsync(cost).AsTask();

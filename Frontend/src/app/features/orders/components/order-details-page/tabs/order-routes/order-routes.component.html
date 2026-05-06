@@ -1,0 +1,88 @@
+<div class="tab-card">
+  <div class="tab-header">
+    <div class="tab-title-group">
+      <h3>Routes</h3>
+      <div class="tab-subtitle">
+        Stops are executed in sequence order. Origin is first pickup; destination is last delivery; only rows marked copy-to-load move into dispatch.
+      </div>
+    </div>
+    <div class="toolbar-actions">
+      <app-ui-button *ngIf="canCreate" variant="primary" (click)="openAddModal()">
+        Add stop
+      </app-ui-button>
+    </div>
+  </div>
+
+  <div class="table-area" *ngIf="items.length; else empty">
+    <table class="simple-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Type</th>
+          <th>Location</th>
+          <th>Address 1</th>
+          <th>City</th>
+          <th>State</th>
+          <th>Postal</th>
+          <th>Country</th>
+          <th>Arrival window</th>
+          <th>Copy</th>
+          <th>Notes</th>
+          <th *ngIf="canUpdate || canDelete">Actions</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let r of items">
+          <td>{{ r.sequence }}</td>
+          <td>
+            <span
+              class="badge"
+              [class.badge-stop-pickup]="r.stopType === 0"
+              [class.badge-stop-delivery]="r.stopType === 1"
+            >
+              {{ stopTypeLabel(r.stopType) }}
+            </span>
+          </td>
+          <td>{{ r.locationName }}</td>
+          <td>{{ r.addressLine1 || '-' }}</td>
+          <td>{{ r.city }}</td>
+          <td>{{ r.state }}</td>
+          <td>{{ r.postalCode || '-' }}</td>
+          <td>{{ r.country }}</td>
+          <td>
+            {{ r.plannedArrivalFrom ? (r.plannedArrivalFrom | date : 'short') : '-' }}
+            -
+            {{ r.plannedArrivalTo ? (r.plannedArrivalTo | date : 'short') : '-' }}
+          </td>
+          <td>
+            <span class="badge" [class.badge-success]="r.copyToLoad" [class.badge-muted]="!r.copyToLoad">
+              {{ r.copyToLoad ? 'Yes' : 'No' }}
+            </span>
+          </td>
+          <td>{{ r.notes || '-' }}</td>
+          <td *ngIf="canUpdate || canDelete" class="actions-cell">
+            <app-ui-button *ngIf="canUpdate" variant="ghost" (click)="openEditModal(r)">
+              Edit
+            </app-ui-button>
+
+            <app-ui-button *ngIf="canDelete" variant="danger" (click)="deleteItem(r.id)">
+              Delete
+            </app-ui-button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <ng-template #empty>
+    <div class="muted">No route stops.</div>
+  </ng-template>
+
+  <app-order-route-modal
+    *ngIf="showModal"
+    [orderId]="parentId"
+    [editing]="editing"
+    (close)="onModalClose($event)"
+  ></app-order-route-modal>
+</div>

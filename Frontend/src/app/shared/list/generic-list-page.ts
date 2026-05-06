@@ -68,6 +68,10 @@ export abstract class GenericListPage<
             ).length;
     }
 
+    get totalPages(): number {
+        return Math.max(1, Math.ceil(this.totalCount / this.pageSize));
+    }
+
 
     protected reload() {
         this.loadData(this.buildQuery());

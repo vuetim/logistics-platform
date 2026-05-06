@@ -1,0 +1,65 @@
+<div class="tab-card">
+  <div class="tab-header">
+    <div class="tab-title-group">
+      <h3>Documents</h3>
+      <div class="tab-subtitle">
+        Attach and manage order files (BOL, POD, invoice, customs, and supporting documents). Mark internal or copy-to-load as needed.
+      </div>
+    </div>
+  </div>
+
+  <div class="toolbar" *ngIf="canUpload">
+    <div class="inline-options">
+      <input type="file" (change)="onFileChange($event)" />
+      <select [(ngModel)]="documentType">
+        <option *ngFor="let option of documentTypeOptions" [ngValue]="option.value">
+          {{ option.label }}
+        </option>
+      </select>
+      <label class="check-inline"><input type="checkbox" [(ngModel)]="isInternal" /> Internal</label>
+      <label class="check-inline"><input type="checkbox" [(ngModel)]="copyToLoad" /> Copy to load</label>
+      <app-ui-button variant="primary" (click)="upload()">Upload</app-ui-button>
+    </div>
+  </div>
+
+  <div class="table-area" *ngIf="docs.length; else empty">
+    <table class="simple-table">
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>File</th>
+          <th>Internal</th>
+          <th>Copy to load</th>
+          <th>Created</th>
+          <th *ngIf="canDelete">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let d of docs">
+          <td>{{ documentTypeLabel(d.documentType) }}</td>
+          <td>
+            <a class="link-truncate" [href]="d.fileUrl" target="_blank" rel="noopener noreferrer">{{ d.fileUrl }}</a>
+          </td>
+          <td>
+            <span class="badge" [class.badge-yes]="d.isInternal" [class.badge-no]="!d.isInternal">
+              {{ d.isInternal ? 'Yes' : 'No' }}
+            </span>
+          </td>
+          <td>
+            <span class="badge" [class.badge-yes]="d.copyToLoad" [class.badge-no]="!d.copyToLoad">
+              {{ d.copyToLoad ? 'Yes' : 'No' }}
+            </span>
+          </td>
+          <td>{{ d.createdAt | date : 'short' }}</td>
+          <td *ngIf="canDelete" class="actions-cell">
+            <app-ui-button variant="danger" (click)="deleteDocument(d.id)">Delete</app-ui-button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <ng-template #empty>
+    <div class="muted">No documents.</div>
+  </ng-template>
+</div>

@@ -1,0 +1,140 @@
+<section class="page">
+  <div class="page-header">
+    <div>
+      <h1>Financials</h1>
+      <p>Customer invoices and carrier settlements generated from completed loads.</p>
+    </div>
+  </div>
+
+  <div class="summary-grid">
+    <div class="summary-card">
+      <span>Invoices</span>
+      <strong>{{ money(totalInvoices()) }}</strong>
+    </div>
+    <div class="summary-card">
+      <span>Settlements</span>
+      <strong>{{ money(totalSettlements()) }}</strong>
+    </div>
+    <div class="summary-card">
+      <span>Net margin</span>
+      <strong>{{ money(margin()) }}</strong>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button type="button" [class.active]="tab === 'invoices'" (click)="tab = 'invoices'">Invoices</button>
+    <button type="button" [class.active]="tab === 'settlements'" (click)="tab = 'settlements'">Settlements</button>
+  </div>
+
+  <div class="empty" *ngIf="loading">Loading financials...</div>
+  <div class="empty" *ngIf="!loading && error">{{ error }}</div>
+
+  <ng-container *ngIf="!loading && !error && tab === 'invoices'">
+    <div class="empty" *ngIf="!invoices.length">No invoices found.</div>
+    <div class="table-wrap" *ngIf="invoices.length">
+      <table>
+        <thead>
+          <tr>
+            <th>Invoice</th>
+            <th>Status</th>
+            <th>Date</th>
+            <th>Due</th>
+            <th>Total</th>
+            <th>Paid</th>
+            <th>Balance</th>
+            <th>Payment Ref</th>
+            <th>Load</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let invoice of invoices">
+            <td>{{ invoice.invoiceNumber }}</td>
+            <td><span class="badge" [ngClass]="invoiceStatusClass(invoice)">{{ invoiceStatusLabel(invoice) }}</span></td>
+            <td>{{ invoice.invoiceDate | date: "shortDate" }}</td>
+            <td>{{ invoice.dueDate ? (invoice.dueDate | date: "shortDate") : '-' }}</td>
+            <td>{{ money(invoice.totalAmount) }}</td>
+            <td>{{ money(invoice.amountPaid) }}</td>
+            <td>{{ money(invoice.balanceDue) }}</td>
+            <td>{{ invoice.paymentReference || '-' }}</td>
+            <td><a [routerLink]="['/loads', invoice.loadId]" [queryParams]="{ tab: 'billing' }">Open Load Billing</a></td>
+            <td><button type="button" class="action-button" (click)="recordInvoicePayment(invoice)">Record Payment</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </ng-container>
+
+  <ng-container *ngIf="!loading && !error && tab === 'settlements'">
+    <div class="empty" *ngIf="!settlements.length">No settlements found.</div>
+    <div class="table-wrap" *ngIf="settlements.length">
+      <table>
+        <thead>
+          <tr>
+            <th>Settlement</th>
+            <th>Status</th>
+            <th>Date</th>
+            <th>Due</th>
+            <th>Total</th>
+            <th>Paid</th>
+            <th>Balance</th>
+            <th>Payment Ref</th>
+            <th>Load</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let settlement of settlements">
+            <td>{{ settlement.settlementNumber }}</td>
+            <td><span class="badge" [ngClass]="settlementStatusClass(settlement)">{{ settlementStatusLabel(settlement) }}</span></td>
+            <td>{{ settlement.settlementDate | date: "shortDate" }}</td>
+            <td>{{ settlement.dueDate ? (settlement.dueDate | date: "shortDate") : '-' }}</td>
+            <td>{{ money(settlement.totalAmount) }}</td>
+            <td>{{ money(settlement.amountPaid) }}</td>
+            <td>{{ money(settlement.balanceDue) }}</td>
+            <td>{{ settlement.paymentReference || '-' }}</td>
+            <td><a [routerLink]="['/loads', settlement.loadId]" [queryParams]="{ tab: 'billing' }">Open Load Billing</a></td>
+            <td><button type="button" class="action-button" (click)="recordSettlementPayment(settlement)">Record Payment</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </ng-container>
+
+  <div class="modal-backdrop" *ngIf="paymentModal as modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <h2>Record Payment</h2>
+          <p>{{ modal.number }}</p>
+        </div>
+        <button type="button" class="icon-button" (click)="closePaymentModal()">x</button>
+      </div>
+
+      <div class="payment-summary">
+        <div><span>Total</span><strong>{{ money(modal.total) }}</strong></div>
+        <div><span>Balance</span><strong>{{ money(modal.balance) }}</strong></div>
+      </div>
+
+      <div class="form-grid">
+        <label>
+          Amount paid
+          <input type="number" min="0" step="0.01" [(ngModel)]="modal.amountPaid" />
+        </label>
+        <label>
+          Paid date
+          <input type="date" [(ngModel)]="modal.paidAt" />
+        </label>
+        <label class="full">
+          Payment reference
+          <input [(ngModel)]="modal.paymentReference" />
+        </label>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="action-button" (click)="closePaymentModal()">Cancel</button>
+        <button type="button" class="action-button primary" (click)="savePayment()">Save Payment</button>
+      </div>
+    </div>
+  </div>
+</section>

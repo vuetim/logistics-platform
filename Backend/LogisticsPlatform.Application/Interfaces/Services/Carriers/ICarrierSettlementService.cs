@@ -8,9 +8,14 @@ public interface ICarrierSettlementService
 {
     /// <summary>
     /// Gets the carrier settlement for a load.
-    /// If it doesn't exist, auto-creates a draft settlement from load data (Turvo style).
+    /// If it doesn't exist, auto-creates a draft settlement from load data .
     /// </summary>
     Task<CarrierSettlementDto> GetAsync(Guid loadId);
+
+    /// <summary>
+    /// Lists existing settlements only. Does not auto-create settlements.
+    /// </summary>
+    Task<List<CarrierSettlementDto>> ListAsync();
 
     /// <summary>
     /// Manual create (nëse ke buton explicit "Create Settlement").
@@ -22,6 +27,7 @@ public interface ICarrierSettlementService
     /// Update status (Draft, Sent, Paid, etc).
     /// </summary>
     Task UpdateStatusAsync(Guid settlementId, SettlementStatus status, Guid userId);
+    Task<CarrierSettlementDto> RecordPaymentAsync(Guid settlementId, RecordSettlementPaymentDto dto, Guid userId);
 
     /// <summary>
     /// Returns full entity (për PDF, email, etj.).

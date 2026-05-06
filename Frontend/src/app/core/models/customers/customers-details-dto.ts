@@ -1,5 +1,6 @@
 import { CustomerAddressDto } from "./addresses/customer-address.dto";
 import { CustomerContactDto } from "./contacts/customer-contact.dto";
+import { CustomerBillingDto } from "./customer-billing.dto";
 import { CustomerNoteDto } from "./notes/customer-note.dto";
 
 export interface CustomerDetailsDto {
@@ -9,7 +10,7 @@ export interface CustomerDetailsDto {
     email?: string | null;
     phone?: string | null;
 
-    paymentTermsDays: number;
+    billing: CustomerBillingDto;
     isActive: boolean;
 
     addresses?: CustomerAddressDto[];

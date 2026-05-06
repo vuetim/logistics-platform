@@ -1,0 +1,10 @@
+<select
+  class="ui-select"
+  [value]="value"
+  [disabled]="disabled"
+  (change)="update($any($event.target).value)"
+>
+  <option *ngFor="let o of options" [value]="o.value">
+    {{ o.label }}
+  </option>
+</select>

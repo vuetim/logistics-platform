@@ -1,26 +1,31 @@
-﻿using LogisticsPlatform.Application.Common.Exceptions;
-using LogisticsPlatform.Application.DTOs.Loads.LoadDocuments;
+﻿using LogisticsPlatform.Application.DTOs.Loads.LoadDocuments;
 using LogisticsPlatform.Application.Interfaces.Repositories.Loads;
 using LogisticsPlatform.Application.Interfaces.Repositories.Users;
 using LogisticsPlatform.Application.Interfaces.Services.Loads;
 using LogisticsPlatform.Application.Interfaces.Services.Security;
 using LogisticsPlatform.Domain.Entities;
+using LogisticsPlatform.Domain.Enums;
 using LogisticsPlatform.Domain.Security;
+using SendGrid.Helpers.Errors.Model;
+using ForbiddenException = LogisticsPlatform.Application.Common.Exceptions.ForbiddenException;
 
 namespace LogisticsPlatform.Application.Services
 {
     public class LoadDocumentService : ILoadDocumentService
     {
         private readonly ILoadDocumentRepository _documents;
+        private readonly ILoadRepository _loads;
         private readonly IUserRepository _users;
         private readonly IPermissionService _permission;
 
         public LoadDocumentService(
             ILoadDocumentRepository documents,
+            ILoadRepository loads,
             IUserRepository users,
             IPermissionService permission)
         {
             _documents = documents;
+            _loads = loads;
             _users = users;
             _permission = permission;
         }
@@ -43,6 +48,16 @@ namespace LogisticsPlatform.Application.Services
             };
 
             await _documents.AddAsync(document);
+
+            if (dto.DocumentType == LoadDocumentType.POD)
+            {
+                var load = await _loads.GetByIdAsync(loadId)
+                    ?? throw new NotFoundException("Load not found.");
+
+                load.PodReceivedAt ??= DateTime.UtcNow;
+                load.PodUploadedBy = user.FullName;
+            }
+
             await _documents.SaveChangesAsync();
         }
 

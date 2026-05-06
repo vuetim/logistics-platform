@@ -1,0 +1,118 @@
+<app-page-layout>
+  <div class="load-page" *ngIf="load as l; else loadingTpl">
+    <div class="load-header">
+      <div>
+        <h1 class="load-title">{{ l.execution.loadNumber }}</h1>
+        <div class="meta">
+          <span>{{ l.execution.customerName }}</span>
+          <span class="meta-sep">&bull;</span>
+          <span>Status <span class="status-pill" [ngClass]="statusClass(l.execution.status)">{{ statusLabel(l.execution.status) }}</span></span>
+          <span class="meta-sep">&bull;</span>
+          <span>Mode {{ modeLabel(l.execution.mode) }}</span>
+        </div>
+        <div class="badges" *ngIf="l.orderSnapshot">
+          <span class="badge badge-success">Created from order</span>
+          <a class="badge link-badge" [routerLink]="['/orders', l.orderSnapshot.orderId]">
+            {{ l.orderSnapshot.orderNumber }}
+          </a>
+        </div>
+      </div>
+      <div class="load-actions">
+        <button *ngIf="canMarkAccepted()" class="action-btn action-primary" (click)="markAccepted()" [disabled]="actionLoading">Mark Accepted</button>
+        <button *ngIf="canDispatch()" class="action-btn action-primary" (click)="openDispatch()" [disabled]="actionLoading">Dispatch</button>
+        <button *ngIf="canComplete()" class="action-btn action-primary" (click)="completeLoad()" [disabled]="actionLoading">Complete Load</button>
+        <a class="action-btn action-ghost" routerLink="/loads">Back</a>
+      </div>
+    </div>
+
+    <app-load-dispatcher-panel [load]="l.execution" (saved)="reload()"></app-load-dispatcher-panel>
+
+    <div class="dispatch-modal-backdrop" *ngIf="dispatching" (click)="dispatching = false">
+      <div class="dispatch-modal" (click)="$event.stopPropagation()">
+        <h3>Dispatch Load</h3>
+        <div class="dispatch-grid">
+          <label>Driver<input [(ngModel)]="dispatchForm.driverName" /></label>
+          <label>Driver phone<input [(ngModel)]="dispatchForm.driverPhone" /></label>
+          <label>Driver email<input [(ngModel)]="dispatchForm.driverEmail" /></label>
+          <label>Truck #<input [(ngModel)]="dispatchForm.truckNumber" /></label>
+          <label>Trailer #<input [(ngModel)]="dispatchForm.trailerNumber" /></label>
+        </div>
+        <div class="dispatch-actions">
+          <button class="action-btn action-ghost" (click)="dispatching = false">Cancel</button>
+          <button class="action-btn action-primary" (click)="dispatchLoad()" [disabled]="actionLoading || !dispatchForm.driverName.trim() || !dispatchForm.truckNumber.trim()">Dispatch</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="tabs-bar">
+      <button class="tab" (click)="setTab('overview')" [class.active]="tab === 'overview'">Overview</button>
+      <button class="tab" (click)="setTab('stops')" [class.active]="tab === 'stops'">Stops</button>
+      <button class="tab" (click)="setTab('items')" [class.active]="tab === 'items'">Items</button>
+      <button class="tab" (click)="setTab('equipment')" [class.active]="tab === 'equipment'">Equipment</button>
+      <button class="tab" (click)="setTab('costs')" [class.active]="tab === 'costs'">Costs</button>
+      <button class="tab" (click)="setTab('billing')" [class.active]="tab === 'billing'">Billing</button>
+      <button class="tab" (click)="setTab('notes')" [class.active]="tab === 'notes'">Notes</button>
+      <button class="tab" (click)="setTab('documents')" [class.active]="tab === 'documents'">Documents</button>
+      <button class="tab" (click)="setTab('activity')" [class.active]="tab === 'activity'">Activity</button>
+    </div>
+
+    <div class="surface">
+      <div *ngIf="tab === 'overview'" class="overview-grid">
+        <div class="card">
+          <h3>Execution</h3>
+          <div class="kv"><label>Origin</label><div>{{ l.execution.origin || "-" }}</div></div>
+          <div class="kv"><label>Destination</label><div>{{ l.execution.destination || "-" }}</div></div>
+          <div class="kv"><label>Carrier</label><div>{{ l.execution.carrierName || "-" }}</div></div>
+          <div class="kv"><label>Planned pickup</label><div>{{ l.execution.plannedPickupDate ? (l.execution.plannedPickupDate | date: "short") : "-" }}</div></div>
+          <div class="kv"><label>Planned delivery</label><div>{{ l.execution.plannedDeliveryDate ? (l.execution.plannedDeliveryDate | date: "short") : "-" }}</div></div>
+          <div class="kv"><label>Actual pickup</label><div>{{ l.execution.actualPickupDate ? (l.execution.actualPickupDate | date: "short") : "-" }}</div></div>
+          <div class="kv"><label>Actual delivery</label><div>{{ l.execution.actualDeliveryDate ? (l.execution.actualDeliveryDate | date: "short") : "-" }}</div></div>
+          <div class="kv"><label>POD received</label><div>{{ l.execution.podReceivedAt ? (l.execution.podReceivedAt | date: "short") : "-" }}</div></div>
+          <div class="kv"><label>POD uploaded by</label><div>{{ l.execution.podUploadedBy || "-" }}</div></div>
+        </div>
+
+        <div class="card">
+          <h3>Summary</h3>
+          <div class="kv"><label>Total stops</label><div>{{ l.summary?.totalStops ?? 0 }}</div></div>
+          <div class="kv"><label>Pickup stops</label><div>{{ l.summary?.pickupStops ?? 0 }}</div></div>
+          <div class="kv"><label>Delivery stops</label><div>{{ l.summary?.deliveryStops ?? 0 }}</div></div>
+          <div class="kv"><label>Total items</label><div>{{ l.summary?.totalItems ?? 0 }}</div></div>
+          <div class="kv"><label>Total weight</label><div>{{ l.summary?.totalWeight ?? 0 }}</div></div>
+          <div class="kv"><label>Total pallets</label><div>{{ l.summary?.totalPallets ?? 0 }}</div></div>
+          <div class="kv"><label>Total volume</label><div>{{ l.summary?.totalVolume ?? 0 }}</div></div>
+        </div>
+
+        <div class="card">
+          <h3>Financial</h3>
+          <div class="kv"><label>Customer rate</label><div>{{ money(l.costSummary?.customerRate ?? l.execution.customerRate) }}</div></div>
+          <div class="kv"><label>Carrier rate</label><div>{{ money(l.costSummary?.carrierRate ?? l.execution.carrierRate) }}</div></div>
+          <div class="kv"><label>Total billable</label><div>{{ money(l.costSummary?.totalBillable) }}</div></div>
+          <div class="kv"><label>Total payable</label><div>{{ money(l.costSummary?.totalPayable) }}</div></div>
+          <div class="kv"><label>Margin</label><div>{{ money(l.costSummary?.margin ?? l.execution.margin) }}</div></div>
+        </div>
+
+        <div class="card" *ngIf="l.orderSnapshot as order">
+          <h3>Order Snapshot</h3>
+          <div class="kv"><label>Order</label><div><a [routerLink]="['/orders', order.orderId]">{{ order.orderNumber }}</a></div></div>
+          <div class="kv"><label>Type</label><div>{{ orderTypeLabel(order.orderType) }}</div></div>
+          <div class="kv"><label>Direction</label><div>{{ directionLabel(order.direction) }}</div></div>
+          <div class="kv"><label>Order pickup</label><div>{{ order.plannedPickupDate ? (order.plannedPickupDate | date: "short") : "-" }}</div></div>
+          <div class="kv"><label>Order delivery</label><div>{{ order.plannedDeliveryDate ? (order.plannedDeliveryDate | date: "short") : "-" }}</div></div>
+        </div>
+      </div>
+
+      <app-load-stops *ngIf="isTabVisited('stops')" [hidden]="tab !== 'stops'" [loadId]="l.execution.id" [stops]="l.execution.stops" (changed)="reload()"></app-load-stops>
+      <app-load-items *ngIf="isTabVisited('items')" [hidden]="tab !== 'items'" [items]="l.items"></app-load-items>
+      <app-load-equipment *ngIf="isTabVisited('equipment')" [hidden]="tab !== 'equipment'" [equipment]="l.equipment"></app-load-equipment>
+      <app-load-costs *ngIf="isTabVisited('costs')" [hidden]="tab !== 'costs'" [loadId]="l.execution.id" [summary]="l.costSummary" (changed)="reload()"></app-load-costs>
+      <app-load-billing *ngIf="isTabVisited('billing')" [hidden]="tab !== 'billing'" [loadId]="l.execution.id"></app-load-billing>
+      <app-load-notes *ngIf="isTabVisited('notes')" [hidden]="tab !== 'notes'" [loadId]="l.execution.id"></app-load-notes>
+      <app-load-documents *ngIf="isTabVisited('documents')" [hidden]="tab !== 'documents'" [loadId]="l.execution.id"></app-load-documents>
+      <app-load-activity *ngIf="isTabVisited('activity')" [hidden]="tab !== 'activity'" [loadId]="l.execution.id"></app-load-activity>
+    </div>
+  </div>
+
+  <ng-template #loadingTpl>
+    <div class="loading">Loading...</div>
+  </ng-template>
+</app-page-layout>

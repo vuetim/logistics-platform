@@ -41,7 +41,7 @@
 
   <app-create-customer-note
     *ngIf="showModal"
-    [customerId]="customerId"
+    [customerId]="parentId"
     [editing]="editing"
     (close)="onModalClose($event)"
   >

@@ -23,10 +23,8 @@ namespace LogisticsPlatform.Api.Controllers.Financial
             _pdf = pdf;
         }
 
-        // =======================
         // GET settlement by loadId
-        // Turvo-style: Get OR Create draft
-        // =======================
+        //  Get OR Create draft
         [HttpGet]
         public async Task<IActionResult> Get(Guid loadId)
         {
@@ -36,10 +34,8 @@ namespace LogisticsPlatform.Api.Controllers.Financial
             return Ok(settlement);
         }
 
-        // =======================
         // CREATE settlement (manual)
         // (nëse don me e kriju explicit, krahas auto-create)
-        // =======================
         [HttpPost]
         public async Task<IActionResult> Create(Guid loadId, [FromBody] CreateSettlementDto dto)
         {
@@ -49,10 +45,8 @@ namespace LogisticsPlatform.Api.Controllers.Financial
             return Ok(settlement);
         }
 
-        // =======================
         // DOWNLOAD settlement PDF (manual generate)
         // Lejohet edhe pa delivered – gjeneron nga gjendja aktuale
-        // =======================
         [HttpGet("{settlementId:guid}/pdf")]
         public async Task<IActionResult> GetPdf(Guid loadId, Guid settlementId)
         {

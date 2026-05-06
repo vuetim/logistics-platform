@@ -25,7 +25,15 @@ namespace LogisticsPlatform.Application.Services
 
         public async Task<OrderDetailsDto?> GetDetailsAsync(Guid id)
         {
-            return await _repo.GetDetailsAsync(id);
+            var dto = await _repo.GetDetailsAsync(id);
+            if (dto == null) return null;
+
+            for (var i = 0; i < dto.Items.Count; i++)
+            {
+                dto.Items[i].LineItemNumber = i + 1;
+            }
+
+            return dto;
         }
     }
 }

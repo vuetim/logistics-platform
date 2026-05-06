@@ -4,6 +4,7 @@ export interface TableColumn<T> {
     sortable?: boolean;
     formatter?: (row: T) => string;
     classFn?: (row: T) => string;
+    routerLink?: (row: T) => string | null | undefined;
     width?: string;
 }
 export type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost';

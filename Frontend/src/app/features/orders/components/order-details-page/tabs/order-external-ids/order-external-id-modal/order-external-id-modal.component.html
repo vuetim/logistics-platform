@@ -1,0 +1,38 @@
+<div class="modal-backdrop">
+  <div class="modal-card">
+    <h2>{{ editing ? 'Edit external reference' : 'Add external reference' }}</h2>
+
+    <div class="form-grid">
+      <div>
+        <label title="Identifier category (PO, BOL, PRO, appointment, etc.).">Type</label>
+        <select [(ngModel)]="model.type" title="Select external identifier type.">
+          <option *ngFor="let t of typeOptions" [ngValue]="t.value">{{ t.label }}</option>
+        </select>
+      </div>
+
+      <div>
+        <label title="Actual identifier value from customer/carrier/warehouse system.">Value</label>
+        <input [(ngModel)]="model.value" title="Example: PO-553190, BOL-88912, PRO-77111." />
+      </div>
+
+      <div>
+        <label title="Party that owns/provided this reference.">Related party</label>
+        <select [(ngModel)]="model.relatedParty" title="Select owning/source party for this reference.">
+          <option *ngFor="let p of relatedPartyOptions" [ngValue]="p.value">{{ p.label }}</option>
+        </select>
+      </div>
+
+      <div class="checkbox">
+        <input type="checkbox" [(ngModel)]="model.copyToLoad" />
+        <label title="If checked, this reference is copied when creating a load from this order.">Copy to load</label>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button (click)="cancel()">Cancel</button>
+      <button [disabled]="loading" (click)="save()">
+        {{ editing ? 'Save changes' : 'Create reference' }}
+      </button>
+    </div>
+  </div>
+</div>

@@ -55,4 +55,15 @@ export class EntityTableComponent<T> {
     return (row as any)[col.key as string];
   }
 
+  asText(value: unknown): string {
+    if (value == null) return '';
+    return String(value);
+  }
+
+  public getRouterLink = (row: T, col: TableColumn<T>): string | null => {
+    const linkFactory = (col as any).routerLink;
+    if (typeof linkFactory !== 'function') return null;
+    return linkFactory(row) ?? null;
+  };
+
 }

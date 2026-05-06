@@ -1,12 +1,16 @@
-﻿namespace LogisticsPlatform.Application.DTOs.Customers
+﻿using LogisticsPlatform.Domain.Enums;
+
+namespace LogisticsPlatform.Application.DTOs.Customers
 {
     public class CreateCustomerDto
     {
         public string Name { get; set; } = string.Empty;
         public string? Email { get; set; }
         public string? Phone { get; set; }
-        public int PaymentTermsDays { get; set; } = 30; // NET 30 default
         public bool IsActive { get; set; } = true;
 
+        public CustomerBillingDto Billing { get; set; } = new();
+
     }
+
 }

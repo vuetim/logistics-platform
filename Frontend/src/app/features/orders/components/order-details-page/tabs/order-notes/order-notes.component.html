@@ -1,0 +1,54 @@
+<div class="tab-card">
+  <div class="tab-header">
+    <div class="tab-title-group">
+      <h3>Notes</h3>
+      <div class="tab-subtitle">
+        Operational and internal communication log for this order. Use internal notes for team-only context.
+      </div>
+    </div>
+    <div class="toolbar-actions">
+      <app-ui-button *ngIf="canCreate" variant="primary" (click)="openAddModal()">Add note</app-ui-button>
+    </div>
+  </div>
+
+  <div class="table-area" *ngIf="items.length; else empty">
+    <table class="simple-table">
+      <thead>
+        <tr>
+          <th>Message</th>
+          <th>Visibility</th>
+          <th>Created by</th>
+          <th>Created at</th>
+          <th *ngIf="canUpdate || canDelete">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let n of items">
+          <td>{{ n.message }}</td>
+          <td>
+            <span class="badge" [class.badge-no]="n.isInternal" [class.badge-yes]="!n.isInternal">
+              {{ n.isInternal ? 'Internal' : 'Public' }}
+            </span>
+          </td>
+          <td>{{ n.createdByName || '-' }}</td>
+          <td>{{ n.createdAt | date : 'short' }}</td>
+          <td *ngIf="canUpdate || canDelete" class="actions-cell">
+            <app-ui-button *ngIf="canUpdate" variant="ghost" (click)="openEditModal(n)">Edit</app-ui-button>
+            <app-ui-button *ngIf="canDelete" variant="danger" (click)="deleteItem(n.id)">Delete</app-ui-button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <ng-template #empty>
+    <div class="muted">No notes.</div>
+  </ng-template>
+
+  <app-order-note-modal
+    *ngIf="showModal"
+    [orderId]="parentId"
+    [editing]="editing"
+    (close)="onModalClose($event)"
+  ></app-order-note-modal>
+</div>

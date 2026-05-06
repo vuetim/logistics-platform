@@ -1,0 +1,153 @@
+<div class="modal-backdrop">
+  <div class="modal-card">
+    <h2>{{ editing ? 'Edit item' : 'Add item' }}</h2>
+
+    <div class="form-grid">
+      <div>
+        <label title="Commodity/item name moved in this order.">Name</label>
+        <input [(ngModel)]="model.name" title="Example: Bananas, Frozen Fish, Palletized Produce." />
+      </div>
+
+      <div>
+        <label title="Customer-side SKU/PO line/item reference.">Customer reference</label>
+        <input [(ngModel)]="model.customerReference" title="External customer item reference." />
+      </div>
+
+      <div>
+        <label title="Planned quantity for this item line.">Quantity</label>
+        <input type="number" min="1" [(ngModel)]="model.quantity" title="Planned quantity value." />
+      </div>
+
+      <div>
+        <label title="Unit of measure for quantity.">Unit</label>
+        <input [(ngModel)]="model.quantityUnit" title="Example: Pallets, Boxes, Cases." />
+      </div>
+
+      <div>
+        <label title="Actual/handling quantity when different from planned quantity.">Actual quantity</label>
+        <input type="number" min="0" [(ngModel)]="model.actualQuantity" title="Optional handling quantity." />
+      </div>
+
+      <div>
+        <label>Handling quantity</label>
+        <input type="number" min="0" [(ngModel)]="model.handlingQuantity" />
+      </div>
+
+      <div>
+        <label>Handling unit</label>
+        <input [(ngModel)]="model.handlingUnit" />
+      </div>
+
+      <div>
+        <label>Unit gross weight</label>
+        <input type="number" min="0" [(ngModel)]="model.unitGrossWeight" />
+      </div>
+
+      <div>
+        <label>Weight unit</label>
+        <input [(ngModel)]="model.weightUnit" />
+      </div>
+
+      <div>
+        <label>Length</label>
+        <input type="number" min="0" [(ngModel)]="model.length" />
+      </div>
+
+      <div>
+        <label>Width</label>
+        <input type="number" min="0" [(ngModel)]="model.width" />
+      </div>
+
+      <div>
+        <label>Height</label>
+        <input type="number" min="0" [(ngModel)]="model.height" />
+      </div>
+
+      <div>
+        <label>Dimension unit</label>
+        <input [(ngModel)]="model.dimensionUnit" />
+      </div>
+
+      <div>
+        <label>Volume unit</label>
+        <input [(ngModel)]="model.volumeUnit" />
+      </div>
+
+      <div>
+        <label>Temperature min</label>
+        <input type="number" [(ngModel)]="model.minTemperature" />
+      </div>
+
+      <div>
+        <label>Temperature max</label>
+        <input type="number" [(ngModel)]="model.maxTemperature" />
+      </div>
+
+      <div>
+        <label>Temperature unit</label>
+        <input [(ngModel)]="model.temperatureUnit" />
+      </div>
+
+      <div>
+        <label title="Operational status of this item line.">Status</label>
+        <select [(ngModel)]="model.status" title="Item status for planning/execution.">
+          <option value="Active">Active</option>
+          <option value="Pending">Pending</option>
+          <option value="Hold">Hold</option>
+        </select>
+      </div>
+
+      <div>
+        <label title="LTL freight class metadata; classification, not a price.">Freight class</label>
+        <input [(ngModel)]="model.freightClass" title="Example: 70, 77.5, 100." />
+      </div>
+
+      <div>
+        <label title="Hazmat regulatory class when applicable.">Hazard class</label>
+        <input [(ngModel)]="model.hazardClass" title="Example: Class 3, Class 8." />
+      </div>
+
+      <div>
+        <label title="UN/NA identification number for hazardous materials.">Identification #</label>
+        <input [(ngModel)]="model.identificationNumber" title="Example: UN1993." />
+      </div>
+
+      <div>
+        <label>Declared value</label>
+        <input type="number" min="0" [(ngModel)]="model.declaredValue" />
+      </div>
+
+      <div>
+        <label>Currency</label>
+        <input [(ngModel)]="model.currency" />
+      </div>
+
+      <div class="checkbox">
+        <input type="checkbox" [(ngModel)]="model.isHazmat" />
+        <label title="Check when this item is hazardous material.">Hazmat</label>
+      </div>
+
+      <div class="checkbox">
+        <input type="checkbox" [(ngModel)]="model.stackable" />
+        <label>Stackable</label>
+      </div>
+
+      <div class="checkbox">
+        <input type="checkbox" [(ngModel)]="model.copyToLoad" />
+        <label>Copy to load</label>
+      </div>
+
+      <div class="full">
+        <label title="Operational notes for this item line.">Notes</label>
+        <textarea rows="3" [(ngModel)]="model.notes" title="Item-specific handling or planning notes."></textarea>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button (click)="cancel()">Cancel</button>
+      <button [disabled]="loading" (click)="save()">
+        {{ editing ? 'Save changes' : 'Create item' }}
+      </button>
+    </div>
+  </div>
+</div>

@@ -45,7 +45,7 @@
 
   <app-create-contact-modal
     *ngIf="showModal"
-    [customerId]="customerId"
+    [customerId]="parentId"
     [editing]="editing"
     (close)="onModalClose($event)"
   >

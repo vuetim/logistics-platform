@@ -2,27 +2,36 @@
   <div class="form">
     <h3>Customer details</h3>
 
-    <input [(ngModel)]="data.name" placeholder="Name *" />
-    <input [(ngModel)]="data.email" placeholder="Email" />
-    <input [(ngModel)]="data.phone" placeholder="Phone" />
+    <ui-input [(ngModel)]="data.name" placeholder="Name *"></ui-input>
 
-    <input
-      type="number"
-      [(ngModel)]="data.paymentTermsDays"
-      placeholder="Payment terms (days)"
-    />
+    <ui-input type="email" [(ngModel)]="data.email" placeholder="Email *">
+    </ui-input>
 
-    <label class="checkbox">
-      <input type="checkbox" [(ngModel)]="data.isActive" />
-      Active
-    </label>
+    <ui-input type="tel" [(ngModel)]="data.phone" placeholder="Phone *">
+    </ui-input>
 
-    <button class="btn primary" (click)="submit()" [disabled]="!isValid()">
-      Next
-    </button>
+    <ui-checkbox [(ngModel)]="data.isActive"> Active </ui-checkbox>
   </div>
-</div>
-<!-- NAV -->
-<div class="step-actions">
-  <button (click)="next.emit()">Next</button>
+
+  <div class="form">
+    <h3 class="section">Billing</h3>
+
+    <ui-select [(ngModel)]="data.billing.terms" [options]="paymentTerms">
+    </ui-select>
+
+    <ui-select [(ngModel)]="data.billing.method" [options]="paymentMethods">
+    </ui-select>
+
+    <ui-input
+      type="number"
+      [(ngModel)]="data.billing.creditLimit"
+      placeholder="Credit limit"
+    >
+    </ui-input>
+
+    <ui-checkbox [(ngModel)]="data.billing.autoInvoice">
+      Auto invoice
+    </ui-checkbox>
+  </div>
+  <app-ui-button (click)="submit()" [disabled]="!isValid()">Next</app-ui-button>
 </div>

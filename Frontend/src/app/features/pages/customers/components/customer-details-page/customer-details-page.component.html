@@ -1,12 +1,15 @@
 <app-page-layout>
   <div page-actions></div>
-  <div class="page">
-    <div class="header" *ngIf="customer as c; else loadingTpl">
-      <div class="title">
-        <div class="name-row">
+
+  <div class="customer-page" *ngIf="customer as c; else loadingTpl">
+    <!--  HEADER  -->
+    <div class="customer-header">
+      <div class="left">
+        <div class="title-row">
           <h1>{{ c.name }}</h1>
+
           <span
-            class="pill"
+            class="status"
             [class.active]="c.isActive"
             [class.inactive]="!c.isActive"
           >
@@ -15,23 +18,31 @@
         </div>
 
         <div class="meta">
-          <span *ngIf="c.email">{{ c.email }}</span>
-          <span *ngIf="c.phone">• {{ c.phone }}</span>
-          <span>• NET {{ c.paymentTermsDays }}</span>
+          <span>{{ c.email || "—" }}</span>
+          <span>•</span>
+          <span>{{ c.billing.method }}</span>
+          <span>•</span>
+          <span>{{ c.billing.terms }}</span>
         </div>
       </div>
 
-      <div class="header-actions">
-        <!-- këtu mundesh me qit button Edit basic info nëse don -->
-        <button class="btn ghost" routerLink="/customers">Back</button>
+      <div class="actions">
+        <button
+          *ngIf="canUpdate"
+          variant="primary"
+          (click)="openEditCustomer()"
+        >
+          Edit
+        </button>
+
+        <app-ui-button variant="ghost" routerLink="/customers">
+          Back
+        </app-ui-button>
       </div>
     </div>
 
-    <ng-template #loadingTpl>
-      <div class="skeleton">Loading...</div>
-    </ng-template>
-
-    <div class="tabs" *ngIf="customer as c">
+    <!--  TABS  -->
+    <div class="tabs-bar">
       <button
         class="tab"
         [class.active]="tab === 'overview'"
@@ -45,7 +56,7 @@
         [class.active]="tab === 'addresses'"
         (click)="setTab('addresses')"
       >
-        Addresses <span class="count">{{ c.addresses?.length || 0 }}</span>
+        Addresses
       </button>
 
       <button
@@ -53,7 +64,7 @@
         [class.active]="tab === 'contacts'"
         (click)="setTab('contacts')"
       >
-        Contacts <span class="count">{{ c.contacts?.length || 0 }}</span>
+        Contacts
       </button>
 
       <button
@@ -61,32 +72,34 @@
         [class.active]="tab === 'notes'"
         (click)="setTab('notes')"
       >
-        Notes <span class="count">{{ c.notes?.length || 0 }}</span>
+        Notes
       </button>
     </div>
 
-    <!-- TAB CONTENT -->
-    <div class="content" *ngIf="customer as c">
-      <!-- OVERVIEW -->
-      <div *ngIf="tab === 'overview'" class="overview">
+    <!--  CONTENT SURFACE  -->
+    <div class="surface">
+      <div *ngIf="tab === 'overview'" class="overview-empty">
         <div class="card">
           <h3>Quick summary</h3>
           <div class="grid">
             <div class="kv">
-              <label>Email</label>
-              <div>{{ c.email || "—" }}</div>
-            </div>
-            <div class="kv">
-              <label>Phone</label>
-              <div>{{ c.phone || "—" }}</div>
-            </div>
-            <div class="kv">
               <label>Payment terms</label>
-              <div>NET {{ c.paymentTermsDays }}</div>
+              <div>{{ c.billing.terms }}</div>
             </div>
+
             <div class="kv">
-              <label>Status</label>
-              <div>{{ c.isActive ? "Active" : "Inactive" }}</div>
+              <label>Method</label>
+              <div>{{ c.billing.method }}</div>
+            </div>
+
+            <div class="kv">
+              <label>Credit limit</label>
+              <div>{{ c.billing.creditLimit | number }}</div>
+            </div>
+
+            <div class="kv">
+              <label>Auto invoice</label>
+              <div>{{ c.billing.autoInvoice ? "Yes" : "No" }}</div>
             </div>
           </div>
         </div>
@@ -106,17 +119,32 @@
           </div>
         </div>
       </div>
-      <!-- ADDRESSES -->
-      <app-customer-addresses *ngIf="tab === 'addresses'" [customerId]="c.id">
-      </app-customer-addresses>
+
+      <app-customer-addresses
+        *ngIf="tab === 'addresses'"
+        [parentId]="c.id"
+      ></app-customer-addresses>
+
       <app-customer-contacts
         *ngIf="tab === 'contacts'"
-        [customerId]="c.id"
+        [parentId]="c.id"
       ></app-customer-contacts>
+
       <app-customer-notes
         *ngIf="tab === 'notes'"
-        [customerId]="c.id"
+        [parentId]="c.id"
       ></app-customer-notes>
     </div>
+
+    <!-- EDIT MODAL -->
+    <app-edit-customer-modal
+      *ngIf="showCustomerModal"
+      [customer]="c"
+      (close)="onCustomerClose($event)"
+    ></app-edit-customer-modal>
   </div>
+
+  <ng-template #loadingTpl>
+    <div class="loading">Loading...</div>
+  </ng-template>
 </app-page-layout>

@@ -1,9 +1,10 @@
+import { CustomerBillingDto } from "./customer-billing.dto";
 
 export interface UpdateCustomerDto {
     name?: string;
     email?: string;
     phone?: string;
-    paymentTermDays: number;
     IsActive?: boolean;
+    billing: CustomerBillingDto;
 
 }

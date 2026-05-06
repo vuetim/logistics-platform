@@ -1,0 +1,37 @@
+<div class="tab-section">
+  <div class="tab-header">
+    <div>
+      <h3>Notes</h3>
+      <p>Operational notes on this load.</p>
+    </div>
+  </div>
+
+  <div class="note-form">
+    <textarea [(ngModel)]="text" placeholder="Add note"></textarea>
+    <label class="check-inline"><input type="checkbox" [(ngModel)]="isInternal" /> Internal</label>
+    <button class="tab-action" (click)="add()" [disabled]="loading || !text.trim()">Add</button>
+  </div>
+
+  <div class="empty" *ngIf="!notes.length">No notes found.</div>
+
+  <div class="table-wrap" *ngIf="notes.length">
+    <table>
+      <thead>
+        <tr>
+          <th>Note</th>
+          <th>Internal</th>
+          <th>Created</th>
+          <th>By</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let note of notes">
+          <td>{{ noteText(note) }}</td>
+          <td>{{ note.isInternal ? "Yes" : "No" }}</td>
+          <td>{{ note.createdAt ? (note.createdAt | date: "short") : "-" }}</td>
+          <td>{{ note.createdByName || "-" }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

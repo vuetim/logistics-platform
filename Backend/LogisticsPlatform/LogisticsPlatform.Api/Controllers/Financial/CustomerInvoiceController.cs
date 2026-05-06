@@ -27,10 +27,8 @@ namespace LogisticsPlatform.Api.Controllers.Financial
             _emailService = emailService;
         }
 
-        // =======================
         // GET invoice by loadId
-        // Turvo-style: Get OR Create
-        // =======================
+        //  Get OR Create
         [HttpGet]
         public async Task<IActionResult> Get(Guid loadId)
         {
@@ -40,10 +38,8 @@ namespace LogisticsPlatform.Api.Controllers.Financial
             return Ok(result);
         }
 
-        // =======================
         // CREATE invoice (manual)
         // (nëse don me e bo explicit, përveç auto-create në GET)
-        // =======================
         [HttpPost]
         public async Task<IActionResult> Create(Guid loadId, [FromBody] CreateInvoiceDto dto)
         {
@@ -54,9 +50,7 @@ namespace LogisticsPlatform.Api.Controllers.Financial
             return Ok(created);
         }
 
-        // =======================
         // SEND invoice PDF via email (manual, në çdo status)
-        // =======================
         [HttpPost("{invoiceId:guid}/send")]
         public async Task<IActionResult> SendPdf(Guid loadId, Guid invoiceId, [FromBody] SendInvoiceEmailDto dto)
         {
@@ -75,10 +69,8 @@ namespace LogisticsPlatform.Api.Controllers.Financial
             return Ok(new { message = "Invoice sent successfully." });
         }
 
-        // =======================
         // DOWNLOAD invoice PDF (manual generate)
         // Lejohet edhe pa delivered – gjeneron nga gjendja aktuale
-        // =======================
         [HttpGet("{invoiceId:guid}/pdf")]
         public async Task<IActionResult> GetPdf(Guid loadId, Guid invoiceId)
         {

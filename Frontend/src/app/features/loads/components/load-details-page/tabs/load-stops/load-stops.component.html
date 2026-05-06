@@ -1,0 +1,132 @@
+<div class="tab-section">
+  <div class="tab-header">
+    <div>
+      <h3>Stops</h3>
+      <p>Execution stops copied from order routes or managed on the load.</p>
+    </div>
+    <button class="tab-action" (click)="openCreate()">Add Stop</button>
+  </div>
+
+  <div class="editor-panel" *ngIf="editing">
+    <div class="editor-grid">
+      <label>
+        Type
+        <select [(ngModel)]="form.stopType">
+          <option *ngFor="let option of stopTypeOptions" [ngValue]="option.value">{{ option.label }}</option>
+        </select>
+      </label>
+      <label>
+        Sequence
+        <input type="number" [(ngModel)]="form.sequence" />
+      </label>
+      <label>
+        Location
+        <input [(ngModel)]="form.locationName" />
+      </label>
+      <label>
+        Address
+        <input [(ngModel)]="form.addressLine1" />
+      </label>
+      <label>
+        Address 2
+        <input [(ngModel)]="form.addressLine2" />
+      </label>
+      <label>
+        City
+        <input [(ngModel)]="form.city" />
+      </label>
+      <label>
+        State
+        <input [(ngModel)]="form.state" />
+      </label>
+      <label>
+        Postal
+        <input [(ngModel)]="form.postalCode" />
+      </label>
+      <label>
+        Country
+        <input [(ngModel)]="form.country" />
+      </label>
+      <label>
+        Planned from
+        <input type="datetime-local" [(ngModel)]="form.plannedArrivalFrom" />
+      </label>
+      <label>
+        Planned to
+        <input type="datetime-local" [(ngModel)]="form.plannedArrivalTo" />
+      </label>
+      <label>
+        Appointment
+        <select [(ngModel)]="form.appointmentType">
+          <option *ngFor="let option of appointmentOptions" [ngValue]="option.value">{{ option.label }}</option>
+        </select>
+      </label>
+      <label>
+        Flex minutes
+        <input type="number" [(ngModel)]="form.flexMinutes" />
+      </label>
+      <label>
+        Appointment #
+        <input [(ngModel)]="form.appointmentNumber" />
+      </label>
+      <label>
+        Reference
+        <input [(ngModel)]="form.stopReference" />
+      </label>
+      <label class="full">
+        Notes
+        <textarea [(ngModel)]="form.notes"></textarea>
+      </label>
+    </div>
+    <div class="editor-actions">
+      <button class="tab-action" (click)="cancelEdit()">Cancel</button>
+      <button class="tab-action primary-action" (click)="saveStop()">Save Stop</button>
+    </div>
+  </div>
+
+  <div class="empty" *ngIf="!stops.length">No stops found.</div>
+
+  <div class="table-wrap" *ngIf="stops.length">
+    <table>
+      <thead>
+        <tr>
+          <th>Seq</th>
+          <th>Type</th>
+          <th>Status</th>
+          <th>Location</th>
+          <th>Planned</th>
+          <th>Revised</th>
+          <th>Actual</th>
+          <th>Appointment</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let s of stops">
+          <td>{{ s.sequence }}</td>
+          <td>{{ stopTypeLabel(s.stopType) }}</td>
+          <td><span class="badge">{{ statusLabel(s.status) }}</span></td>
+          <td>
+            <strong>{{ s.locationName }}</strong>
+            <span>{{ s.addressLine1 }} {{ s.city }}, {{ s.state }} {{ s.postalCode }} {{ s.country }}</span>
+          </td>
+          <td>{{ s.plannedArrivalFrom ? (s.plannedArrivalFrom | date: "short") : "-" }} -> {{ s.plannedArrivalTo ? (s.plannedArrivalTo | date: "short") : "-" }}</td>
+          <td>{{ s.revisedArrivalFrom ? (s.revisedArrivalFrom | date: "short") : "-" }} -> {{ s.revisedArrivalTo ? (s.revisedArrivalTo | date: "short") : "-" }}</td>
+          <td>{{ s.actualArrival ? (s.actualArrival | date: "short") : "-" }} -> {{ s.actualDeparture ? (s.actualDeparture | date: "short") : "-" }}</td>
+          <td>{{ appointmentLabel(s.appointmentType) }}</td>
+          <td>
+            <div class="row-actions">
+              <button *ngIf="canMarkEnroute(s)" (click)="mark(s.id, 'enroute')">Enroute</button>
+              <button *ngIf="canMarkArrive(s)" (click)="mark(s.id, 'arrive')">Arrive</button>
+              <button *ngIf="canMarkLoaded(s)" (click)="mark(s.id, 'loaded')">Loaded</button>
+              <button *ngIf="canMarkUnloaded(s)" (click)="mark(s.id, 'unloaded')">Unloaded</button>
+              <button (click)="openEdit(s)">Edit</button>
+              <button (click)="deleteStop(s)">Delete</button>
+              <span class="muted" *ngIf="!canMarkEnroute(s) && !canMarkArrive(s) && !canMarkLoaded(s) && !canMarkUnloaded(s)">No action</span>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

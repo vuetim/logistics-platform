@@ -8,6 +8,7 @@ import { CustomerContactsService } from "../../../../../../../data-access/custom
 import { BaseCrudTabComponent } from "../../../../../../../shared/crud/customer-base-crud-tab.component";
 import { UiButtonComponent } from "../../../../../../../shared/UI/ui-button/ui-button.component";
 import { CreateContactModalComponent } from "./create-contact-modal/create-contact-modal.component";
+import { BaseEntityCrudTabComponent } from "../../../../../../../shared/crud/base-entity-crud-tab.component";
 
 @Component({
   selector: 'app-customer-contacts',
@@ -16,7 +17,7 @@ import { CreateContactModalComponent } from "./create-contact-modal/create-conta
   templateUrl: './customer-contacts.component.html'
 })
 export class CustomerContactsComponent
-  extends BaseCrudTabComponent<
+  extends BaseEntityCrudTabComponent<
     CustomerContactDto,
     CreateCustomerContactDto,
     UpdateCustomerContactDto

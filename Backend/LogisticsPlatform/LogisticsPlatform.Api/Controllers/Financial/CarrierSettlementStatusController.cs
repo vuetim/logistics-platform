@@ -18,6 +18,13 @@ public class CarrierSettlementStatusController : ControllerBase
         _service = service;
     }
 
+    [HttpGet("/api/financials/settlements")]
+    public async Task<IActionResult> List()
+    {
+        var settlements = await _service.ListAsync();
+        return Ok(settlements);
+    }
+
     // PATCH: /api/financials/settlements/{settlementId}/status
     [HttpPatch]
     public async Task<IActionResult> UpdateStatus(Guid settlementId, [FromBody] UpdateSettlementStatusDto dto)
@@ -26,5 +33,13 @@ public class CarrierSettlementStatusController : ControllerBase
 
         await _service.UpdateStatusAsync(settlementId, dto.Status, userId);
         return NoContent();
+    }
+
+    [HttpPatch("/api/financials/settlements/{settlementId:guid}/payment")]
+    public async Task<IActionResult> RecordPayment(Guid settlementId, [FromBody] RecordSettlementPaymentDto dto)
+    {
+        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var settlement = await _service.RecordPaymentAsync(settlementId, dto, userId);
+        return Ok(settlement);
     }
 }

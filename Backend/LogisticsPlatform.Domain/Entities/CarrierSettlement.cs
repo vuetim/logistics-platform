@@ -18,6 +18,9 @@ public class CarrierSettlement
     public SettlementStatus Status { get; set; } = SettlementStatus.Draft;
 
     public decimal TotalAmount { get; set; }
+    public decimal AmountPaid { get; set; }
+    public DateTime? PaidAt { get; set; }
+    public string? PaymentReference { get; set; }
     public string? PdfUrl { get; set; }
     //  Audit fields
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

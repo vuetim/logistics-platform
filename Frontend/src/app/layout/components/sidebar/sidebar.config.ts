@@ -14,10 +14,10 @@ export const SIDEBAR_ITEMS: SidebarItem[] = [
             { label: 'Orders List', route: '/orders', icon: 'list', disabled: false }
         ]
     },
-    { label: 'Loads', route: '/loads', icon: 'local_shipping', disabled: true },
+    { label: 'Loads', route: '/loads', icon: 'local_shipping', disabled: false },
+    { label: 'Financials', route: '/financials', icon: 'request_quote', disabled: false },
     { label: 'Customers', route: 'admin/customers', icon: 'groups', disabled: false },
     { label: 'Carriers', route: '/carriers', icon: 'warehouse', disabled: true },
-    { label: 'Documents', route: '/documents', icon: 'description', disabled: true },
-    { label: 'Stops', route: '/stops', icon: 'place', disabled: true }
+    { label: 'Documents', route: '/documents', icon: 'description', disabled: false }
 ];
 

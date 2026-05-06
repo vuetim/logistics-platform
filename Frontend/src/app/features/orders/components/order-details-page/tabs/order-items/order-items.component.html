@@ -1,0 +1,83 @@
+<div class="tab-card">
+  <div class="tab-header">
+    <div class="tab-title-group">
+      <h3>Items</h3>
+      <div class="tab-subtitle">
+        Commodity lines to move. Quantity and unit define planning volume, while freight class and hazmat data drive operational handling.
+      </div>
+    </div>
+    <div class="toolbar-actions">
+      <app-ui-button *ngIf="canCreate" variant="primary" (click)="openAddModal()">
+        Add item
+      </app-ui-button>
+    </div>
+  </div>
+
+  <div class="table-area" *ngIf="items.length; else empty">
+    <table class="simple-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Name</th>
+          <th>Reference</th>
+          <th>Qty</th>
+          <th>Actual Qty</th>
+          <th>Status</th>
+          <th>Unit</th>
+          <th>Weight</th>
+          <th>Dimensions</th>
+          <th>Temp</th>
+          <th>Hazmat</th>
+          <th>Stackable</th>
+          <th>Copy</th>
+          <th>Freight class</th>
+          <th>Hazard class</th>
+          <th *ngIf="canUpdate || canDelete">Actions</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let i of items">
+          <td>{{ i.lineItemNumber ?? '-' }}</td>
+          <td>{{ i.name }}</td>
+          <td>{{ i.customerReference || '-' }}</td>
+          <td>{{ i.quantity }}</td>
+          <td>{{ i.actualQuantity ?? i.quantity }}</td>
+          <td>{{ i.status || 'Active' }}</td>
+          <td>{{ i.quantityUnit }}</td>
+          <td>{{ i.unitGrossWeight || '-' }} {{ i.weightUnit || '' }}</td>
+          <td>{{ i.length || '-' }} x {{ i.width || '-' }} x {{ i.height || '-' }} {{ i.dimensionUnit || '' }}</td>
+          <td>{{ i.minTemperature != null || i.maxTemperature != null ? (i.minTemperature + '-' + i.maxTemperature + ' ' + (i.temperatureUnit || '')) : '-' }}</td>
+          <td>
+            <span class="badge" [class.badge-yes]="i.isHazmat" [class.badge-no]="!i.isHazmat">
+              {{ i.isHazmat ? 'Hazmat' : 'Standard' }}
+            </span>
+          </td>
+          <td>{{ i.stackable ? 'Yes' : 'No' }}</td>
+          <td>{{ i.copyToLoad ? 'Yes' : 'No' }}</td>
+          <td>{{ i.freightClass || '-' }}</td>
+          <td>{{ i.hazardClass || '-' }}</td>
+          <td *ngIf="canUpdate || canDelete" class="actions-cell">
+            <app-ui-button *ngIf="canUpdate" variant="ghost" (click)="openEditModal(i)">
+              Edit
+            </app-ui-button>
+            <app-ui-button *ngIf="canDelete" variant="danger" (click)="deleteItem(i.id)">
+              Delete
+            </app-ui-button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <ng-template #empty>
+    <div class="muted">No items.</div>
+  </ng-template>
+
+  <app-order-item-modal
+    *ngIf="showModal"
+    [orderId]="parentId"
+    [editing]="editing"
+    (close)="onModalClose($event)"
+  ></app-order-item-modal>
+</div>

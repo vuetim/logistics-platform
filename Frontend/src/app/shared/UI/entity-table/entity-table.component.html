@@ -24,12 +24,31 @@
           class="badge"
           [ngClass]="col.classFn(row)"
         >
-          {{ getCellValue(row, col) }}
+          <a
+            *ngIf="getRouterLink(row, col) as link; else badgeText"
+            class="cell-link badge-link"
+            [routerLink]="link"
+          >
+            {{ getCellValue(row, col) }}
+          </a>
+          <ng-template #badgeText>{{ getCellValue(row, col) }}</ng-template>
         </span>
 
         <!-- normal cell -->
         <ng-template #plainCell>
-          {{ getCellValue(row, col) }}
+          <a
+            *ngIf="getRouterLink(row, col) as link; else plainText"
+            class="cell-text cell-link"
+            [routerLink]="link"
+            [title]="asText(getCellValue(row, col))"
+          >
+            {{ getCellValue(row, col) }}
+          </a>
+          <ng-template #plainText>
+            <span class="cell-text" [title]="asText(getCellValue(row, col))">
+              {{ getCellValue(row, col) }}
+            </span>
+          </ng-template>
         </ng-template>
       </td>
 

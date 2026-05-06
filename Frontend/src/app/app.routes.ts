@@ -65,6 +65,42 @@ export const routes: Routes = [
             {
                 path: 'customers/:id',
                 component: CustomerDetailsPageComponent
+            },
+            {
+                path: 'orders',
+                loadChildren: () =>
+                    import('./features/orders/orders.routes')
+                        .then(m => m.default),
+                data: {
+                    breadcrumb: ['Orders']
+                }
+            },
+            {
+                path: 'loads',
+                loadChildren: () =>
+                    import('./features/loads/loads.routes')
+                        .then(m => m.default),
+                data: {
+                    breadcrumb: ['Loads']
+                }
+            },
+            {
+                path: 'financials',
+                loadChildren: () =>
+                    import('./features/financials/financials.routes')
+                        .then(m => m.default),
+                data: {
+                    breadcrumb: ['Financials']
+                }
+            },
+            {
+                path: 'documents',
+                loadComponent: () =>
+                    import('./features/documents/documents-page.component')
+                        .then(m => m.DocumentsPageComponent),
+                data: {
+                    breadcrumb: ['Documents']
+                }
             }
 
         ]

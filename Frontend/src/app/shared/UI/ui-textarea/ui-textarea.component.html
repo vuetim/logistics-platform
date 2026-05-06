@@ -1,0 +1,9 @@
+<textarea
+  class="ui-textarea"
+  [rows]="rows"
+  [placeholder]="placeholder"
+  [value]="value"
+  [disabled]="disabled"
+  (input)="update($any($event.target).value)"
+  (blur)="onTouched()"
+></textarea>

@@ -21,9 +21,7 @@ public class DelayFaultAttributionService : IDelayFaultAttributionService
         DelayFaultParty party;
         string reason;
 
-        // =========================
-        // TURVO-STYLE RULES
-        // =========================
+       
 
         // 1️⃣ Shipper fault (appointment moved / revised)
         if (stop.RevisedArrivalTo.HasValue &&

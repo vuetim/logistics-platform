@@ -6,6 +6,7 @@ using LogisticsPlatform.Application.Interfaces.Repositories.Loads;
 using LogisticsPlatform.Application.Interfaces.Repositories.Orders;
 using LogisticsPlatform.Application.Interfaces.Repositories.Users;
 using LogisticsPlatform.Application.Interfaces.Services.Loads;
+using LogisticsPlatform.Application.Interfaces.Services.Orders;
 using LogisticsPlatform.Application.Interfaces.Services.Security;
 using LogisticsPlatform.Domain.Entities;
 using LogisticsPlatform.Domain.Enums;
@@ -24,6 +25,7 @@ namespace LogisticsPlatform.Application.Services
         private readonly IPermissionService _permission;
         private readonly IOrderRepository _orders;
         private readonly ILoadFinancialAutomationService _financialAutomationService;
+        private readonly IOrderLoadSyncService _orderLoadSyncService;
 
         public LoadService(
             ILoadRepository loads,
@@ -32,7 +34,8 @@ namespace LogisticsPlatform.Application.Services
             IUserRepository users,
             IPermissionService permission,
             IOrderRepository orders,
-            ILoadFinancialAutomationService loadFinancialAutomationService)
+            ILoadFinancialAutomationService loadFinancialAutomationService,
+            IOrderLoadSyncService orderLoadSyncService)
         {
             _loads = loads;
             _customers = customers;
@@ -41,11 +44,11 @@ namespace LogisticsPlatform.Application.Services
             _permission = permission;
             _orders = orders;
             _financialAutomationService = loadFinancialAutomationService;
+            _orderLoadSyncService = orderLoadSyncService;
         }
 
-        // =============================
         // CREATE LOAD (manual) (Admin, Broker)
-        // =============================
+        
         public async Task<Guid> CreateAsync(CreateLoadDto dto, Guid userId)
         {
             var user = await GetUserOrThrow(userId);
@@ -144,9 +147,7 @@ namespace LogisticsPlatform.Application.Services
             await _loads.SaveChangesAsync();
         }
 
-        // =============================
         // CHANGE LOAD STATUS
-        // =============================
         public async Task ChangeStatusAsync(Guid id, LoadStatus newStatus, Guid userId)
         {
             var load = await _loads.GetByIdAsync(id)
@@ -161,6 +162,9 @@ namespace LogisticsPlatform.Application.Services
                 throw new BusinessRuleException("Completed load cannot be changed.");
             if (newStatus == LoadStatus.Completed)
             {
+                if (load.Status != LoadStatus.Delivered)
+                    throw new BusinessRuleException("Load must be delivered before it can be completed.");
+
                 await _financialAutomationService.GenerateFinancialDocumentsAsync(load);
             }
 
@@ -169,11 +173,10 @@ namespace LogisticsPlatform.Application.Services
 
             await _loads.UpdateAsync(load);
             await _loads.SaveChangesAsync();
+            await _orderLoadSyncService.SyncFromLoadAsync(load);
         }
 
-        // =============================
         // CREATE LOAD FROM ORDER (snapshot)
-        // =============================
         public async Task<Guid> CreateFromOrderAsync(
             CreateLoadFromOrderDto dto,
             Guid userId)
@@ -188,18 +191,57 @@ namespace LogisticsPlatform.Application.Services
             var order = await _orders.GetByIdWithRoutesAsync(dto.OrderId)
                 ?? throw new NotFoundException("Order not found.");
 
+            if (order.Status == OrderStatus.Draft)
+                throw new BusinessRuleException("Order must be submitted before creating a load.");
+
+            var orderWithLoads = await _orders.GetByIdWithLoadsAsync(dto.OrderId)
+                ?? throw new NotFoundException("Order not found.");
+
+            if (orderWithLoads.Loads.Any(l => l.Load != null && !l.Load.IsArchived) && !dto.SplitOrder)
+                throw new BusinessRuleException("Order already has an active load. Use split flow if needed.");
+
+            if (dto.SplitOrder)
+                throw new BusinessRuleException("SplitOrder is not implemented yet.");
+
             // NOTE:
             // GetByIdWithRoutesAsync duhet të përfshij:
             //  .Include(o => o.OrderRoutes)
             //  .Include(o => o.Items)
 
-            var routes = order.OrderRoutes
-                .Where(r => r.CopyToLoad && r.IsActive)
+            var activeRoutes = order.OrderRoutes
+                .Where(r => r.IsActive)
+                .OrderBy(r => r.Sequence)
+                .ToList();
+
+            var mandatoryPickup = activeRoutes
+                .Where(r => r.StopType == StopType.Pickup)
+                .OrderBy(r => r.Sequence)
+                .FirstOrDefault();
+
+            var mandatoryDelivery = activeRoutes
+                .Where(r => r.StopType == StopType.Delivery)
+                .OrderByDescending(r => r.Sequence)
+                .FirstOrDefault();
+
+            var mandatoryRouteIds = new[]
+                {
+                    mandatoryPickup?.Id,
+                    mandatoryDelivery?.Id
+                }
+                .Where(id => id.HasValue)
+                .Select(id => id!.Value)
+                .ToHashSet();
+
+            var routes = activeRoutes
+                .Where(r => r.CopyToLoad || mandatoryRouteIds.Contains(r.Id))
                 .OrderBy(r => r.Sequence)
                 .ToList();
 
             if (!routes.Any())
                 throw new BusinessRuleException("No active routes to copy.");
+
+            if (mandatoryPickup == null || mandatoryDelivery == null)
+                throw new BusinessRuleException("Order must have at least one pickup and one delivery route to create a load.");
 
             // (opsionale) nese biznesi kerkon patjeter items:
             // if (!order.Items.Any())
@@ -208,6 +250,7 @@ namespace LogisticsPlatform.Application.Services
             // 3️⃣ Create Load (in-memory, pa SaveChanges ende)
             var firstRoute = routes.First();
             var lastRoute = routes.Last();
+            var orderCustomerRate = order.Cost?.QuotedTotal ?? order.CustomerRate ?? 0;
 
             var load = new Load
             {
@@ -219,11 +262,17 @@ namespace LogisticsPlatform.Application.Services
                 Status = LoadStatus.Draft,
                 Mode = ModeType.TL, // TODO: me vone mund të vije nga Order/DTO
 
-                CustomerRate = order.CustomerRate,
+                CustomerRate = orderCustomerRate,
                 CarrierRate = dto.CarrierRate ?? 0,
+                Accessorials = order.Cost?.Accessorials,
+                RateConfirmationNumber = dto.RateConfirmationNumber,
 
-                Origin = $"{firstRoute.City}, {firstRoute.State}",
-                Destination = $"{lastRoute.City}, {lastRoute.State}",
+                Origin = !string.IsNullOrWhiteSpace(firstRoute.LocationName)
+                    ? firstRoute.LocationName
+                    : $"{firstRoute.City}, {firstRoute.State}",
+                Destination = !string.IsNullOrWhiteSpace(lastRoute.LocationName)
+                    ? lastRoute.LocationName
+                    : $"{lastRoute.City}, {lastRoute.State}",
 
                 IsArchived = false,
                 CreatedByUserId = userId,
@@ -235,6 +284,21 @@ namespace LogisticsPlatform.Application.Services
             //  Snapshot OrderRoutes - LoadStops
             foreach (var route in routes)
             {
+                var plannedArrivalFrom = route.PlannedArrivalFrom;
+                var plannedArrivalTo = route.PlannedArrivalTo;
+
+                if (route.Id == firstRoute.Id && dto.PlannedPickupDate.HasValue)
+                {
+                    plannedArrivalFrom = dto.PlannedPickupDate.Value;
+                    plannedArrivalTo = dto.PlannedPickupDate.Value;
+                }
+
+                if (route.Id == lastRoute.Id && dto.PlannedDeliveryDate.HasValue)
+                {
+                    plannedArrivalFrom = dto.PlannedDeliveryDate.Value;
+                    plannedArrivalTo = dto.PlannedDeliveryDate.Value;
+                }
+
                 var stop = new LoadStop
                 {
                     // lidhje me Load si navigation – EF do mbush LoadId
@@ -253,8 +317,8 @@ namespace LogisticsPlatform.Application.Services
                     Latitude = route.Latitude,
                     Longitude = route.Longitude,
 
-                    PlannedArrivalFrom = route.PlannedArrivalFrom,
-                    PlannedArrivalTo = route.PlannedArrivalTo,
+                    PlannedArrivalFrom = plannedArrivalFrom,
+                    PlannedArrivalTo = plannedArrivalTo,
                     PlannedDepartureFrom = route.PlannedDepartureFrom,
                     PlannedDepartureTo = route.PlannedDepartureTo,
 
@@ -374,13 +438,12 @@ namespace LogisticsPlatform.Application.Services
 
             // one SaveChanges for all
             await _loads.SaveChangesAsync();
+            await _orderLoadSyncService.SyncByOrderIdAsync(order.Id);
 
             return load.Id;
         }
 
-        // =============================
         // ARCHIVE LOAD (Admin only)
-        // =============================
         public async Task ArchiveAsync(Guid id, Guid userId)
         {
             var load = await _loads.GetByIdAsync(id)
@@ -397,9 +460,7 @@ namespace LogisticsPlatform.Application.Services
             await _loads.SaveChangesAsync();
         }
 
-        // =============================
         // PRIVATE HELPERS
-        // =============================
         private async Task<User> GetUserOrThrow(Guid userId)
         {
             return await _users.GetByIdAsync(userId)
@@ -467,6 +528,7 @@ namespace LogisticsPlatform.Application.Services
 
             await _loads.UpdateAsync(load);
             await _loads.SaveChangesAsync();
+            await _orderLoadSyncService.SyncFromLoadAsync(load);
         }
 
         private TemperatureUnit ParseTemperatureUnit(string? unit)

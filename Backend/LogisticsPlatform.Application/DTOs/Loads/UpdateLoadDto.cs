@@ -17,8 +17,8 @@ public class UpdateLoadDto
     public decimal? Accessorials { get; set; }
 
     public string? Summary { get; set; }
-    public string? Origin { get; internal set; }
-    public string? Destination { get; internal set; }
+    public string? Origin { get; set; }
+    public string? Destination { get; set; }
     public string? BolNumber { get; set; }
     public string? ProNumber { get; set; }
     public string? RateConfirmationNumber { get; set; }

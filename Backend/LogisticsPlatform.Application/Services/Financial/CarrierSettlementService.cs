@@ -23,7 +23,7 @@ public class CarrierSettlementService : ICarrierSettlementService
     }
 
     /// <summary>
-    /// Turvo-style:
+    /// 
     /// - Nëse ekziston settlement për këtë load → ktheje
     /// - Nëse nuk ekziston → auto-create draft settlement nga load data
     /// </summary>
@@ -39,7 +39,7 @@ public class CarrierSettlementService : ICarrierSettlementService
                 var loadForRefresh = await _loads.GetByIdAsync(loadId)
                     ?? throw new NotFoundException("Load not found.");
 
-                RecalculateDraftSettlement(existing, loadForRefresh);
+                await RecalculateDraftSettlementAsync(existing, loadForRefresh);
                 await _repo.SaveChangesAsync();
             }
 
@@ -62,6 +62,12 @@ public class CarrierSettlementService : ICarrierSettlementService
         var created = await CreateInternalAsync(load, dto, load.CreatedByUserId, isAuto: true);
 
         return Map(created);
+    }
+
+    public async Task<List<CarrierSettlementDto>> ListAsync()
+    {
+        var settlements = await _repo.ListAsync();
+        return settlements.Select(Map).ToList();
     }
 
     /// <summary>
@@ -197,6 +203,27 @@ public class CarrierSettlementService : ICarrierSettlementService
         await _repo.SaveChangesAsync();
     }
 
+    public async Task<CarrierSettlementDto> RecordPaymentAsync(Guid settlementId, RecordSettlementPaymentDto dto, Guid userId)
+    {
+        var settlement = await _repo.GetByIdAsync(settlementId)
+            ?? throw new NotFoundException("Settlement not found.");
+
+        var amountPaid = dto.AmountPaid < 0 ? 0 : dto.AmountPaid;
+        settlement.AmountPaid = amountPaid > settlement.TotalAmount ? settlement.TotalAmount : amountPaid;
+        settlement.PaidAt = settlement.AmountPaid >= settlement.TotalAmount
+            ? dto.PaidAt ?? DateTime.UtcNow
+            : dto.PaidAt;
+        settlement.PaymentReference = dto.PaymentReference;
+        settlement.Status = settlement.AmountPaid >= settlement.TotalAmount
+            ? SettlementStatus.Paid
+            : SettlementStatus.Sent;
+        settlement.UpdatedAt = DateTime.UtcNow;
+        settlement.UpdatedByUserId = userId;
+
+        await _repo.SaveChangesAsync();
+        return Map(settlement);
+    }
+
     public async Task UpdatePdfUrlAsync(Guid settlementId, string pdfUrl)
     {
         var settlement = await _repo.GetByIdAsync(settlementId)
@@ -219,6 +246,10 @@ public class CarrierSettlementService : ICarrierSettlementService
             SettlementDate = settlement.SettlementDate,
             Status = settlement.Status,
             TotalAmount = settlement.TotalAmount,
+            AmountPaid = settlement.AmountPaid,
+            BalanceDue = settlement.TotalAmount - settlement.AmountPaid,
+            PaidAt = settlement.PaidAt,
+            PaymentReference = settlement.PaymentReference,
             Notes = settlement.Notes,
             DueDate = settlement.DueDate,
 
@@ -236,15 +267,26 @@ public class CarrierSettlementService : ICarrierSettlementService
                 .ToList()
         };
     }
-    private void RecalculateDraftSettlement(CarrierSettlement settlement, Load load)
+    private async Task RecalculateDraftSettlementAsync(CarrierSettlement settlement, Load load)
     {
         if (settlement.Status != SettlementStatus.Draft)
             return;
 
         var items = BuildLineItemsFromLoad(load);
 
-        settlement.LineItems = items;
+        await _repo.DeleteLineItemsBySettlementIdAsync(settlement.Id);
+        foreach (var item in items)
+        {
+            item.SettlementId = settlement.Id;
+        }
+        if (items.Count > 0)
+        {
+            await _repo.AddLineItemsAsync(items);
+        }
+
         settlement.TotalAmount = items.Sum(x => x.Amount);
+        if (settlement.AmountPaid > settlement.TotalAmount)
+            settlement.AmountPaid = settlement.TotalAmount;
 
         // Rillogarit Due Date sipas Carrier Terms
         settlement.DueDate = settlement.SettlementDate.AddDays(load.Carrier.PaymentTermsDays);

@@ -1,0 +1,116 @@
+<div class="wizard-grid">
+  <div class="form-row">
+    <label for="customerId" title="Customer account that owns this order.">Customer</label>
+    <select id="customerId" [(ngModel)]="order.customerId">
+      <option value="">Select Customer</option>
+      <option *ngFor="let customer of customers" [value]="customer.id">
+        {{ customer.name }}
+      </option>
+    </select>
+  </div>
+
+  <div class="form-row">
+    <label for="orderType" title="Business type of this order, usually Transportation.">Order Type</label>
+    <select id="orderType" [(ngModel)]="order.orderType">
+      <option value="Transportation">Transportation</option>
+      <option value="Storage">Storage</option>
+    </select>
+  </div>
+
+  <div class="form-row">
+    <label for="direction" title="Inbound: into your network. Outbound: out of your network.">Direction</label>
+    <select id="direction" [(ngModel)]="order.direction">
+      <option value="Outbound">Outbound</option>
+      <option value="Inbound">Inbound</option>
+    </select>
+  </div>
+
+  <div class="form-row">
+    <label for="startDate" title="Order window start: commercial/planning validity start.">Order Window Start</label>
+    <input id="startDate" type="datetime-local" [(ngModel)]="startDateInput" title="Commercial/order validity start date and time." />
+  </div>
+
+  <div class="form-row">
+    <label for="endDate" title="Order window end: commercial/planning validity end.">Order Window End</label>
+    <input id="endDate" type="datetime-local" [(ngModel)]="endDateInput" title="Commercial/order validity end date and time." />
+  </div>
+
+  <div class="form-row">
+    <label for="plannedPickupDate" title="Operational planned first pickup date/time for execution planning.">Planned Pickup (Operational)</label>
+    <input
+      id="plannedPickupDate"
+      type="datetime-local"
+      [(ngModel)]="plannedPickupInput"
+      title="Execution milestone: planned pickup date/time."
+    />
+  </div>
+
+  <div class="form-row">
+    <label for="plannedDeliveryDate" title="Operational planned final delivery date/time for execution planning.">Planned Delivery (Operational)</label>
+    <input
+      id="plannedDeliveryDate"
+      type="datetime-local"
+      [(ngModel)]="plannedDeliveryInput"
+      title="Execution milestone: planned delivery date/time."
+    />
+  </div>
+
+  <div class="form-row">
+    <label for="preferredCarrierId" title="Optional preferred carrier to prioritize during planning/tendering.">Preferred Carrier</label>
+    <select id="preferredCarrierId" [(ngModel)]="order.preferredCarrierId">
+      <option [ngValue]="null">No preference</option>
+      <option *ngFor="let carrier of carriers" [ngValue]="carrier.id">
+        {{ carrier.name }}
+      </option>
+    </select>
+  </div>
+
+  <div class="form-row">
+    <label for="primaryPONumber" title="Primary customer Purchase Order reference for billing and traceability.">PO Number</label>
+    <input id="primaryPONumber" [(ngModel)]="order.primaryPONumber" title="Purchase order reference." />
+  </div>
+
+  <div class="form-row">
+    <label for="primaryBolNumber" title="Bill of Lading reference number.">BOL Number</label>
+    <input id="primaryBolNumber" [(ngModel)]="order.primaryBolNumber" title="Bill of Lading number." />
+  </div>
+
+  <div class="form-row">
+    <label for="primaryProNumber" title="Carrier PRO tracking/reference number if available.">Pro Number</label>
+    <input id="primaryProNumber" [(ngModel)]="order.primaryProNumber" title="Carrier PRO reference number." />
+  </div>
+
+  <div class="form-row">
+    <label for="totalWeight" title="Estimated total shipment weight (all items).">Total Weight</label>
+    <input id="totalWeight" type="number" [(ngModel)]="order.totalWeight" title="Total planned weight for this order." />
+  </div>
+
+  <div class="form-row">
+    <label for="totalPallets" title="Estimated total pallet count across all items.">Total Pallets</label>
+    <input id="totalPallets" type="number" [(ngModel)]="order.totalPallets" title="Total planned pallets for this order." />
+  </div>
+
+  <div class="form-row">
+    <label for="totalVolume" title="Estimated total volume for planning/capacity.">Total Volume</label>
+    <input id="totalVolume" type="number" [(ngModel)]="order.totalVolume" title="Total planned shipment volume." />
+  </div>
+
+  <div class="form-row full">
+    <label for="dispatchNotes" title="Operational instructions for dispatch team.">Dispatch Notes</label>
+    <textarea id="dispatchNotes" [(ngModel)]="order.dispatchNotes" title="Internal/operational dispatch instructions."></textarea>
+  </div>
+
+  <div class="form-row full">
+    <label for="deliveryNotes" title="Delivery-specific handling/site instructions.">Delivery Notes</label>
+    <textarea id="deliveryNotes" [(ngModel)]="order.deliveryNotes" title="Final delivery instructions for operations."></textarea>
+  </div>
+
+  <div class="form-actions">
+    <button class="primary" (click)="submit()" [disabled]="loading">
+      Create Order
+    </button>
+    <button class="secondary" (click)="cancel()" [disabled]="loading">
+      Cancel
+    </button>
+  </div>
+</div>

@@ -50,6 +50,10 @@ namespace LogisticsPlatform.Application.Services
             var totalPayable = loadCost?
                 .LineItems.Where(x => x.IsCarrier)
                 .Sum(x => x.Amount) ?? 0;
+            var customerBase = load.CustomerRate ?? 0;
+            var carrierBase = load.CarrierRate ?? 0;
+            var totalBillableWithBase = customerBase + totalBillable;
+            var totalPayableWithBase = carrierBase + totalPayable;
 
             return new LoadDetailsDto
             {
@@ -63,13 +67,48 @@ namespace LogisticsPlatform.Application.Services
                     Status = load.Status,
                     Mode = load.Mode,
 
+                    CustomerId = load.CustomerId,
                     Origin = load.Origin,
                     Destination = load.Destination,
                     CustomerName = load.Customer.Name,
+                    CarrierId = load.CarrierId,
                     CarrierName = load.Carrier?.Name,
 
                     CustomerRate = load.CustomerRate,
                     CarrierRate = load.CarrierRate,
+                    Accessorials = load.Accessorials,
+                    BolNumber = load.BolNumber,
+                    ProNumber = load.ProNumber,
+                    RateConfirmationNumber = load.RateConfirmationNumber,
+                    TrackingNumber = load.TrackingNumber,
+                    DriverName = load.DriverName,
+                    DriverPhone = load.DriverPhone,
+                    DriverEmail = load.DriverEmail,
+                    TruckNumber = load.TruckNumber,
+                    TrailerNumber = load.TrailerNumber,
+                    CarrierSCAC = load.CarrierSCAC,
+                    PodReceivedAt = load.PodReceivedAt,
+                    PodUploadedBy = load.PodUploadedBy,
+                    PlannedPickupDate = load.Stops
+                        .Where(s => s.StopType == StopType.Pickup)
+                        .OrderBy(s => s.Sequence)
+                        .Select(s => s.PlannedArrivalFrom)
+                        .FirstOrDefault(),
+                    PlannedDeliveryDate = load.Stops
+                        .Where(s => s.StopType == StopType.Delivery)
+                        .OrderByDescending(s => s.Sequence)
+                        .Select(s => s.PlannedArrivalTo)
+                        .FirstOrDefault(),
+                    ActualPickupDate = load.Stops
+                        .Where(s => s.StopType == StopType.Pickup)
+                        .OrderBy(s => s.Sequence)
+                        .Select(s => s.ActualDeparture)
+                        .FirstOrDefault(),
+                    ActualDeliveryDate = load.Stops
+                        .Where(s => s.StopType == StopType.Delivery)
+                        .OrderByDescending(s => s.Sequence)
+                        .Select(s => s.ActualDeparture)
+                        .FirstOrDefault(),
 
                     Stops = load.Stops
                         .OrderBy(s => s.Sequence)
@@ -158,10 +197,30 @@ namespace LogisticsPlatform.Application.Services
                 {
                     Id = i.Id,
                     Name = i.Name,
+                    CustomerReference = i.CustomerReference,
                     Quantity = i.Quantity,
                     QuantityUnit = i.QuantityUnit,
+                    HandlingQuantity = i.HandlingQuantity,
+                    HandlingUnit = i.HandlingUnit,
+                    UnitNetWeight = i.UnitNetWeight,
+                    UnitGrossWeight = i.UnitGrossWeight,
+                    WeightUnit = i.WeightUnit,
+                    Length = i.Length,
+                    Width = i.Width,
+                    Height = i.Height,
+                    DimensionUnit = i.DimensionUnit,
                     IsHazmat = i.IsHazmat,
                     FreightClass = i.FreightClass,
+                    HazardClass = i.HazardClass,
+                    IdentificationNumber = i.IdentificationNumber,
+                    Volume = i.Volume,
+                    VolumeUnit = i.VolumeUnit,
+                    MinTemperature = i.MinTemperature,
+                    MaxTemperature = i.MaxTemperature,
+                    TemperatureUnit = i.TemperatureUnit,
+                    DeclaredValue = i.DeclaredValue,
+                    Currency = i.Currency,
+                    Stackable = i.Stackable,
                     Notes = i.Notes
                 }).ToList(),
 
@@ -175,27 +234,11 @@ namespace LogisticsPlatform.Application.Services
                 // ==================
                 CostSummary = new LoadCostSummaryDto
                 {
-                    CustomerRate = load.CustomerRate ?? 0,
-                    CarrierRate = load.CarrierRate ?? 0,
-
-                    TotalBillable =
-        (load.CustomerRate ?? 0) +
-        (load.Cost?.LineItems
-            .Where(x => x.IsCustomer)
-            .Sum(x => x.Amount) ?? 0),
-
-                    TotalPayable =
-        (load.CarrierRate ?? 0) +
-        (load.Cost?.LineItems
-            .Where(x => x.IsCarrier)
-            .Sum(x => x.Amount) ?? 0),
-
-                    Margin =
-        ((load.CustomerRate ?? 0) +
-         (load.Cost?.LineItems.Where(x => x.IsCustomer).Sum(x => x.Amount) ?? 0))
-         -
-        ((load.CarrierRate ?? 0) +
-         (load.Cost?.LineItems.Where(x => x.IsCarrier).Sum(x => x.Amount) ?? 0))
+                    CustomerRate = customerBase,
+                    CarrierRate = carrierBase,
+                    TotalBillable = totalBillableWithBase,
+                    TotalPayable = totalPayableWithBase,
+                    Margin = totalBillableWithBase - totalPayableWithBase
                 }
             };
         }

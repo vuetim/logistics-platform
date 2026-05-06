@@ -37,6 +37,28 @@ namespace LogisticsPlatform.Infrastructure.Repositories.Financial
                 .FirstOrDefaultAsync(i => i.Id == id);
         }
 
+        public Task<List<CustomerInvoice>> ListAsync()
+        {
+            return _context.CustomerInvoices
+                .Include(i => i.LineItems)
+                .Include(i => i.Customer)
+                .Include(i => i.Load)
+                .OrderByDescending(i => i.InvoiceDate)
+                .ToListAsync();
+        }
+
+        public Task DeleteLineItemsByInvoiceIdAsync(Guid invoiceId)
+        {
+            return _context.CustomerInvoiceLineItems
+                .Where(li => li.InvoiceId == invoiceId)
+                .ExecuteDeleteAsync();
+        }
+
+        public Task AddLineItemsAsync(IEnumerable<CustomerInvoiceLineItem> lineItems)
+        {
+            return _context.CustomerInvoiceLineItems.AddRangeAsync(lineItems);
+        }
+
         public async Task AddAsync(CustomerInvoice invoice)
         {
             await _context.CustomerInvoices.AddAsync(invoice);

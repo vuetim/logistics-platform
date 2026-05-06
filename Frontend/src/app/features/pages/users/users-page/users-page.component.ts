@@ -111,6 +111,8 @@ export class UsersPageComponent
     this.usersService.getPaged(query).subscribe(res => {
       this.users = res.items;
       this.totalCount = res.total;
+      this.page = res.page;
+      this.pageSize = res.pageSize;
     });
   }
 

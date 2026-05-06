@@ -104,6 +104,8 @@ export class CustomersPageComponent
     this.customersService.getPaged(query).subscribe(res => {
       this.customers = res.items;
       this.totalCount = res.total;
+      this.page = res.page;
+      this.pageSize = res.pageSize;
     });
   }
 

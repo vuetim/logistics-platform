@@ -1,23 +1,30 @@
 ﻿using LogisticsPlatform.Domain.Enums;
 
-namespace LogisticsPlatform.Application.DTOs.Orders
+public class CreateOrderDto
 {
-    public class CreateOrderDto
-    {
-        public Guid CustomerId { get; set; }
-        public Guid? PreferredCarrierId { get; set; }
+    public Guid CustomerId { get; set; }
+    public OrderType OrderType { get; set; }
+    public OrderDirection Direction { get; set; }
+    public OrderDateDto StartDate { get; set; } = new();
+    public OrderDateDto EndDate { get; set; } = new();
+    public LookupValueDto? StartDateType { get; set; }
+    public LookupValueDto? EndDateType { get; set; }
 
-        public OrderType OrderType { get; set; }
-        public OrderDirection Direction { get; set; }
+    public Guid? PreferredCarrierId { get; set; }
+    public OrderDateDto? PlannedPickup { get; set; }
+    public OrderDateDto? PlannedDelivery { get; set; }
 
-        // Planning window (intent)
-        public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
+    // Optional business fields
+    public string? PrimaryPONumber { get; set; }
+    public string? PrimaryBolNumber { get; set; }
+    public string? PrimaryProNumber { get; set; }
 
-        public DateTime? PlannedPickupDate { get; set; }
-        public DateTime? PlannedDeliveryDate { get; set; }
+    public string? Commodity { get; set; }
+    public decimal? TotalWeight { get; set; }
+    public int? TotalPallets { get; set; }
+    public decimal? TotalVolume { get; set; }
 
-        //public CreateOrderCostDto? Cost { get; set; }
-        //public List<CreateOrderExternalIdDto> ExternalIds { get; set; } = new();
-    }
+    public string? DispatchNotes { get; set; }
+    public string? DeliveryNotes { get; set; }
+    public decimal? CustomerRate { get; set; }
 }

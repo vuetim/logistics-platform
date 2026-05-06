@@ -40,7 +40,7 @@ export class CustomersApi {
         return this.http.post<CustomerDto>(this.baseUrl, dto);
     }
 
-    update(id: string, dto: UpdateCustomerDto) {
+    updateCustomer(id: string, dto: UpdateCustomerDto) {
         return this.http.put<CustomerDto>(`${this.baseUrl}/${id}`, dto);
     }
 

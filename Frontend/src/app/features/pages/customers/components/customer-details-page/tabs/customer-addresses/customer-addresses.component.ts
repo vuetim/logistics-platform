@@ -8,6 +8,7 @@ import { BaseCrudTabComponent } from "../../../../../../../shared/crud/customer-
 import { UiButtonComponent } from "../../../../../../../shared/UI/ui-button/ui-button.component";
 import { CreateAddressModalComponent } from "./create-address-modal/create-address-modal.component";
 import { NgFor, NgIf } from "@angular/common";
+import { BaseEntityCrudTabComponent } from "../../../../../../../shared/crud/base-entity-crud-tab.component";
 
 
 @Component({
@@ -17,7 +18,7 @@ import { NgFor, NgIf } from "@angular/common";
   templateUrl: './customer-addresses.component.html'
 })
 export class CustomerAddressesComponent
-  extends BaseCrudTabComponent<
+  extends BaseEntityCrudTabComponent<
     CustomerAddressDto,
     CreateCustomerAddressDto,
     UpdateCustomerAddressDto

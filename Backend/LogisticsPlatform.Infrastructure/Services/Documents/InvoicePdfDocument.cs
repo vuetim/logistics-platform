@@ -52,7 +52,7 @@ namespace LogisticsPlatform.Infrastructure.Services.Documents
                     col.Item().AlignRight().Text($"#{_invoice.InvoiceNumber}");
                     col.Item().AlignRight().Text($"Date: {_invoice.InvoiceDate:yyyy-MM-dd}");
                     if (_invoice.DueDate != null)
-                        col.Item().AlignRight().Text($"Terms: Net {_invoice.Customer.PaymentTermsDays}");
+                        col.Item().AlignRight().Text($"Terms: Net {(int)_invoice.Customer.Billing.Terms}");
                     if (_invoice.DueDate != null)
                         col.Item().AlignRight().Text($"Due: {_invoice.DueDate:yyyy-MM-dd}");
                     col.Item().AlignRight().Text($"Status: {_invoice.Status}");

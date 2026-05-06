@@ -60,14 +60,19 @@ public class OrderRouteService : IOrderRouteService
             Sequence = r.Sequence,
             StopType = r.StopType,
             LocationName = r.LocationName,
+            AddressLine1 = r.AddressLine1,
+            AddressLine2 = r.AddressLine2,
             City = r.City,
             State = r.State,
+            PostalCode = r.PostalCode,
             Country = r.Country,
             PlannedArrivalFrom = r.PlannedArrivalFrom,
             PlannedArrivalTo = r.PlannedArrivalTo,
             HasTime = r.HasTime,
+            CopyToLoad = r.CopyToLoad,
             StopReference = r.StopReference,
             AppointmentNumber = r.AppointmentNumber,
+            Notes = r.Notes,
             IsActive = r.IsActive
         }).ToList();
     }

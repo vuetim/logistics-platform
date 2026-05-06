@@ -68,7 +68,10 @@ public class LoadCostService : ILoadCostService
         var load = await _loads.GetByIdAsync(loadId)
             ?? throw new NotFoundException("Load not found.");
 
-        var cost = await _costs.GetByLoadIdAsync(loadId);
+        if (load.Status == LoadStatus.Completed)
+            throw new BusinessRuleException("Completed load costs cannot be changed.");
+
+        var cost = await _costs.GetByLoadIdForUpdateAsync(loadId);
 
         if (cost == null)
         {
@@ -82,19 +85,25 @@ public class LoadCostService : ILoadCostService
             await _costs.AddAsync(cost);
         }
 
-        // replace all
         cost.Notes = dto.Notes;
-        cost.LineItems.Clear();
 
+        await _costs.DeleteLineItemsByLoadCostIdAsync(cost.Id);
+        var newLineItems = new List<LoadCostLineItem>();
         foreach (var liDto in dto.LineItems)
         {
-            var amount = liDto.Qty * liDto.Price;
+            var qty = liDto.Qty < 0 ? 0 : liDto.Qty;
+            var price = liDto.Price < 0 ? 0 : liDto.Price;
+            var amount = qty * price;
+            var type = Enum.IsDefined(typeof(ChargeType), liDto.Type)
+                ? liDto.Type
+                : ChargeType.Other;
 
-            cost.LineItems.Add(new LoadCostLineItem
+            newLineItems.Add(new LoadCostLineItem
             {
-                Type = liDto.Type,
-                Qty = liDto.Qty,
-                Price = liDto.Price,
+                LoadCostId = cost.Id,
+                Type = type,
+                Qty = qty,
+                Price = price,
                 Amount = amount,
                 IsCustomer = liDto.IsCustomer,
                 IsCarrier = liDto.IsCarrier,
@@ -102,25 +111,21 @@ public class LoadCostService : ILoadCostService
             });
         }
 
+        if (newLineItems.Count > 0)
+        {
+            await _costs.AddLineItemsAsync(newLineItems);
+        }
+
         // totals
-        var totalCarrier = cost.LineItems
+        var totalCarrier = newLineItems
             .Where(x => x.IsCarrier)
             .Sum(x => x.Amount);
 
-        var totalCustomer = cost.LineItems
+        var totalCustomer = newLineItems
             .Where(x => x.IsCustomer)
             .Sum(x => x.Amount);
 
-        // sync to load
         cost.TotalAmount = totalCarrier;
-
-        load.CarrierRate = totalCarrier;
-
-        // optional passthrough logic
-        if (!load.Orders.Any())
-        {
-            load.CustomerRate = totalCustomer;
-        }
 
         // recalc margin
         load.RecalculateFinancials();

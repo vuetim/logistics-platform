@@ -1,0 +1,114 @@
+<div class="modal-backdrop">
+  <div class="modal-card">
+    <h2>Edit order</h2>
+    <p class="hint">
+      Origin and destination are derived from the first pickup and last delivery stops in Routes.
+    </p>
+
+    <div class="form-grid">
+      <div>
+        <label>Order type</label>
+        <select [(ngModel)]="model.orderType">
+          <option value="Transportation">Transportation</option>
+          <option value="Warehouse">Warehouse</option>
+          <option value="Storage">Storage</option>
+          <option value="CustomerOrder">Customer Order</option>
+        </select>
+      </div>
+
+      <div>
+        <label>Direction</label>
+        <select [(ngModel)]="model.direction">
+          <option value="Inbound">Inbound</option>
+          <option value="Outbound">Outbound</option>
+          <option value="Transfer">Transfer</option>
+        </select>
+      </div>
+
+      <div>
+        <label>Preferred carrier</label>
+        <select [(ngModel)]="model.preferredCarrierId">
+          <option [ngValue]="null">No preference</option>
+          <option *ngFor="let carrier of carriers" [ngValue]="carrier.id">
+            {{ carrier.name }}
+          </option>
+        </select>
+      </div>
+
+      <div>
+        <label>Start date</label>
+        <input type="datetime-local" [(ngModel)]="startDateInput" />
+      </div>
+
+      <div>
+        <label>End date</label>
+        <input type="datetime-local" [(ngModel)]="endDateInput" />
+      </div>
+
+      <div>
+        <label>Planned pickup</label>
+        <input type="datetime-local" [(ngModel)]="plannedPickupInput" />
+      </div>
+
+      <div>
+        <label>Planned delivery</label>
+        <input type="datetime-local" [(ngModel)]="plannedDeliveryInput" />
+      </div>
+
+      <div>
+        <label>Customer rate</label>
+        <input type="number" min="0" step="0.01" [(ngModel)]="model.customerRate" />
+      </div>
+
+      <div>
+        <label>Commodity</label>
+        <input [(ngModel)]="model.commodity" />
+      </div>
+
+      <div>
+        <label>PO number</label>
+        <input [(ngModel)]="model.primaryPONumber" />
+      </div>
+
+      <div>
+        <label>BOL number</label>
+        <input [(ngModel)]="model.primaryBolNumber" />
+      </div>
+
+      <div>
+        <label>PRO number</label>
+        <input [(ngModel)]="model.primaryProNumber" />
+      </div>
+
+      <div>
+        <label>Total weight</label>
+        <input type="number" min="0" step="0.01" [(ngModel)]="model.totalWeight" />
+      </div>
+
+      <div>
+        <label>Total pallets</label>
+        <input type="number" min="0" [(ngModel)]="model.totalPallets" />
+      </div>
+
+      <div>
+        <label>Total volume</label>
+        <input type="number" min="0" step="0.01" [(ngModel)]="model.totalVolume" />
+      </div>
+
+      <div class="full">
+        <label>Dispatch notes</label>
+        <textarea rows="3" [(ngModel)]="model.dispatchNotes"></textarea>
+      </div>
+
+      <div class="full">
+        <label>Delivery notes</label>
+        <textarea rows="3" [(ngModel)]="model.deliveryNotes"></textarea>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button (click)="cancel()">Cancel</button>
+      <button [disabled]="loading" (click)="save()">Save changes</button>
+    </div>
+  </div>
+</div>

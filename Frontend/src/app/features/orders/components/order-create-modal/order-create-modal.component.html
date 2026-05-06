@@ -1,0 +1,12 @@
+<div class="modal-backdrop" (click)="close.emit(false)"></div>
+
+<div class="modal">
+  <div class="modal-header">
+    <h2>Create Order</h2>
+    <button class="close" (click)="close.emit(false)" title="Close">×</button>
+  </div>
+
+  <div class="modal-body">
+    <app-order-create-wizard (close)="close.emit($event)"></app-order-create-wizard>
+  </div>
+</div>

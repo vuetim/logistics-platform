@@ -132,7 +132,34 @@ namespace LogisticsPlatform.Infrastructure.Repositories
 
                     CustomerRate = l.CustomerRate,
                     CarrierRate = l.CarrierRate,
-                    Margin = l.CustomerRate - l.CarrierRate
+                    TotalBillable =
+                        (l.CustomerRate ?? 0) +
+                        (l.Cost != null
+                            ? l.Cost.LineItems
+                                .Where(li => li.IsCustomer)
+                                .Sum(li => li.Amount)
+                            : 0),
+                    TotalPayable =
+                        (l.CarrierRate ?? 0) +
+                        (l.Cost != null
+                            ? l.Cost.LineItems
+                                .Where(li => li.IsCarrier)
+                                .Sum(li => li.Amount)
+                            : 0),
+                    Margin =
+                        ((l.CustomerRate ?? 0) +
+                         (l.Cost != null
+                            ? l.Cost.LineItems
+                                .Where(li => li.IsCustomer)
+                                .Sum(li => li.Amount)
+                            : 0))
+                        -
+                        ((l.CarrierRate ?? 0) +
+                         (l.Cost != null
+                            ? l.Cost.LineItems
+                                .Where(li => li.IsCarrier)
+                                .Sum(li => li.Amount)
+                            : 0))
                 })
                 .ToListAsync();
 

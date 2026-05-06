@@ -1,0 +1,36 @@
+<div class="tab-section">
+  <div class="tab-header">
+    <div>
+      <h3>Billing</h3>
+      <p>Customer invoice and carrier settlement generated from this load.</p>
+    </div>
+  </div>
+
+  <div class="billing-grid">
+    <div class="billing-card">
+      <h4>Customer Invoice</h4>
+      <div class="empty" *ngIf="invoiceError && !invoice">{{ invoiceError }}</div>
+      <ng-container *ngIf="invoice">
+        <div class="kv-row"><span>Invoice #</span><strong>{{ invoice.invoiceNumber }}</strong></div>
+        <div class="kv-row"><span>Status</span><strong>{{ invoice.status }}</strong></div>
+        <div class="kv-row"><span>Date</span><strong>{{ invoice.invoiceDate | date: "shortDate" }}</strong></div>
+        <div class="kv-row"><span>Due</span><strong>{{ invoice.dueDate ? (invoice.dueDate | date: "shortDate") : "-" }}</strong></div>
+        <div class="kv-row"><span>Total</span><strong>{{ money(invoice.totalAmount) }}</strong></div>
+        <button type="button" class="tab-action" (click)="downloadInvoicePdf()">Download PDF</button>
+      </ng-container>
+    </div>
+
+    <div class="billing-card">
+      <h4>Carrier Settlement</h4>
+      <div class="empty" *ngIf="settlementError && !settlement">{{ settlementError }}</div>
+      <ng-container *ngIf="settlement">
+        <div class="kv-row"><span>Settlement #</span><strong>{{ settlement.settlementNumber }}</strong></div>
+        <div class="kv-row"><span>Status</span><strong>{{ settlement.status }}</strong></div>
+        <div class="kv-row"><span>Date</span><strong>{{ settlement.settlementDate | date: "shortDate" }}</strong></div>
+        <div class="kv-row"><span>Due</span><strong>{{ settlement.dueDate ? (settlement.dueDate | date: "shortDate") : "-" }}</strong></div>
+        <div class="kv-row"><span>Total</span><strong>{{ money(settlement.totalAmount) }}</strong></div>
+        <button type="button" class="tab-action" (click)="downloadSettlementPdf()">Download PDF</button>
+      </ng-container>
+    </div>
+  </div>
+</div>

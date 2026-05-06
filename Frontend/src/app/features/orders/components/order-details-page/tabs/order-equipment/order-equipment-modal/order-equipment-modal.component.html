@@ -1,0 +1,82 @@
+<div class="modal-backdrop">
+  <div class="modal-card">
+    <h2>{{ editing ? "Edit equipment requirement" : "Add equipment requirement" }}</h2>
+
+    <div class="form-grid">
+      <div>
+        <label title="Trailer/equipment category required for this order.">Equipment type</label>
+        <input [(ngModel)]="model.equipmentType" title="Example: Reefer, Dry Van, Flatbed." />
+      </div>
+
+      <div>
+        <label title="Equipment size/capacity descriptor.">Equipment size</label>
+        <input [(ngModel)]="model.equipmentSize" title="Example: 53 ft, 48 ft." />
+      </div>
+
+      <div>
+        <label title="Number of equipment units requested.">Quantity</label>
+        <input type="number" min="1" [(ngModel)]="model.quantity" title="Required equipment count." />
+      </div>
+
+      <div>
+        <label title="Maximum supported weight for requested equipment.">Max weight</label>
+        <input type="number" min="0" [(ngModel)]="model.maxWeight" title="Maximum weight threshold." />
+      </div>
+
+      <div>
+        <label title="Unit used for max weight values.">Weight unit</label>
+        <select [(ngModel)]="model.weightUnit" title="Weight unit (lb/kg).">
+          <option *ngFor="let option of weightUnitOptions" [ngValue]="option.value">
+            {{ option.label }}
+          </option>
+        </select>
+      </div>
+
+      <div>
+        <label title="Temperature unit for min/max temperature requirements.">Temperature unit</label>
+        <select [(ngModel)]="model.temperatureUnit" title="Temperature unit (F/C).">
+          <option *ngFor="let option of temperatureUnitOptions" [ngValue]="option.value">
+            {{ option.label }}
+          </option>
+        </select>
+      </div>
+
+      <div>
+        <label title="Lowest allowed temperature for this equipment requirement.">Min temperature</label>
+        <input type="number" [(ngModel)]="model.minTemperature" title="Minimum allowed temperature." />
+      </div>
+
+      <div>
+        <label title="Highest allowed temperature for this equipment requirement.">Max temperature</label>
+        <input type="number" [(ngModel)]="model.maxTemperature" title="Maximum allowed temperature." />
+      </div>
+
+      <div class="checkbox">
+        <input type="checkbox" [(ngModel)]="model.isMandatory" />
+        <label title="Mandatory requirements must be met to execute this order.">Mandatory</label>
+      </div>
+
+      <div class="checkbox">
+        <input type="checkbox" [(ngModel)]="model.copyToLoad" />
+        <label title="If checked, this equipment requirement is copied to created load.">Copy to load</label>
+      </div>
+
+      <div class="checkbox">
+        <input type="checkbox" [(ngModel)]="model.isPrefered" />
+        <label title="Preferred requirement is optional but recommended.">Preferred</label>
+      </div>
+
+      <div class="full">
+        <label title="Additional equipment/handling instructions.">Notes</label>
+        <textarea rows="3" [(ngModel)]="model.notes" title="Equipment-specific operational notes."></textarea>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button (click)="cancel()">Cancel</button>
+      <button [disabled]="loading" (click)="save()">
+        {{ editing ? "Save changes" : "Create requirement" }}
+      </button>
+    </div>
+  </div>
+</div>

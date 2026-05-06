@@ -70,6 +70,27 @@ namespace LogisticsPlatform.Api.Controllers
             );
         }
 
+        [HttpPut("{id:guid}")]
+        public async Task<IActionResult> Update(Guid id, [FromBody] UpdateOrderDto dto)
+        {
+            await _service.UpdateAsync(id, dto);
+            return NoContent();
+        }
+
+        [HttpPost("{id:guid}/submit")]
+        public async Task<IActionResult> Submit(Guid id)
+        {
+            await _service.ChangeStatusAsync(id, LogisticsPlatform.Domain.Enums.OrderStatus.Submitted);
+            return NoContent();
+        }
+
+        [HttpPost("{id:guid}/cancel")]
+        public async Task<IActionResult> Cancel(Guid id)
+        {
+            await _service.ChangeStatusAsync(id, LogisticsPlatform.Domain.Enums.OrderStatus.Cancelled);
+            return NoContent();
+        }
+
 
         //[HttpPost("{orderId}/loads")]
         //public async Task<IActionResult> CreateLoadFromOrder(

@@ -1,0 +1,65 @@
+<div class="modal-backdrop">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h2>Edit customer</h2>
+      <button class="close-x" (click)="cancel()">✕</button>
+    </div>
+
+    <div class="form-grid">
+      <div>
+        <label>Name</label>
+        <input [(ngModel)]="model.name" />
+      </div>
+
+      <div>
+        <label>Email</label>
+        <input [(ngModel)]="model.email" />
+      </div>
+
+      <div>
+        <label>Phone</label>
+        <input [(ngModel)]="model.phone" />
+      </div>
+
+      <div>
+        <label>Payment terms</label>
+        <select [(ngModel)]="model.billing.terms">
+          <option *ngFor="let t of paymentTerms" [ngValue]="t.value">
+            {{ t.label }}
+          </option>
+        </select>
+      </div>
+
+      <div>
+        <label>Payment method</label>
+        <select [(ngModel)]="model.billing.method">
+          <option *ngFor="let m of paymentMethods" [ngValue]="m.value">
+            {{ m.label }}
+          </option>
+        </select>
+      </div>
+
+      <div>
+        <label>Credit limit</label>
+        <input type="number" [(ngModel)]="model.billing.creditLimit" />
+      </div>
+
+      <div class="checkbox">
+        <input type="checkbox" [(ngModel)]="model.billing.autoInvoice" />
+        <label>Auto invoice</label>
+      </div>
+
+      <div class="checkbox">
+        <input type="checkbox" [(ngModel)]="model.IsActive" />
+        <label>Active</label>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button (click)="cancel()">Cancel</button>
+      <button class="primary" [disabled]="loading" (click)="save()">
+        Save
+      </button>
+    </div>
+  </div>
+</div>

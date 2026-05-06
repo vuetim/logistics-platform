@@ -6,7 +6,7 @@ public class Customer : BaseEntity
     public string Name { get; private set; }
     public string? Email { get; private set; }
     public string? Phone { get; private set; }
-    public int PaymentTermsDays { get; private set; }
+    public CustomerBillingInfo Billing { get; private set; }
     public bool IsActive { get; private set; }
 
     public ICollection<CustomerAddress> Addresses { get; private set; } = [];
@@ -17,32 +17,38 @@ public class Customer : BaseEntity
     private Customer() { } // EF Core
 
     public Customer(
-        string name,
-        string? email,
-        string? phone,
-        int paymentTermsDays,
-        bool isActive = true)
+     string name,
+     string? email,
+     string? phone,
+     bool isActive,
+     CustomerBillingInfo billing)
     {
         Name = name;
         Email = email;
         Phone = phone;
-        PaymentTermsDays = paymentTermsDays;
         IsActive = isActive;
+        Billing = billing;
     }
+
+    public void Activate()
+    {
+        IsActive = true;
+    }
+
     public void Deactivate()
     {
         IsActive = false;
     }
-    public void UpdateBasicInfo(
-        string? name,
-        string? email,
-        string? phone,
-        int? paymentTermsDays)
+    public void UpdateBasicInfo(string name, string? email, string? phone)
     {
-        if (name != null) Name = name;
-        if (email != null) Email = email;
-        if (phone != null) Phone = phone;
-        if (paymentTermsDays.HasValue) PaymentTermsDays = paymentTermsDays.Value;
+        Name = name;
+        Email = email;
+        Phone = phone;
+    }
+
+    public void UpdateBilling(CustomerBillingInfo billing)
+    {
+        Billing = billing;
     }
 
     public void AddAddress(CustomerAddress address)

@@ -49,6 +49,8 @@ public class LoadStopRepository : ILoadStopRepository
         return await _context.LoadStops
             .Include(s => s.Load)
                 .ThenInclude(l => l.Stops)
+            .Include(s => s.Load)
+                .ThenInclude(l => l.Orders)
             .FirstOrDefaultAsync(s => s.Id == id);
     }
 

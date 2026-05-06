@@ -1,0 +1,35 @@
+<div class="tab-section">
+  <div class="tab-header">
+    <div>
+      <h3>Equipment</h3>
+      <p>Execution equipment requirements for this load.</p>
+    </div>
+  </div>
+
+  <div class="empty" *ngIf="!equipment.length">No equipment found.</div>
+
+  <div class="table-wrap" *ngIf="equipment.length">
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Qty</th>
+          <th>Length</th>
+          <th>Weight</th>
+          <th>Temperature</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let e of equipment">
+          <td>{{ equipmentLabel(e.equipmentType) }}</td>
+          <td>{{ e.quantity ?? "-" }}</td>
+          <td>{{ e.length ?? "-" }}</td>
+          <td>{{ e.weight != null ? e.weight + " " + weightUnitLabel(e.weightUnit) : "-" }}</td>
+          <td>
+            {{ e.minTemp != null || e.maxTemp != null ? (e.minTemp ?? "-") + " / " + (e.maxTemp ?? "-") + " " + tempUnitLabel(e.tempUnit) : "-" }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

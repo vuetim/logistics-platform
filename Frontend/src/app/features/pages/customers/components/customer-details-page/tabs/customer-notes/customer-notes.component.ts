@@ -8,6 +8,7 @@ import { CustomerNotesService } from '../../../../../../../data-access/customers
 import { UiButtonComponent } from '../../../../../../../shared/UI/ui-button/ui-button.component';
 import { NgFor, NgIf } from '@angular/common';
 import { CreateCustomerNoteComponent } from './create-customer-note/create-customer-note.component';
+import { BaseEntityCrudTabComponent } from '../../../../../../../shared/crud/base-entity-crud-tab.component';
 
 @Component({
   selector: 'app-customer-notes',
@@ -16,7 +17,7 @@ import { CreateCustomerNoteComponent } from './create-customer-note/create-custo
   templateUrl: './customer-notes.component.html',
   styleUrl: './customer-notes.component.css'
 })
-export class CustomerNotesComponent extends BaseCrudTabComponent<
+export class CustomerNotesComponent extends BaseEntityCrudTabComponent<
   CustomerNoteDto,
   CreateCustomerNoteDto,
   UpdateCustomerNoteDto

@@ -1,0 +1,161 @@
+<div class="tab-card">
+  <div class="tab-header">
+    <div class="tab-title-group">
+      <h3>Costs</h3>
+      <div class="tab-subtitle">
+        Cost type = charge category (Linehaul, FSC, Detention). Freight class
+        is on Items and is not a price.
+      </div>
+    </div>
+    <div class="toolbar-actions">
+      <app-ui-button *ngIf="canUpdate" variant="ghost" (click)="addLine()"
+        >Add line</app-ui-button
+      >
+      <app-ui-button *ngIf="canUpdate" variant="primary" (click)="save()"
+        >Save costs</app-ui-button
+      >
+    </div>
+  </div>
+
+  <div class="form-grid">
+    <div class="form-row">
+      <label>Bill to</label>
+      <select
+        [disabled]="!canUpdate || !billToOptions.length"
+        [(ngModel)]="cost.billTo"
+      >
+        <option *ngFor="let option of billToOptions" [ngValue]="option">
+          {{ option }}
+        </option>
+      </select>
+    </div>
+
+    <div class="form-row">
+      <label>Tax rate (%)</label>
+      <input
+        type="number"
+        min="0"
+        max="100"
+        step="0.0001"
+        [disabled]="!canUpdate"
+        [(ngModel)]="cost.taxRate"
+        (ngModelChange)="recalculate()"
+      />
+    </div>
+
+    <div class="form-row">
+      <label>Cost notes</label>
+      <textarea
+        [disabled]="!canUpdate"
+        [(ngModel)]="cost.notes"
+        placeholder="Internal financial notes"
+      ></textarea>
+    </div>
+  </div>
+
+  <div class="muted" *ngIf="!cost.lineItems.length">No cost lines yet.</div>
+
+  <div class="table-area" *ngIf="cost.lineItems.length">
+    <table class="simple-table costs-table">
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Qty</th>
+          <th>Price</th>
+          <th>Amount</th>
+          <th>Billable</th>
+          <th>Notes</th>
+          <th *ngIf="canUpdate">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let li of cost.lineItems; let i = index">
+          <td>
+            <select [disabled]="!canUpdate" [(ngModel)]="li.type">
+              <option
+                *ngFor="let option of chargeTypeOptions"
+                [ngValue]="option.value"
+              >
+                {{ option.label }}
+              </option>
+            </select>
+          </td>
+          <td>
+            <input
+              type="number"
+              [disabled]="!canUpdate"
+              [(ngModel)]="li.qty"
+              (ngModelChange)="recalculate()"
+            />
+          </td>
+          <td>
+            <input
+              type="number"
+              [disabled]="!canUpdate"
+              [(ngModel)]="li.price"
+              (ngModelChange)="recalculate()"
+            />
+          </td>
+          <td>{{ li.amount | number : "1.2-2" }}</td>
+          <td>
+            <input
+              type="checkbox"
+              [disabled]="!canUpdate"
+              [(ngModel)]="li.isCustomer"
+              (ngModelChange)="recalculate()"
+            />
+          </td>
+          <td><input [disabled]="!canUpdate" [(ngModel)]="li.notes" /></td>
+          <td *ngIf="canUpdate" class="actions-cell">
+            <app-ui-button variant="danger" (click)="removeLine(i)"
+              >Delete</app-ui-button
+            >
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-label">Base Freight (Linehaul)</div>
+      <div class="stat-value">{{ cost.baseFreight | number : "1.2-2" }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Accessorials</div>
+      <div class="stat-value">{{ cost.accessorials | number : "1.2-2" }}</div>
+    </div>
+    <div class="stat-card stat-card-emphasis">
+      <div class="stat-label">Quoted Total</div>
+      <div class="stat-value">{{ cost.quotedTotal | number : "1.2-2" }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">SubTotal</div>
+      <div class="stat-value">{{ cost.subTotal | number : "1.2-2" }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Tax</div>
+      <div class="stat-value">{{ cost.totalTax | number : "1.2-2" }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Total Amount</div>
+      <div class="stat-value">
+        {{ (cost.subTotal + cost.totalTax) | number : "1.2-2" }}
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Billable</div>
+      <div class="stat-value">{{ cost.totalBillable | number : "1.2-2" }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Non-billable</div>
+      <div class="stat-value">
+        {{ cost.totalNonBillable | number : "1.2-2" }}
+      </div>
+    </div>
+    <div class="stat-card stat-card-emphasis">
+      <div class="stat-label">All Lines Total</div>
+      <div class="stat-value">{{ cost.totalAmount | number : "1.2-2" }}</div>
+    </div>
+  </div>
+</div>

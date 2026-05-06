@@ -1,0 +1,98 @@
+<div class="modal-backdrop">
+  <div class="modal-card">
+    <h2>{{ editing ? 'Edit route stop' : 'Add route stop' }}</h2>
+
+    <div class="form-grid">
+      <div>
+        <label title="Global route sequence across all stops; lower number executes first.">Sequence</label>
+        <input type="number" min="1" [(ngModel)]="model.sequence" title="Global execution order of this stop." />
+      </div>
+
+      <div>
+        <label title="Pickup/Delivery/Transload/Storage stop classification.">Stop type</label>
+        <select [(ngModel)]="model.stopType" title="Type of route stop.">
+          <option *ngFor="let option of stopTypeOptions" [ngValue]="option.value">
+            {{ option.label }}
+          </option>
+        </select>
+      </div>
+
+      <div>
+        <label title="Location/facility name for this stop.">Location</label>
+        <input [(ngModel)]="model.locationName" title="Stop location name (warehouse/site)." />
+      </div>
+
+      <div>
+        <label title="Primary street address for this stop.">Address line 1</label>
+        <input [(ngModel)]="model.addressLine1" title="Street address line 1." />
+      </div>
+
+      <div>
+        <label title="Secondary address details (suite, dock, etc.).">Address line 2</label>
+        <input [(ngModel)]="model.addressLine2" title="Address line 2 (optional)." />
+      </div>
+
+      <div>
+        <label title="City for this stop.">City</label>
+        <input [(ngModel)]="model.city" title="City name." />
+      </div>
+
+      <div>
+        <label title="State/region for this stop.">State</label>
+        <input [(ngModel)]="model.state" title="State or region." />
+      </div>
+
+      <div>
+        <label title="Postal/ZIP code for this stop.">Postal code</label>
+        <input [(ngModel)]="model.postalCode" title="Postal code." />
+      </div>
+
+      <div>
+        <label title="Country for this stop.">Country</label>
+        <input [(ngModel)]="model.country" title="Country." />
+      </div>
+
+      <div>
+        <label title="Beginning of allowed/planned arrival window.">Planned arrival from</label>
+        <input type="datetime-local" [(ngModel)]="model.plannedArrivalFrom" title="Arrival window start." />
+      </div>
+
+      <div>
+        <label title="End of allowed/planned arrival window.">Planned arrival to</label>
+        <input type="datetime-local" [(ngModel)]="model.plannedArrivalTo" title="Arrival window end." />
+      </div>
+
+      <div>
+        <label title="External/warehouse stop reference identifier.">Stop reference</label>
+        <input [(ngModel)]="model.stopReference" title="Stop-level external reference." />
+      </div>
+
+      <div>
+        <label title="Facility appointment identifier.">Appointment number</label>
+        <input [(ngModel)]="model.appointmentNumber" title="Dock appointment reference." />
+      </div>
+
+      <div class="checkbox">
+        <input type="checkbox" [(ngModel)]="model.hasTime" />
+        <label title="Whether stop scheduling uses a strict time window.">Has time window</label>
+      </div>
+
+      <div class="checkbox">
+        <input type="checkbox" [(ngModel)]="model.copyToLoad" />
+        <label title="If checked, this stop is copied when creating a load from the order.">Copy to load</label>
+      </div>
+
+      <div class="full">
+        <label title="Operational notes for this stop.">Notes</label>
+        <textarea rows="3" [(ngModel)]="model.notes" title="Stop-specific instructions/notes."></textarea>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button (click)="cancel()">Cancel</button>
+      <button [disabled]="loading" (click)="save()">
+        {{ editing ? 'Save changes' : 'Create stop' }}
+      </button>
+    </div>
+  </div>
+</div>

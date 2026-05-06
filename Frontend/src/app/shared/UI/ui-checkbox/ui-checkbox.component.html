@@ -1,0 +1,11 @@
+<label class="cl-checkbox">
+  <input
+    type="checkbox"
+    [checked]="value"
+    [disabled]="disabled"
+    (change)="toggle($event)"
+  />
+  <span>
+    <ng-content></ng-content>
+  </span>
+</label>

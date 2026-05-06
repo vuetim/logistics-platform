@@ -17,6 +17,13 @@ public class CustomerInvoiceStatusController : ControllerBase
         _service = service;
     }
 
+    [HttpGet]
+    public async Task<IActionResult> List()
+    {
+        var invoices = await _service.ListAsync();
+        return Ok(invoices);
+    }
+
     [HttpPatch("{invoiceId:guid}/status")]
     public async Task<IActionResult> UpdateStatus(Guid invoiceId, UpdateInvoiceStatusDto dto)
     {
@@ -25,5 +32,13 @@ public class CustomerInvoiceStatusController : ControllerBase
         await _service.UpdateStatusAsync(invoiceId, dto.Status, userId);
 
         return NoContent();
+    }
+
+    [HttpPatch("{invoiceId:guid}/payment")]
+    public async Task<IActionResult> RecordPayment(Guid invoiceId, [FromBody] RecordInvoicePaymentDto dto)
+    {
+        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var invoice = await _service.RecordPaymentAsync(invoiceId, dto, userId);
+        return Ok(invoice);
     }
 }

@@ -10,7 +10,10 @@
         public string? Category { get; set; }
 
         public decimal Quantity { get; set; }
+        public decimal ActualQuantity { get; set; }
         public string QuantityUnit { get; set; } = string.Empty;
+        public string Status { get; set; } = "Active";
+        public int LineItemNumber { get; set; }
 
         public decimal? HandlingQuantity { get; set; }
         public string? HandlingUnit { get; set; }
@@ -35,6 +38,10 @@
         public string? HazardClass { get; set; }
 
         public string? FreightClass { get; set; }
+        public decimal? DeclaredValue { get; set; }
+        public string? Currency { get; set; }
+        public bool Stackable { get; set; }
+        public bool CopyToLoad { get; set; }
         public string? Notes { get; set; }
     }
 }

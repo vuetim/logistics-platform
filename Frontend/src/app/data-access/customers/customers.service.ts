@@ -4,6 +4,7 @@ import { CustomersApi } from "./customers.api";
 import { CreateCustomerDto } from "../../core/models/customers/create-customer.dto";
 import { CreateCustomerFullDto } from "../../core/models/customers/create-customer-full.dto";
 import { CreateCustomerWizardState } from "../../features/pages/customers/components/customers-page/create-customer-wizard/create-customer-wizard.state";
+import { UpdateCustomerDto } from "../../core/models/customers/update-customer.dto";
 
 @Injectable({ providedIn: 'root' })
 export class CustomersService {
@@ -31,9 +32,9 @@ export class CustomersService {
         return this.api.createFull(dto);
     }
 
-    //   updateCustomer(id: string, dto: UpdateCustomerDto) {
-    //     return this.api.update(id, dto);
-    //   }
+    updateCustomer(id: string, dto: UpdateCustomerDto) {
+        return this.api.updateCustomer(id, dto);
+    }
 
     deleteCustomer(id: string) {
         return this.api.delete(id);

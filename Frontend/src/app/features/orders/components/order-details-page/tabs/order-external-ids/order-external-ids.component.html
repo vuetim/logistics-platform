@@ -1,0 +1,54 @@
+<div class="tab-card">
+  <div class="tab-header">
+    <div class="tab-title-group">
+      <h3>References</h3>
+      <div class="tab-subtitle">
+        External identifiers used by customer, buyer, warehouse, and downstream systems (PO, truck ID, customer ref, etc.).
+      </div>
+    </div>
+    <div class="toolbar-actions">
+      <app-ui-button *ngIf="canCreate" variant="primary" (click)="openAddModal()">Add reference</app-ui-button>
+    </div>
+  </div>
+
+  <div class="table-area" *ngIf="items.length; else empty">
+    <table class="simple-table">
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Value</th>
+          <th>Related party</th>
+          <th>Copy to load</th>
+          <th *ngIf="canUpdate || canDelete">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let x of items">
+          <td>{{ typeLabel(x.type) }}</td>
+          <td>{{ x.value }}</td>
+          <td>{{ relatedPartyLabel(x.relatedParty) }}</td>
+          <td>
+            <span class="badge" [class.badge-yes]="x.copyToLoad" [class.badge-no]="!x.copyToLoad">
+              {{ x.copyToLoad ? 'Yes' : 'No' }}
+            </span>
+          </td>
+          <td *ngIf="canUpdate || canDelete" class="actions-cell">
+            <app-ui-button *ngIf="canUpdate" variant="ghost" (click)="openEditModal(x)">Edit</app-ui-button>
+            <app-ui-button *ngIf="canDelete" variant="danger" (click)="deleteItem(x.id)">Delete</app-ui-button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <ng-template #empty>
+    <div class="muted">No external references.</div>
+  </ng-template>
+
+  <app-order-external-id-modal
+    *ngIf="showModal"
+    [orderId]="parentId"
+    [editing]="editing"
+    (close)="onModalClose($event)"
+  ></app-order-external-id-modal>
+</div>

@@ -4,6 +4,7 @@ using LogisticsPlatform.Application.Interfaces.Repositories.Loads;
 using LogisticsPlatform.Application.Interfaces.Services.ActivityLog;
 using LogisticsPlatform.Application.Interfaces.Services.Carriers;
 using LogisticsPlatform.Application.Interfaces.Services.Loads;
+using LogisticsPlatform.Application.Interfaces.Services.Orders;
 using LogisticsPlatform.Domain.Entities;
 using LogisticsPlatform.Domain.Enums;
 using SendGrid.Helpers.Errors.Model;
@@ -20,13 +21,18 @@ namespace LogisticsPlatform.Application.Services
         private readonly IEtaPredictionService _etaPredictionService;
         private readonly ILoadAlertService _alertService;
         private readonly IDelayFaultAttributionService _delayFaultAttributionService;
+        private readonly IOrderLoadSyncService _orderLoadSyncService;
 
         public LoadStopExecutionService(
             ILoadStopRepository stops,
             ILoadRepository loads,
             ILoadStatusCalculatorService calculator,
             IActivityLogService activityLog,
-            ICarrierPerformanceService carrierPerformanceService,IEtaPredictionService etaPredictionService, ILoadAlertService alertService, IDelayFaultAttributionService delayFaultAttributionService)
+            ICarrierPerformanceService carrierPerformanceService,
+            IEtaPredictionService etaPredictionService,
+            ILoadAlertService alertService,
+            IDelayFaultAttributionService delayFaultAttributionService,
+            IOrderLoadSyncService orderLoadSyncService)
         {
             _stops = stops;
             _loads = loads;
@@ -36,11 +42,10 @@ namespace LogisticsPlatform.Application.Services
             _etaPredictionService = etaPredictionService;
             _alertService = alertService;
             _delayFaultAttributionService = delayFaultAttributionService;
+            _orderLoadSyncService = orderLoadSyncService;
         }
 
-        // =============================
         // PICKUP / DELIVERY WORKFLOW
-        // =============================
 
         public async Task MarkEnRouteAsync(Guid stopId, Guid userId)
         {
@@ -134,9 +139,7 @@ namespace LogisticsPlatform.Application.Services
             await UpdateLoadStatusAndLogAsync(stop, oldStatus, userId, "marked Unloaded");
         }
 
-        // =============================
-        // CORE HELPER (✅ SINGLE SOURCE)
-        // =============================
+        // CORE HELPER ( SINGLE SOURCE)
         private async Task UpdateLoadStatusAndLogAsync(
             LoadStop stop,
             StopStatus oldStopStatus,
@@ -150,6 +153,7 @@ namespace LogisticsPlatform.Application.Services
 
             await _stops.UpdateAsync(stop);
             await _loads.SaveChangesAsync();
+            await _orderLoadSyncService.SyncFromLoadAsync(load);
 
             // 🔹 Stop activity
             await _activityLog.LogAsync(new ActivityLogEntry
@@ -183,9 +187,7 @@ namespace LogisticsPlatform.Application.Services
 
 
 
-        // =============================
         // PRIVATE GUARDS
-        // =============================
         private async Task<LoadStop> GetStopOrThrow(Guid stopId)
             => await _stops.GetByIdWithLoadAsync(stopId)
                 ?? throw new NotFoundException("Load stop not found.");

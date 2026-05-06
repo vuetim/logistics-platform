@@ -1,0 +1,57 @@
+<app-page-layout>
+  <app-ui-card cardTitle="Loads">
+    <div card-actions class="card-header">
+      <div class="toolbar">
+        <app-ui-button variant="ghost" (click)="toggleFilters()">Filters</app-ui-button>
+      </div>
+    </div>
+
+    <div class="loads-filters" *ngIf="filtersOpen">
+      <div class="filters-grid">
+        <input
+          type="text"
+          [(ngModel)]="filterModel.search"
+          placeholder="Search load #, customer, carrier..."
+          (keyup.enter)="applyFilters()"
+        />
+
+        <select [(ngModel)]="filterModel.status">
+          <option value="">All statuses</option>
+          <option *ngFor="let o of statusOptions" [value]="o.value">{{ o.label }}</option>
+        </select>
+
+        <select [(ngModel)]="filterModel.mode">
+          <option value="">All modes</option>
+          <option *ngFor="let o of modeOptions" [value]="o.value">{{ o.label }}</option>
+        </select>
+
+        <input type="date" [(ngModel)]="filterModel.pickupFrom" />
+        <input type="date" [(ngModel)]="filterModel.pickupTo" />
+        <input type="date" [(ngModel)]="filterModel.deliveryFrom" />
+        <input type="date" [(ngModel)]="filterModel.deliveryTo" />
+      </div>
+
+      <div class="filters-actions">
+        <app-ui-button variant="ghost" (click)="clearFilters()">Clear</app-ui-button>
+        <app-ui-button variant="primary" (click)="applyFilters()">Apply</app-ui-button>
+      </div>
+    </div>
+
+    <div class="filter-chip-main" *ngIf="activeFiltersCount > 0">
+      <span>Filters (<span class="filter-count">{{ activeFiltersCount }}</span>)</span>
+      <div class="filter-chip" *ngFor="let item of activeFilters | keyvalue">
+        <span class="chip-label">{{ item.key }}:</span>
+        <span class="chip-value">{{ formatFilterValue(item.key, item.value) }}</span>
+        <button class="chip-remove" (click)="removeFilterChip(item.key)">x</button>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <app-entity-table [columns]="columns" [rows]="loads" [actions]="actions"></app-entity-table>
+    </div>
+
+    <div card-footer>
+      <app-pagination [page]="page" [totalPages]="totalPages" (pageChange)="onPageChange($event)"></app-pagination>
+    </div>
+  </app-ui-card>
+</app-page-layout>

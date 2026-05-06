@@ -40,8 +40,10 @@ namespace LogisticsPlatform.Infrastructure.Repositories
         {
             return await _context.Orders
                 .Include(o => o.OrderRoutes)
-                 .Include(o => o.Items)
-                 .Include(o => o.EquipmentRequirements)
+                .Include(o => o.Items)
+                .Include(o => o.EquipmentRequirements)
+                .Include(o => o.Cost)
+                    .ThenInclude(c => c.LineItems)
                 .FirstOrDefaultAsync(o => o.Id == id);
         }
         public async Task<Order?> GetByIdWithItemsAsync(Guid orderId)

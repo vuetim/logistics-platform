@@ -1,0 +1,67 @@
+<div class="tab-card">
+  <div class="tab-header">
+    <div class="tab-title-group">
+      <h3>Equipment requirements</h3>
+      <div class="tab-subtitle">
+        Defines trailer and handling constraints for execution. Mandatory and copy-to-load rows are transferred during load creation.
+      </div>
+    </div>
+    <div class="toolbar-actions">
+      <app-ui-button *ngIf="canCreate" variant="primary" (click)="openAddModal()">
+        Add equipment
+      </app-ui-button>
+    </div>
+  </div>
+
+  <div class="table-area" *ngIf="items.length; else empty">
+    <table class="simple-table">
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Size</th>
+          <th>Qty</th>
+          <th>Max Weight</th>
+          <th>Temp range</th>
+          <th>Mandatory</th>
+          <th *ngIf="canUpdate || canDelete">Actions</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let e of items">
+          <td>{{ e.equipmentType }}</td>
+          <td>{{ e.equipmentSize || '-' }}</td>
+          <td>{{ e.quantity }}</td>
+          <td>{{ e.maxWeight || '-' }} {{ weightUnitLabel(e.weightUnit) }}</td>
+          <td>{{ e.minTemperature || '-' }} - {{ e.maxTemperature || '-' }} {{ temperatureUnitLabel(e.temperatureUnit) }}</td>
+          <td>
+            <span class="badge" [class.badge-yes]="e.isMandatory" [class.badge-no]="!e.isMandatory">
+              {{ e.isMandatory ? 'Mandatory' : 'Optional' }}
+            </span>
+          </td>
+
+          <td *ngIf="canUpdate || canDelete" class="actions-cell">
+            <app-ui-button *ngIf="canUpdate" variant="ghost" (click)="openEditModal(e)">
+              Edit
+            </app-ui-button>
+
+            <app-ui-button *ngIf="canDelete" variant="danger" (click)="deleteItem(e.id)">
+              Delete
+            </app-ui-button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <ng-template #empty>
+    <div class="muted">No equipment requirements.</div>
+  </ng-template>
+
+  <app-order-equipment-modal
+    *ngIf="showModal"
+    [orderId]="parentId"
+    [editing]="editing"
+    (close)="onModalClose($event)"
+  ></app-order-equipment-modal>
+</div>

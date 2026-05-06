@@ -36,4 +36,20 @@ public class OrderItemsController : ControllerBase
         var items = await _service.GetByOrderIdAsync(orderId);
         return Ok(items);
     }
+
+    [HttpPut("{itemId:guid}")]
+    public async Task<IActionResult> Update(Guid orderId, Guid itemId, [FromBody] UpdateOrderItemDto dto)
+    {
+        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        await _service.UpdateAsync(orderId, itemId, dto, userId);
+        return NoContent();
+    }
+
+    [HttpDelete("{itemId:guid}")]
+    public async Task<IActionResult> Delete(Guid orderId, Guid itemId)
+    {
+        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        await _service.DeleteAsync(orderId, itemId, userId);
+        return NoContent();
+    }
 }

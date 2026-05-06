@@ -1,0 +1,119 @@
+<app-page-layout>
+  <app-ui-card cardTitle="Orders">
+    <div card-actions class="card-header">
+      <div class="toolbar">
+        <app-ui-button variant="ghost" (click)="toggleFilters()">
+          Filters
+        </app-ui-button>
+        <div class="column-menu-wrap">
+          <app-ui-button variant="ghost" (click)="toggleColumnMenu()">
+            Columns
+          </app-ui-button>
+        </div>
+        <app-ui-button
+          variant="primary"
+          *ngIf="canCreate"
+          (click)="openCreateOrder()"
+        >
+          Add Order
+        </app-ui-button>
+      </div>
+    </div>
+
+    <div class="orders-filters" *ngIf="filtersOpen">
+      <div class="filters-grid">
+        <input
+          type="text"
+          [(ngModel)]="filterModel.search"
+          placeholder="Search order #, customer..."
+          (keyup.enter)="applyFilters()"
+        />
+
+        <select [(ngModel)]="filterModel.status">
+          <option value="">All statuses</option>
+          <option *ngFor="let o of statusOptions" [value]="o.value">{{ o.label }}</option>
+        </select>
+
+        <select [(ngModel)]="filterModel.phase">
+          <option value="">All phases</option>
+          <option *ngFor="let o of phaseOptions" [value]="o.value">{{ o.label }}</option>
+        </select>
+
+        <select [(ngModel)]="filterModel.direction">
+          <option value="">All directions</option>
+          <option *ngFor="let o of directionOptions" [value]="o.value">{{ o.label }}</option>
+        </select>
+
+        <select [(ngModel)]="filterModel.preferredCarrierId">
+          <option value="">Any carrier</option>
+          <option *ngFor="let carrier of carriers" [value]="carrier.id">{{ carrier.name }}</option>
+        </select>
+
+        <input type="date" [(ngModel)]="filterModel.fromDate" />
+        <input type="date" [(ngModel)]="filterModel.toDate" />
+      </div>
+      <div class="filters-actions">
+        <app-ui-button variant="ghost" (click)="clearFilters()">Clear</app-ui-button>
+        <app-ui-button variant="primary" (click)="applyFilters()">Apply</app-ui-button>
+      </div>
+    </div>
+
+    <div class="filter-chip-main" *ngIf="activeFiltersCount > 0">
+      <span>Filters (<span class="filter-count">{{ activeFiltersCount }}</span>)</span>
+      <div
+        class="filter-chip"
+        *ngFor="let item of activeFilters | keyvalue"
+        [hidden]="item.key == null || item.value == null"
+      >
+        <span class="chip-label">{{ item.key }}:</span>
+        <span class="chip-value">{{ formatFilterValue(item.key, item.value) }}</span>
+        <button class="chip-remove" (click)="removeFilterChip(item.key)">x</button>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <app-entity-table [columns]="columns" [rows]="orders" [actions]="actions">
+      </app-entity-table>
+    </div>
+
+    <div card-footer>
+      <app-pagination
+        [page]="page"
+        [totalPages]="totalPages"
+        (pageChange)="onPageChange($event)"
+      >
+      </app-pagination>
+    </div>
+  </app-ui-card>
+
+  <app-order-create-modal
+    *ngIf="creatingOrder"
+    (close)="onCreateOrderClose($event)"
+  >
+  </app-order-create-modal>
+
+  <div class="column-modal-backdrop" *ngIf="showColumnMenu" (click)="cancelColumnConfig()">
+    <div class="column-modal" (click)="$event.stopPropagation()">
+      <div class="column-menu-title">Customize Columns</div>
+      <div class="column-item" *ngFor="let c of columnControls">
+        <label class="column-toggle">
+          <input
+            type="checkbox"
+            [checked]="isColumnVisible(c.key)"
+            [disabled]="c.locked"
+            (click)="onColumnCheckboxClick(c.key, $event)"
+          />
+          <span>{{ c.label }}</span>
+        </label>
+        <div class="column-actions">
+          <button type="button" (click)="moveColumn(c.key, -1)" [disabled]="c.index === 0">Up</button>
+          <button type="button" (click)="moveColumn(c.key, 1)" [disabled]="c.index === columnControls.length - 1">Down</button>
+        </div>
+      </div>
+      <div class="column-menu-footer">
+        <app-ui-button variant="ghost" (click)="cancelColumnConfig()">Cancel</app-ui-button>
+        <app-ui-button variant="primary" (click)="saveColumnConfig()">Save</app-ui-button>
+      </div>
+    </div>
+  </div>
+</app-page-layout>

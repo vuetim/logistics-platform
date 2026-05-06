@@ -1,0 +1,82 @@
+<div class="tab-section">
+  <div class="tab-header">
+    <div>
+      <h3>Costs</h3>
+      <p>Load customer and carrier cost summary from backend financial services.</p>
+    </div>
+    <div class="row-actions">
+      <button class="tab-action" (click)="addLine(false)">Add Bill Customer</button>
+      <button class="tab-action" (click)="addLine(true)">Add Pay Carrier</button>
+      <button class="tab-action primary-action" (click)="save()" [disabled]="saving || loading">Save Costs</button>
+    </div>
+  </div>
+
+  <div class="editor-panel" *ngIf="cost">
+    <label class="full-note">
+      Notes
+      <textarea [(ngModel)]="cost.notes"></textarea>
+    </label>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Customer Base</th>
+          <th>Bill Customer Lines</th>
+          <th>Total Billable</th>
+          <th>Carrier Base</th>
+          <th>Pay Carrier Lines</th>
+          <th>Total Payable</th>
+          <th>Margin</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>{{ money(summary?.customerRate) }}</td>
+          <td>{{ money(billCustomerSubtotal) }}</td>
+          <td>{{ money(summary?.totalBillable) }}</td>
+          <td>{{ money(summary?.carrierRate) }}</td>
+          <td>{{ money(payCarrierSubtotal) }}</td>
+          <td>{{ money(summary?.totalPayable) }}</td>
+          <td>{{ money(summary?.margin) }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="empty" *ngIf="!loading && !cost?.lineItems?.length">No cost line items found.</div>
+
+  <div class="table-wrap" *ngIf="cost?.lineItems?.length">
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Qty</th>
+          <th>Price</th>
+          <th>Amount</th>
+          <th>Bill Customer</th>
+          <th>Pay Carrier</th>
+          <th>Notes</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let line of cost?.lineItems; let i = index">
+          <td>
+            <select [(ngModel)]="line.type">
+              <option *ngFor="let type of chargeTypes" [ngValue]="type.value">{{ type.label }}</option>
+            </select>
+          </td>
+          <td><input type="number" [(ngModel)]="line.qty" (ngModelChange)="recalc(line)" /></td>
+          <td><input type="number" [(ngModel)]="line.price" (ngModelChange)="recalc(line)" /></td>
+          <td>{{ money(line.amount) }}</td>
+          <td><input type="checkbox" [(ngModel)]="line.isCustomer" /></td>
+          <td><input type="checkbox" [(ngModel)]="line.isCarrier" /></td>
+          <td><input [(ngModel)]="line.notes" /></td>
+          <td><button class="tab-action" (click)="removeLine(i)">Remove</button></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

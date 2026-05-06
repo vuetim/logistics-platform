@@ -98,6 +98,7 @@ builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<IUserRoleRepository, UserRoleRepository>();
+builder.Services.AddScoped<IUserTablePreferenceRepository, UserTablePreferenceRepository>();
 builder.Services.AddScoped<ICustomerContactRepository, CustomerContactRepository>();
 builder.Services.AddScoped<ICustomerNoteRepository, CustomerNoteRepository>();
 builder.Services.AddScoped<ICustomerAddressRepository, CustomerAddressRepository>();
@@ -125,6 +126,9 @@ builder.Services.AddScoped<ILoadItemRepository, LoadItemRepository>();
 builder.Services.AddScoped<IOrderCostRepository, OrderCostRepository>();
 builder.Services.AddScoped<ILoadCostRepository, LoadCostRepository>();
 builder.Services.AddScoped<IOrderEquipmentRequirementRepository, OrderEquipmentRequirementRepository>();
+builder.Services.AddScoped<IOrderNoteRepository, OrderNoteRepository>();
+builder.Services.AddScoped<IOrderDocumentRepository, OrderDocumentRepository>();
+builder.Services.AddScoped<IOrderExternalIdRepository, OrderExternalIdRepository>();
 // Financial Repositories
 builder.Services.AddScoped<ICustomerInvoiceRepository, CustomerInvoiceRepository>();
 builder.Services.AddScoped<ICarrierSettlementRepository, CarrierSettlementRepository>();
@@ -173,6 +177,7 @@ builder.Services.AddScoped<ILoadEquipmentService, LoadEquipmentService>();
 builder.Services.AddScoped<ILoadDocumentService, LoadDocumentService>();
 builder.Services.AddScoped<ILoadNoteService, LoadNoteService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IOrderLoadSyncService, OrderLoadSyncService>();
 builder.Services.AddScoped<IOrderQueryService, OrderQueryService>();
 builder.Services.AddScoped<IOrderRouteService, OrderRouteService>();
 builder.Services.AddScoped<ILoadStatusCalculatorService, LoadStatusCalculatorService>();
@@ -183,6 +188,9 @@ builder.Services.AddScoped<ILoadItemService, LoadItemService>();
 builder.Services.AddScoped<IOrderCostService, OrderCostService>();
 builder.Services.AddScoped<ILoadCostService, LoadCostService>();
 builder.Services.AddScoped<IOrderEquipmentRequirementService, OrderEquipmentRequirementService>();
+builder.Services.AddScoped<IOrderNoteService, OrderNoteService>();
+builder.Services.AddScoped<IOrderDocumentService, OrderDocumentService>();
+builder.Services.AddScoped<IOrderExternalIdService, OrderExternalIdService>();
 // Financial Services
 builder.Services.AddScoped<ICustomerInvoiceService, CustomerInvoiceService>();
 builder.Services.AddScoped<ICarrierSettlementService, CarrierSettlementService>();
@@ -213,6 +221,7 @@ builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 builder.Services.AddScoped<IAuthAuditService, AuthAuditService>();
 //users
 builder.Services.AddScoped<IUserManagementService, UserManagementService>();
+builder.Services.AddScoped<IUserTablePreferenceService, UserTablePreferenceService>();
 
 builder.Services.AddScoped<IPermissionReadModel, PermissionReadModel>();
 builder.Services.AddScoped<IPermissionService, PermissionService>();

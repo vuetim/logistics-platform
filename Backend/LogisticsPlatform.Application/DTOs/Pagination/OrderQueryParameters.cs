@@ -10,6 +10,7 @@ namespace LogisticsPlatform.Application.DTOs.Orders
 
         public OrderStatus? Status { get; set; }
         public OrderPhase? Phase { get; set; }
+        public OrderDirection? Direction { get; set; }
 
         public DateTime? FromDate { get; set; }
         public DateTime? ToDate { get; set; }

@@ -1,0 +1,275 @@
+<app-page-layout>
+  <div class="order-page" *ngIf="order as o; else loadingTpl">
+    <div class="order-header">
+      <div class="order-header-left">
+        <h1 class="order-title">{{ o.orderNumber }}</h1>
+        <div class="meta">
+          <span class="meta-item">{{ o.customerName }}</span>
+          <span class="meta-sep">&bull;</span>
+          <span class="meta-item">Status <span class="status-pill" [ngClass]="statusClass(o.status)">{{ statusLabel(o.status) }}</span></span>
+          <span class="meta-sep">&bull;</span>
+          <span class="meta-item">Phase <span class="status-pill" [ngClass]="phaseClass(o.phase)">{{ phaseLabel(o.phase) }}</span></span>
+        </div>
+        <div class="badges" *ngIf="o.hasActiveLoad">
+          <span class="badge badge-success">Load from this order</span>
+          <a
+            class="badge link-badge"
+            *ngIf="o.activeLoadId; else linkedLoadText"
+            [routerLink]="['/loads', o.activeLoadId]"
+          >
+            {{ o.activeLoadNumber || "Linked Load" }}
+          </a>
+          <ng-template #linkedLoadText>
+            <span class="badge">{{ o.activeLoadNumber || "Linked Load" }}</span>
+          </ng-template>
+        </div>
+      </div>
+
+      <div class="order-actions">
+        <button
+          *ngIf="canSubmit(o)"
+          class="action-btn action-submit"
+          (click)="submitOrder()"
+          [disabled]="actionLoading || loading"
+        >
+          Submit
+        </button>
+        <button
+          *ngIf="canCreateLoad(o)"
+          class="action-btn action-create"
+          (click)="createLoadFromOrder()"
+          [disabled]="actionLoading || loading"
+        >
+          Create Load
+        </button>
+
+        <button
+          *ngIf="canUpdate"
+          class="action-btn action-edit"
+          (click)="openEditOrder()"
+        >
+          Edit
+        </button>
+        <a class="action-btn action-ghost" routerLink="/orders">Back</a>
+      </div>
+    </div>
+
+    <div class="tabs-bar">
+      <button
+        class="tab"
+        (click)="setTab('overview')"
+        [class.active]="tab === 'overview'"
+      >
+        Overview
+      </button>
+      <button
+        class="tab"
+        (click)="setTab('items')"
+        [class.active]="tab === 'items'"
+      >
+        Items
+      </button>
+      <button
+        class="tab"
+        (click)="setTab('routes')"
+        [class.active]="tab === 'routes'"
+      >
+        Routes
+      </button>
+      <button
+        class="tab"
+        (click)="setTab('equipment')"
+        [class.active]="tab === 'equipment'"
+      >
+        Equipment
+      </button>
+      <button
+        class="tab"
+        (click)="setTab('costs')"
+        [class.active]="tab === 'costs'"
+      >
+        Costs
+      </button>
+      <button
+        class="tab"
+        (click)="setTab('references')"
+        [class.active]="tab === 'references'"
+      >
+        References
+      </button>
+      <button
+        class="tab"
+        (click)="setTab('notes')"
+        [class.active]="tab === 'notes'"
+      >
+        Notes
+      </button>
+      <button
+        class="tab"
+        (click)="setTab('documents')"
+        [class.active]="tab === 'documents'"
+      >
+        Documents
+      </button>
+    </div>
+
+    <div class="surface">
+      <div *ngIf="tab === 'overview'" class="overview-grid">
+        <div class="card">
+          <h3>Planning</h3>
+          <div class="kv">
+            <label title="Order window start used for commercial/planning validity.">Order window start</label>
+            <div>{{ o.startDate.date | date: "shortDate" }}</div>
+          </div>
+          <div class="kv">
+            <label title="Order window end used for commercial/planning validity.">Order window end</label>
+            <div>{{ o.endDate.date | date: "shortDate" }}</div>
+          </div>
+          <div class="kv">
+            <label title="Operational planned pickup milestone for execution.">Planned pickup</label>
+            <div>
+              {{
+                o.plannedPickup ? (o.plannedPickup.date | date: "short") : "-"
+              }}
+            </div>
+          </div>
+          <div class="kv">
+            <label title="Operational planned delivery milestone for execution.">Planned delivery</label>
+            <div>
+              {{
+                o.plannedDelivery
+                  ? (o.plannedDelivery.date | date: "short")
+                  : "-"
+              }}
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Route Summary</h3>
+          <div class="kv">
+            <label>Origin</label>
+            <div>{{ o.origin || "-" }}</div>
+          </div>
+          <div class="kv">
+            <label>Destination</label>
+            <div>{{ o.destination || "-" }}</div>
+          </div>
+          <div class="kv">
+            <label>Direction</label>
+            <div>{{ directionLabel(o.direction) }}</div>
+          </div>
+          <div class="kv">
+            <label>Type</label>
+            <div>{{ typeLabel(o.orderType) }}</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Commercial</h3>
+          <div class="kv">
+            <label>Base freight</label>
+            <div>{{ o.baseFreight ?? 0 }}</div>
+          </div>
+          <div class="kv">
+            <label>Customer rate</label>
+            <div>{{ o.customerRate ?? "-" }}</div>
+          </div>
+          <div class="kv">
+            <label>Accessorials</label>
+            <div>{{ o.accessorials ?? "-" }}</div>
+          </div>
+          <div class="kv">
+            <label>Quoted total</label>
+            <div>{{ o.quotedTotal ?? "-" }}</div>
+          </div>
+          <div class="kv">
+            <label>Commodity</label>
+            <div>{{ o.commodity || "-" }}</div>
+          </div>
+          <div class="kv">
+            <label>PO</label>
+            <div>{{ o.primaryPONumber || "-" }}</div>
+          </div>
+          <div class="kv">
+            <label>BOL</label>
+            <div>{{ o.primaryBolNumber || "-" }}</div>
+          </div>
+          <div class="kv">
+            <label>PRO</label>
+            <div>{{ o.primaryProNumber || "-" }}</div>
+          </div>
+          <div class="kv">
+            <label>Notes</label>
+            <div>{{ o.dispatchNotes || "-" }}</div>
+          </div>
+          <div class="kv">
+            <label>Delivery notes</label>
+            <div>{{ o.deliveryNotes || "-" }}</div>
+          </div>
+          <div class="kv">
+            <label>Items</label>
+            <div>{{ o.items.length }}</div>
+          </div>
+        </div>
+      </div>
+
+      <app-order-items
+        *ngIf="isTabVisited('items')"
+        [hidden]="tab !== 'items'"
+        [parentId]="o.id"
+        (changed)="onChildChanged()"
+      ></app-order-items>
+      <app-order-routes
+        *ngIf="isTabVisited('routes')"
+        [hidden]="tab !== 'routes'"
+        [parentId]="o.id"
+        (changed)="onChildChanged()"
+      ></app-order-routes>
+      <app-order-equipment
+        *ngIf="isTabVisited('equipment')"
+        [hidden]="tab !== 'equipment'"
+        [parentId]="o.id"
+      ></app-order-equipment>
+      <app-order-costs
+        *ngIf="isTabVisited('costs')"
+        [hidden]="tab !== 'costs'"
+        [parentId]="o.id"
+        (changed)="onChildChanged()"
+      ></app-order-costs>
+      <app-order-external-ids
+        *ngIf="isTabVisited('references')"
+        [hidden]="tab !== 'references'"
+        [parentId]="o.id"
+      ></app-order-external-ids>
+      <app-order-notes
+        *ngIf="isTabVisited('notes')"
+        [hidden]="tab !== 'notes'"
+        [parentId]="o.id"
+      ></app-order-notes>
+      <app-order-documents
+        *ngIf="isTabVisited('documents')"
+        [hidden]="tab !== 'documents'"
+        [parentId]="o.id"
+      ></app-order-documents>
+    </div>
+
+    <app-edit-order-modal
+      *ngIf="showEditModal"
+      [order]="o"
+      (close)="onEditClose($event)"
+    ></app-edit-order-modal>
+    <button
+      *ngIf="canCancel(o)"
+      class="action-btn action-cancel"
+      (click)="cancelOrder()"
+      [disabled]="actionLoading || loading"
+    >
+      Cancel this Order
+    </button>
+  </div>
+
+  <ng-template #loadingTpl>
+    <div class="loading">Loading...</div>
+  </ng-template>
+</app-page-layout>

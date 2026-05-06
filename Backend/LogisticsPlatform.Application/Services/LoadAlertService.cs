@@ -37,7 +37,7 @@ public class LoadAlertService : ILoadAlertService
             severity.Value);
 
         if (exists)
-            return; // ❌ no spam (Turvo rule)
+            return; //  no spam 
 
         var alert = new LoadAlert
         {

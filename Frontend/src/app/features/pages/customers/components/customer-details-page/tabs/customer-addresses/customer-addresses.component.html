@@ -56,7 +56,7 @@
 
   <app-create-address-modal
     *ngIf="showModal"
-    [customerId]="customerId"
+    [customerId]="parentId"
     [editing]="editing"
     (close)="onModalClose($event)"
   >

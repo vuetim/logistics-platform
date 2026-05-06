@@ -4,7 +4,6 @@ using LogisticsPlatform.Application.DTOs.Customers.Addresses;
 using LogisticsPlatform.Application.DTOs.Customers.Contacts;
 using LogisticsPlatform.Application.DTOs.Customers.Notes;
 using LogisticsPlatform.Application.Interfaces.Repositories.Customers;
-using LogisticsPlatform.Application.Interfaces.Services.Customers;
 using LogisticsPlatform.Domain.Entities;
 
 namespace LogisticsPlatform.Application.Services
@@ -22,9 +21,7 @@ namespace LogisticsPlatform.Application.Services
             _uow = uow;
         }
 
-        // ======================
         // GET ALL
-        // ======================
         public async Task<IEnumerable<CustomerListItemDto>> GetAllAsync()
         {
             var list = await _customers.GetAllAsync();
@@ -39,9 +36,8 @@ namespace LogisticsPlatform.Application.Services
             });
         }
 
-        // ======================
         // GET BY ID
-        // ======================
+        
         public async Task<CustomerListItemDto?> GetByIdAsync(Guid id)
         {
             var c = await _customers.GetByIdAsync(id);
@@ -57,9 +53,7 @@ namespace LogisticsPlatform.Application.Services
             };
         }
 
-        // ======================
         // GET DETAILS (aggregate)
-        // ======================
         public async Task<CustomerDetailsDto?> GetDetailsAsync(Guid id)
         {
             var c = await _customers.GetDetailsAsync(id);
@@ -71,8 +65,16 @@ namespace LogisticsPlatform.Application.Services
                 Name = c.Name,
                 Email = c.Email,
                 Phone = c.Phone,
-                PaymentTermsDays = c.PaymentTermsDays,
                 IsActive = c.IsActive,
+
+                Billing = new CustomerBillingDto
+                {
+                    Terms = c.Billing.Terms,
+                    Method = c.Billing.Method,
+                    CreditLimit = c.Billing.CreditLimit,
+                    AutoInvoice = c.Billing.AutoInvoice
+                },
+
 
                 Addresses = c.Addresses
                     .Where(a => a.IsActive)
@@ -110,18 +112,22 @@ namespace LogisticsPlatform.Application.Services
             };
         }
 
-        // ======================
         // CREATE BASIC
-        // ======================
+        
         public async Task<Guid> CreateAsync(CreateCustomerDto dto)
         {
             var customer = new Customer(
-                dto.Name,
-                dto.Email,
-                dto.Phone,
-                dto.PaymentTermsDays,
-                true
-            );
+       dto.Name,
+       dto.Email,
+       dto.Phone,
+       dto.IsActive,
+       new CustomerBillingInfo(
+           dto.Billing.Terms,
+           dto.Billing.Method,
+           dto.Billing.CreditLimit,
+           dto.Billing.AutoInvoice
+       )
+   );
 
             await _customers.AddAsync(customer);
             await _uow.SaveChangesAsync();
@@ -129,9 +135,7 @@ namespace LogisticsPlatform.Application.Services
             return customer.Id;
         }
 
-        // ======================
         // UPDATE
-        // ======================
         public async Task<bool> UpdateAsync(Guid id, UpdateCustomerDto dto)
         {
             var customer = await _customers.GetByIdAsync(id);
@@ -140,9 +144,22 @@ namespace LogisticsPlatform.Application.Services
             customer.UpdateBasicInfo(
                 dto.Name,
                 dto.Email,
-                dto.Phone,
-                dto.PaymentTermsDays
+                dto.Phone
             );
+
+            customer.UpdateBilling(
+     new CustomerBillingInfo(
+         dto.Billing.Terms,
+         dto.Billing.Method,
+         dto.Billing.CreditLimit,
+         dto.Billing.AutoInvoice
+     )
+ );
+
+            if (dto.IsActive)
+                customer.Activate();
+            else
+                customer.Deactivate();
 
             _customers.Update(customer);
             await _uow.SaveChangesAsync();
@@ -150,9 +167,7 @@ namespace LogisticsPlatform.Application.Services
             return true;
         }
 
-        // ======================
         // DELETE (soft)
-        // ======================
         public async Task<bool> DeleteAsync(Guid id)
         {
             var customer = await _customers.GetByIdAsync(id);
@@ -166,21 +181,26 @@ namespace LogisticsPlatform.Application.Services
             return true;
         }
 
-        // ======================
-        // CREATE FULL (DDD aggregate)
-        // ======================
+        // CREATE FULL (aggregate)
         public async Task<Guid> CreateFullAsync(CreateCustomerFullDto dto, Guid userId)
         {
             await _uow.BeginAsync();
 
             try
             {
+                var billing = new CustomerBillingInfo(
+     dto.Customer.Billing.Terms,
+     dto.Customer.Billing.Method,
+     dto.Customer.Billing.CreditLimit,
+     dto.Customer.Billing.AutoInvoice
+ );
+
                 var customer = new Customer(
                     dto.Customer.Name,
                     dto.Customer.Email,
                     dto.Customer.Phone,
-                    dto.Customer.PaymentTermsDays,
-                    dto.Customer.IsActive
+                    dto.Customer.IsActive,
+                    billing
                 );
 
                 // Addresses
@@ -226,7 +246,6 @@ namespace LogisticsPlatform.Application.Services
                 }
 
                 await _customers.AddAsync(customer);
-
                 await _uow.CommitAsync();
 
                 return customer.Id;

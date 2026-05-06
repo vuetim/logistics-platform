@@ -16,6 +16,10 @@ public class CustomerInvoiceDto
     public InvoiceStatus Status { get; set; }
 
     public decimal TotalAmount { get; set; }
+    public decimal AmountPaid { get; set; }
+    public decimal BalanceDue { get; set; }
+    public DateTime? PaidAt { get; set; }
+    public string? PaymentReference { get; set; }
     public string? Notes { get; set; }
 
     public List<InvoiceLineItemDto> LineItems { get; set; } = new();

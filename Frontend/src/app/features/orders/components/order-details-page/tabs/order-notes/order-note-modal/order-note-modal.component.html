@@ -1,0 +1,22 @@
+<div class="modal-backdrop">
+  <div class="modal-card">
+    <h2>{{ editing ? 'Edit note' : 'Add note' }}</h2>
+
+    <div>
+      <label title="Operational note body.">Message</label>
+      <textarea rows="4" [(ngModel)]="model.message" title="Note message text."></textarea>
+    </div>
+
+    <div class="checkbox">
+      <input type="checkbox" [(ngModel)]="model.isInternal" />
+      <label title="Internal notes are only visible to your team users.">Internal note</label>
+    </div>
+
+    <div class="actions">
+      <button (click)="cancel()">Cancel</button>
+      <button [disabled]="loading" (click)="save()">
+        {{ editing ? 'Save changes' : 'Create note' }}
+      </button>
+    </div>
+  </div>
+</div>

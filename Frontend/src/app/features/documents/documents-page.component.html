@@ -1,0 +1,39 @@
+<section class="page">
+  <div class="page-header">
+    <div>
+      <h1>Documents</h1>
+      <p>Order and load documents from the active operational records.</p>
+    </div>
+  </div>
+
+  <div class="empty" *ngIf="loading">Loading documents...</div>
+  <div class="empty" *ngIf="!loading && error">{{ error }}</div>
+  <div class="empty" *ngIf="!loading && !error && !rows.length">No documents found.</div>
+
+  <div class="table-wrap" *ngIf="!loading && rows.length">
+    <table>
+      <thead>
+        <tr>
+          <th>Entity</th>
+          <th>Number</th>
+          <th>Type</th>
+          <th>Internal</th>
+          <th>Copy To Load</th>
+          <th>Uploaded</th>
+          <th>File</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of rows">
+          <td><span class="badge" [class.badge-load]="row.entityType === 'Load'" [class.badge-order]="row.entityType === 'Order'">{{ row.entityType }}</span></td>
+          <td><a [routerLink]="entityLink(row)">{{ row.entityNumber }}</a></td>
+          <td>{{ typeLabel(row.documentType, row.entityType) }}</td>
+          <td>{{ row.isInternal ? 'Yes' : 'No' }}</td>
+          <td>{{ row.copyToLoad === undefined ? '-' : (row.copyToLoad ? 'Yes' : 'No') }}</td>
+          <td>{{ row.uploadedAt ? (row.uploadedAt | date: "short") : '-' }}</td>
+          <td><a [href]="row.fileUrl" target="_blank" rel="noreferrer">Open</a></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>

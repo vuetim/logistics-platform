@@ -1,0 +1,49 @@
+<div class="tab-section">
+  <div class="tab-header">
+    <div>
+      <h3>Items</h3>
+      <p>Freight items attached to this load.</p>
+    </div>
+  </div>
+
+  <div class="empty" *ngIf="!items.length">No items found.</div>
+
+  <div class="table-wrap" *ngIf="items.length">
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Qty</th>
+          <th>Handling</th>
+          <th>Weight</th>
+          <th>Dimensions</th>
+          <th>Customer Ref</th>
+          <th>Temp</th>
+          <th>Hazmat</th>
+          <th>Stackable</th>
+          <th>Freight Class</th>
+          <th>Declared</th>
+          <th>Volume</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of items">
+          <td>{{ item.name }}</td>
+          <td>{{ item.quantity }} {{ item.quantityUnit }}</td>
+          <td>{{ item.handlingQuantity || "-" }} {{ item.handlingUnit || "" }}</td>
+          <td>{{ item.unitGrossWeight || item.unitNetWeight || "-" }} {{ item.weightUnit || "" }}</td>
+          <td>{{ item.length || "-" }} x {{ item.width || "-" }} x {{ item.height || "-" }} {{ item.dimensionUnit || "" }}</td>
+          <td>{{ item.customerReference || "-" }}</td>
+          <td>{{ item.minTemperature != null || item.maxTemperature != null ? (item.minTemperature + "-" + item.maxTemperature + " " + (item.temperatureUnit || "")) : "-" }}</td>
+          <td>{{ item.isHazmat ? "Yes" : "No" }}</td>
+          <td>{{ item.stackable ? "Yes" : "No" }}</td>
+          <td>{{ item.freightClass || "-" }}</td>
+          <td>{{ item.declaredValue != null ? item.declaredValue + " " + (item.currency || "") : "-" }}</td>
+          <td>{{ item.volume != null ? item.volume + " " + (item.volumeUnit || "") : "-" }}</td>
+          <td>{{ item.notes || "-" }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

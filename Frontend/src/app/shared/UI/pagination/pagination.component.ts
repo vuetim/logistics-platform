@@ -1,6 +1,5 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { NgFor } from '@angular/common';
-import { UiButtonComponent } from "../ui-button/ui-button.component";
 
 @Component({
   selector: 'app-pagination',
@@ -14,8 +13,16 @@ export class PaginationComponent {
   @Input() totalPages = 1;
   @Output() pageChange = new EventEmitter<number>();
 
+  get safeTotalPages(): number {
+    return Math.max(1, this.totalPages || 1);
+  }
+
+  get pages(): number[] {
+    return Array.from({ length: this.safeTotalPages }, (_, i) => i + 1);
+  }
+
   change(p: number) {
-    if (p < 1 || p > this.totalPages) return;
+    if (p < 1 || p > this.safeTotalPages) return;
     this.page = p;
     this.pageChange.emit(p);
   }

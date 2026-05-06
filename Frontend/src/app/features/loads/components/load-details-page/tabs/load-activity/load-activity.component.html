@@ -1,0 +1,31 @@
+<div class="tab-section">
+  <div class="tab-header">
+    <div>
+      <h3>Activity</h3>
+      <p>Status and execution activity recorded against this load.</p>
+    </div>
+  </div>
+
+  <div class="empty" *ngIf="!activity.length">No activity found.</div>
+
+  <div class="table-wrap" *ngIf="activity.length">
+    <table>
+      <thead>
+        <tr>
+          <th>When</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>User</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of activity">
+          <td>{{ row.createdAt ? (row.createdAt | date: "short") : "-" }}</td>
+          <td>{{ type(row) }}</td>
+          <td>{{ text(row) }}</td>
+          <td>{{ user(row) }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

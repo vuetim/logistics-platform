@@ -9,6 +9,11 @@ import { CustomerAddressesComponent } from './tabs/customer-addresses/customer-a
 import { PageLayoutComponent } from '../../../../../layout/app-shell/page-layout/page-layout/page-layout.component';
 import { CustomerContactsComponent } from "./tabs/customer-contacts/customer-contacts.component";
 import { CustomerNotesComponent } from './tabs/customer-notes/customer-notes.component';
+import { EditCustomerModalComponent } from './edit-customer-modal/edit-customer-modal.component';
+import { CustomerPaymentTerms } from '../../../../../core/enums/customers/customer-payment-terms.enum';
+import { CustomerPaymentMethod } from '../../../../../core/enums/customers/customer-payment-method.enum';
+import { enumToOptions } from '../../../../../core/utils/enum-options';
+import { FormsModule } from '@angular/forms';
 
 
 type TabKey = 'overview' | 'addresses' | 'contacts' | 'notes';
@@ -17,13 +22,14 @@ type TabKey = 'overview' | 'addresses' | 'contacts' | 'notes';
   selector: 'app-customer-details-page',
   standalone: true,
   imports: [
-    CommonModule,
+    CommonModule, FormsModule,
     RouterModule,
     CustomerAddressesComponent,
     CustomerContactsComponent,
     CustomerNotesComponent,
     PageLayoutComponent,
-    CustomerContactsComponent
+    CustomerContactsComponent,
+    EditCustomerModalComponent
   ],
   templateUrl: './customer-details-page.component.html',
   styleUrl: './customer-details-page.component.css'
@@ -31,9 +37,11 @@ type TabKey = 'overview' | 'addresses' | 'contacts' | 'notes';
 export class CustomerDetailsPageComponent implements OnInit {
   customerId!: string;
   customer?: CustomerDetailsDto;
-
+  paymentMethods = enumToOptions(CustomerPaymentMethod);
+  paymentTerms = enumToOptions(CustomerPaymentTerms);
   loading = true;
   tab: TabKey = 'overview';
+  showCustomerModal = false;
 
   // permissions 
   canUpdate = false;
@@ -77,7 +85,12 @@ export class CustomerDetailsPageComponent implements OnInit {
   onChildChanged() {
     this.load();
   }
+  openEditCustomer() {
+    this.showCustomerModal = true;
+  }
 
-
-
+  onCustomerClose(saved: boolean) {
+    this.showCustomerModal = false;
+    if (saved) this.load();
+  }
 }

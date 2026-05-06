@@ -1,13 +1,13 @@
 <div class="pagination">
-  <button (click)="change(page - 1)" [disabled]="page === 1">‹</button>
+  <button (click)="change(page - 1)" [disabled]="page <= 1">&lt;</button>
 
   <button
-    *ngFor="let p of [].constructor(totalPages); let i = index"
-    (click)="change(i + 1)"
-    [class.active]="page === i + 1"
+    *ngFor="let p of pages"
+    (click)="change(p)"
+    [class.active]="page === p"
   >
-    {{ i + 1 }}
+    {{ p }}
   </button>
 
-  <button (click)="change(page + 1)" [disabled]="page === totalPages">›</button>
+  <button (click)="change(page + 1)" [disabled]="page >= safeTotalPages">&gt;</button>
 </div>

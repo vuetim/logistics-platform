@@ -19,6 +19,24 @@ public class OrderCostRepository : IOrderCostRepository
             .FirstOrDefaultAsync(c => c.OrderId == orderId);
     }
 
+    public Task<OrderCost?> GetByOrderIdForUpdateAsync(Guid orderId)
+    {
+        return _context.OrderCosts
+            .FirstOrDefaultAsync(c => c.OrderId == orderId);
+    }
+
+    public Task DeleteLineItemsByOrderCostIdAsync(Guid orderCostId)
+    {
+        return _context.OrderCostLineItems
+            .Where(li => li.OrderCostId == orderCostId)
+            .ExecuteDeleteAsync();
+    }
+
+    public Task AddLineItemsAsync(IEnumerable<OrderCostLineItem> lineItems)
+    {
+        return _context.OrderCostLineItems.AddRangeAsync(lineItems);
+    }
+
     public Task AddAsync(OrderCost cost)
     {
         return _context.OrderCosts.AddAsync(cost).AsTask();
