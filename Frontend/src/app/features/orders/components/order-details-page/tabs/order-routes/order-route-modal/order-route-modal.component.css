@@ -22,6 +22,51 @@
   gap: 12px;
 }
 
+.geocode-panel {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 14px;
+  padding: 12px;
+  border: 1px solid #dbe4ef;
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+.geocode-search {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+}
+
+.geocode-search button,
+.geocode-results button {
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 8px 10px;
+  font-weight: 700;
+}
+
+.geocode-results {
+  display: grid;
+  gap: 6px;
+}
+
+.geocode-results button {
+  text-align: left;
+}
+
+.geocode-results strong,
+.geocode-results span {
+  display: block;
+}
+
+.geocode-results span,
+.geocode-panel small {
+  color: #64748b;
+  font-size: 12px;
+}
+
 .full {
   grid-column: 1 / -1;
 }

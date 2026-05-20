@@ -1,114 +1,456 @@
 <app-page-layout>
   <div class="load-page" *ngIf="load as l; else loadingTpl">
     <div class="load-header">
-      <div>
-        <h1 class="load-title">{{ l.execution.loadNumber }}</h1>
-        <div class="meta">
-          <span>{{ l.execution.customerName }}</span>
-          <span class="meta-sep">&bull;</span>
-          <span>Status <span class="status-pill" [ngClass]="statusClass(l.execution.status)">{{ statusLabel(l.execution.status) }}</span></span>
-          <span class="meta-sep">&bull;</span>
-          <span>Mode {{ modeLabel(l.execution.mode) }}</span>
-        </div>
-        <div class="badges" *ngIf="l.orderSnapshot">
-          <span class="badge badge-success">Created from order</span>
-          <a class="badge link-badge" [routerLink]="['/orders', l.orderSnapshot.orderId]">
-            {{ l.orderSnapshot.orderNumber }}
-          </a>
-        </div>
+      <div class="load-crumbs">
+        <a routerLink="/loads">Loads</a>
+        <span>/</span>
+        <strong>{{ l.execution.loadNumber }}</strong>
+        <span class="status-pill" [ngClass]="statusClass(l.execution.status)">{{
+          statusLabel(l.execution.status)
+        }}</span>
+        <span>{{ l.execution.customerName }}</span>
+        <span>Mode {{ modeLabel(l.execution.mode) }}</span>
+        <a
+          *ngIf="l.orderSnapshot"
+          class="link-badge"
+          [routerLink]="['/orders', l.orderSnapshot.orderId]"
+        >
+          {{ l.orderSnapshot.orderNumber }}
+        </a>
       </div>
       <div class="load-actions">
-        <button *ngIf="canMarkAccepted()" class="action-btn action-primary" (click)="markAccepted()" [disabled]="actionLoading">Mark Accepted</button>
-        <button *ngIf="canDispatch()" class="action-btn action-primary" (click)="openDispatch()" [disabled]="actionLoading">Dispatch</button>
-        <button *ngIf="canComplete()" class="action-btn action-primary" (click)="completeLoad()" [disabled]="actionLoading">Complete Load</button>
+        <button
+          *ngIf="canMarkAccepted()"
+          class="action-btn action-primary"
+          (click)="markAccepted()"
+          [disabled]="actionLoading"
+        >
+          Mark Covered
+        </button>
+        <button
+          *ngIf="canDispatch()"
+          class="action-btn action-primary"
+          (click)="openDispatch()"
+          [disabled]="actionLoading"
+        >
+          Dispatch
+        </button>
+        <button
+          *ngIf="canComplete()"
+          class="action-btn action-primary"
+          (click)="completeLoad()"
+          [disabled]="actionLoading"
+        >
+          Complete Load
+        </button>
         <a class="action-btn action-ghost" routerLink="/loads">Back</a>
       </div>
     </div>
 
-    <app-load-dispatcher-panel [load]="l.execution" (saved)="reload()"></app-load-dispatcher-panel>
+    <app-load-route-map
+      *ngIf="canViewTracking()"
+      [load]="l"
+    ></app-load-route-map>
 
-    <div class="dispatch-modal-backdrop" *ngIf="dispatching" (click)="dispatching = false">
+    <app-load-operational-panel
+      [load]="l.execution"
+      (saved)="reload()"
+    ></app-load-operational-panel>
+
+    <div
+      class="dispatch-modal-backdrop"
+      *ngIf="dispatching"
+      (click)="dispatching = false"
+    >
       <div class="dispatch-modal" (click)="$event.stopPropagation()">
         <h3>Dispatch Load</h3>
         <div class="dispatch-grid">
           <label>Driver<input [(ngModel)]="dispatchForm.driverName" /></label>
-          <label>Driver phone<input [(ngModel)]="dispatchForm.driverPhone" /></label>
-          <label>Driver email<input [(ngModel)]="dispatchForm.driverEmail" /></label>
+          <label
+            >Driver phone<input [(ngModel)]="dispatchForm.driverPhone"
+          /></label>
+          <label
+            >Driver email<input [(ngModel)]="dispatchForm.driverEmail"
+          /></label>
           <label>Truck #<input [(ngModel)]="dispatchForm.truckNumber" /></label>
-          <label>Trailer #<input [(ngModel)]="dispatchForm.trailerNumber" /></label>
+          <label
+            >Trailer #<input [(ngModel)]="dispatchForm.trailerNumber"
+          /></label>
         </div>
         <div class="dispatch-actions">
-          <button class="action-btn action-ghost" (click)="dispatching = false">Cancel</button>
-          <button class="action-btn action-primary" (click)="dispatchLoad()" [disabled]="actionLoading || !dispatchForm.driverName.trim() || !dispatchForm.truckNumber.trim()">Dispatch</button>
+          <button class="action-btn action-ghost" (click)="dispatching = false">
+            Cancel
+          </button>
+          <button
+            class="action-btn action-primary"
+            (click)="dispatchLoad()"
+            [disabled]="
+              actionLoading ||
+              !dispatchForm.driverName.trim() ||
+              !dispatchForm.truckNumber.trim()
+            "
+          >
+            Dispatch
+          </button>
         </div>
       </div>
     </div>
 
     <div class="tabs-bar">
-      <button class="tab" (click)="setTab('overview')" [class.active]="tab === 'overview'">Overview</button>
-      <button class="tab" (click)="setTab('stops')" [class.active]="tab === 'stops'">Stops</button>
-      <button class="tab" (click)="setTab('items')" [class.active]="tab === 'items'">Items</button>
-      <button class="tab" (click)="setTab('equipment')" [class.active]="tab === 'equipment'">Equipment</button>
-      <button class="tab" (click)="setTab('costs')" [class.active]="tab === 'costs'">Costs</button>
-      <button class="tab" (click)="setTab('billing')" [class.active]="tab === 'billing'">Billing</button>
-      <button class="tab" (click)="setTab('notes')" [class.active]="tab === 'notes'">Notes</button>
-      <button class="tab" (click)="setTab('documents')" [class.active]="tab === 'documents'">Documents</button>
-      <button class="tab" (click)="setTab('activity')" [class.active]="tab === 'activity'">Activity</button>
+      <button
+        class="tab"
+        (click)="setTab('overview')"
+        [class.active]="tab === 'overview'"
+      >
+        Overview
+      </button>
+      <button
+        class="tab"
+        (click)="setTab('stops')"
+        [class.active]="tab === 'stops'"
+      >
+        Stops
+      </button>
+      <button
+        class="tab"
+        (click)="setTab('items')"
+        [class.active]="tab === 'items'"
+      >
+        Items
+      </button>
+      <button
+        class="tab"
+        (click)="setTab('equipment')"
+        [class.active]="tab === 'equipment'"
+      >
+        Equipment
+      </button>
+      <button
+        class="tab"
+        *ngIf="canViewCarrierOffers()"
+        (click)="setTab('tenders')"
+        [class.active]="tab === 'tenders'"
+      >
+        Carrier Offers
+      </button>
+      <button
+        class="tab"
+        *ngIf="canViewCosts()"
+        (click)="setTab('costs')"
+        [class.active]="tab === 'costs'"
+      >
+        Costs
+      </button>
+      <button
+        class="tab"
+        *ngIf="canViewFinancials()"
+        (click)="setTab('billing')"
+        [class.active]="tab === 'billing'"
+      >
+        Billing
+      </button>
+      <button
+        class="tab"
+        *ngIf="canViewExceptions()"
+        (click)="setTab('exceptions')"
+        [class.active]="tab === 'exceptions'"
+      >
+        Exceptions
+      </button>
+      <button
+        class="tab"
+        (click)="setTab('notes')"
+        [class.active]="tab === 'notes'"
+      >
+        Notes
+      </button>
+      <button
+        class="tab"
+        (click)="setTab('documents')"
+        [class.active]="tab === 'documents'"
+      >
+        Documents
+      </button>
+      <button
+        class="tab"
+        (click)="setTab('activity')"
+        [class.active]="tab === 'activity'"
+      >
+        Activity
+      </button>
     </div>
 
     <div class="surface">
-      <div *ngIf="tab === 'overview'" class="overview-grid">
-        <div class="card">
-          <h3>Execution</h3>
-          <div class="kv"><label>Origin</label><div>{{ l.execution.origin || "-" }}</div></div>
-          <div class="kv"><label>Destination</label><div>{{ l.execution.destination || "-" }}</div></div>
-          <div class="kv"><label>Carrier</label><div>{{ l.execution.carrierName || "-" }}</div></div>
-          <div class="kv"><label>Planned pickup</label><div>{{ l.execution.plannedPickupDate ? (l.execution.plannedPickupDate | date: "short") : "-" }}</div></div>
-          <div class="kv"><label>Planned delivery</label><div>{{ l.execution.plannedDeliveryDate ? (l.execution.plannedDeliveryDate | date: "short") : "-" }}</div></div>
-          <div class="kv"><label>Actual pickup</label><div>{{ l.execution.actualPickupDate ? (l.execution.actualPickupDate | date: "short") : "-" }}</div></div>
-          <div class="kv"><label>Actual delivery</label><div>{{ l.execution.actualDeliveryDate ? (l.execution.actualDeliveryDate | date: "short") : "-" }}</div></div>
-          <div class="kv"><label>POD received</label><div>{{ l.execution.podReceivedAt ? (l.execution.podReceivedAt | date: "short") : "-" }}</div></div>
-          <div class="kv"><label>POD uploaded by</label><div>{{ l.execution.podUploadedBy || "-" }}</div></div>
+      <div *ngIf="tab === 'overview'" class="overview-grid turvo-overview">
+        <div class="card overview-card">
+          <h3>Overview</h3>
+          <div class="overview-lane">
+            <strong
+              >{{ l.execution.origin || "-" }} ->
+              {{ l.execution.destination || "-" }}</strong
+            >
+            <span
+              >{{ l.summary?.pickupStops ?? 0 }} pickup -
+              {{ l.summary?.deliveryStops ?? 0 }} delivery -
+              {{
+                l.execution.distanceMiles
+                  ? (l.execution.distanceMiles | number: "1.0-0") + " mi"
+                  : "-"
+              }}</span
+            >
+          </div>
+          <div class="overview-pairs">
+            <div>
+              <label>Planned pickup</label
+              ><strong>{{
+                l.execution.plannedPickupDate
+                  ? (l.execution.plannedPickupDate | date: "mediumDate")
+                  : "-"
+              }}</strong>
+            </div>
+            <div>
+              <label>Planned delivery</label
+              ><strong>{{
+                l.execution.plannedDeliveryDate
+                  ? (l.execution.plannedDeliveryDate | date: "mediumDate")
+                  : "-"
+              }}</strong>
+            </div>
+            <div>
+              <label>Actual pickup</label
+              ><strong>{{
+                l.execution.actualPickupDate
+                  ? (l.execution.actualPickupDate | date: "short")
+                  : "-"
+              }}</strong>
+            </div>
+            <div>
+              <label>Actual delivery</label
+              ><strong>{{
+                l.execution.actualDeliveryDate
+                  ? (l.execution.actualDeliveryDate | date: "short")
+                  : "-"
+              }}</strong>
+            </div>
+            <div>
+              <label>Equipment</label><strong>{{ equipmentText(l) }}</strong>
+            </div>
+            <div>
+              <label>Mode</label
+              ><strong>{{ modeLabel(l.execution.mode) }}</strong>
+            </div>
+          </div>
         </div>
 
-        <div class="card">
-          <h3>Summary</h3>
-          <div class="kv"><label>Total stops</label><div>{{ l.summary?.totalStops ?? 0 }}</div></div>
-          <div class="kv"><label>Pickup stops</label><div>{{ l.summary?.pickupStops ?? 0 }}</div></div>
-          <div class="kv"><label>Delivery stops</label><div>{{ l.summary?.deliveryStops ?? 0 }}</div></div>
-          <div class="kv"><label>Total items</label><div>{{ l.summary?.totalItems ?? 0 }}</div></div>
-          <div class="kv"><label>Total weight</label><div>{{ l.summary?.totalWeight ?? 0 }}</div></div>
-          <div class="kv"><label>Total pallets</label><div>{{ l.summary?.totalPallets ?? 0 }}</div></div>
-          <div class="kv"><label>Total volume</label><div>{{ l.summary?.totalVolume ?? 0 }}</div></div>
+        <div class="card route-card">
+          <h3>Route</h3>
+          <div class="route-carrier">
+            <strong>{{
+              l.execution.carrierName || "Carrier not covered"
+            }}</strong>
+            <span>{{
+              l.execution.carrierSCAC || "Mode " + modeLabel(l.execution.mode)
+            }}</span>
+          </div>
+          <div class="route-timeline">
+            <div
+              class="route-stop"
+              *ngFor="let stop of overviewStops(l); let i = index"
+              [ngClass]="stopClass(stop)"
+            >
+              <div class="stop-rail">
+                <span>{{ i + 1 }}</span>
+              </div>
+              <div class="stop-body">
+                <div>
+                  <strong>{{ stop.locationName || cityState(stop) }}</strong>
+                  <span
+                    >{{ stopTypeLabel(stop.stopType) }} -
+                    {{ appointmentLabel(stop.appointmentType) }}</span
+                  >
+                </div>
+
+                <small> {{ stop.addressLine1 || cityState(stop) }}</small>
+                <small>{{ stopWindow(stop) }}</small>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div class="card">
-          <h3>Financial</h3>
-          <div class="kv"><label>Customer rate</label><div>{{ money(l.costSummary?.customerRate ?? l.execution.customerRate) }}</div></div>
-          <div class="kv"><label>Carrier rate</label><div>{{ money(l.costSummary?.carrierRate ?? l.execution.carrierRate) }}</div></div>
-          <div class="kv"><label>Total billable</label><div>{{ money(l.costSummary?.totalBillable) }}</div></div>
-          <div class="kv"><label>Total payable</label><div>{{ money(l.costSummary?.totalPayable) }}</div></div>
-          <div class="kv"><label>Margin</label><div>{{ money(l.costSummary?.margin ?? l.execution.margin) }}</div></div>
+        <div class="card costs-card" *ngIf="canViewCosts()">
+          <h3>Costs</h3>
+          <div class="cost-columns">
+            <div class="cost-box">
+              <div><span>Customer bill</span><strong>Total</strong></div>
+              <div>
+                <span>Freight</span
+                ><strong>{{
+                  money(l.costSummary?.customerRate ?? l.execution.customerRate)
+                }}</strong>
+              </div>
+              <div>
+                <span>Accessorial</span
+                ><strong>{{ money(l.execution.accessorials) }}</strong>
+              </div>
+              <div>
+                <span>Billable</span
+                ><strong>{{ money(l.costSummary?.totalBillable) }}</strong>
+              </div>
+            </div>
+            <div class="cost-box">
+              <div><span>Carrier pay</span><strong>Total</strong></div>
+              <div>
+                <span>Freight</span
+                ><strong>{{
+                  money(l.costSummary?.carrierRate ?? l.execution.carrierRate)
+                }}</strong>
+              </div>
+              <div>
+                <span>Accessorial</span
+                ><strong>{{
+                  money(
+                    (l.costSummary?.totalPayable ?? 0) -
+                      (l.costSummary?.carrierRate ??
+                        l.execution.carrierRate ??
+                        0)
+                  )
+                }}</strong>
+              </div>
+              <div>
+                <span>Payable</span
+                ><strong>{{ money(l.costSummary?.totalPayable) }}</strong>
+              </div>
+            </div>
+          </div>
+          <div class="margin-strip">
+            <span>Margin</span>
+            <strong
+              >{{ money(l.costSummary?.margin ?? l.execution.margin) }}
+              {{ marginPercent(l) }}</strong
+            >
+          </div>
         </div>
 
-        <div class="card" *ngIf="l.orderSnapshot as order">
-          <h3>Order Snapshot</h3>
-          <div class="kv"><label>Order</label><div><a [routerLink]="['/orders', order.orderId]">{{ order.orderNumber }}</a></div></div>
-          <div class="kv"><label>Type</label><div>{{ orderTypeLabel(order.orderType) }}</div></div>
-          <div class="kv"><label>Direction</label><div>{{ directionLabel(order.direction) }}</div></div>
-          <div class="kv"><label>Order pickup</label><div>{{ order.plannedPickupDate ? (order.plannedPickupDate | date: "short") : "-" }}</div></div>
-          <div class="kv"><label>Order delivery</label><div>{{ order.plannedDeliveryDate ? (order.plannedDeliveryDate | date: "short") : "-" }}</div></div>
+        <div class="card customer-card">
+          <h3>Customer</h3>
+          <div class="customer-name">
+            <strong>{{ l.execution.customerName }}</strong>
+            <span>{{
+              l.execution.trackingNumber || l.execution.loadNumber
+            }}</span>
+          </div>
+          <div class="kv">
+            <label>Order</label>
+            <div *ngIf="l.orderSnapshot as order; else noOrder">
+              <a [routerLink]="['/orders', order.orderId]">{{
+                order.orderNumber
+              }}</a>
+            </div>
+          </div>
+          <ng-template #noOrder><div>-</div></ng-template>
+          <div class="kv">
+            <label>PO</label>
+            <div>{{ l.orderSnapshot?.primaryPONumber || "-" }}</div>
+          </div>
+          <div class="kv">
+            <label>Commodity</label>
+            <div>{{ l.orderSnapshot?.commodity || "-" }}</div>
+          </div>
+          <div class="kv">
+            <label>BOL</label>
+            <div>
+              {{
+                l.execution.bolNumber ||
+                  l.orderSnapshot?.primaryBolNumber ||
+                  "-"
+              }}
+            </div>
+          </div>
+          <div class="kv">
+            <label>PRO</label>
+            <div>
+              {{
+                l.execution.proNumber ||
+                  l.orderSnapshot?.primaryProNumber ||
+                  "-"
+              }}
+            </div>
+          </div>
+          <div class="kv">
+            <label>Rate confirmation</label>
+            <div>{{ l.execution.rateConfirmationNumber || "-" }}</div>
+          </div>
+          <div class="kv">
+            <label>POD received</label>
+            <div>
+              {{
+                l.execution.podReceivedAt
+                  ? (l.execution.podReceivedAt | date: "short")
+                  : "-"
+              }}
+            </div>
+          </div>
         </div>
       </div>
 
-      <app-load-stops *ngIf="isTabVisited('stops')" [hidden]="tab !== 'stops'" [loadId]="l.execution.id" [stops]="l.execution.stops" (changed)="reload()"></app-load-stops>
-      <app-load-items *ngIf="isTabVisited('items')" [hidden]="tab !== 'items'" [items]="l.items"></app-load-items>
-      <app-load-equipment *ngIf="isTabVisited('equipment')" [hidden]="tab !== 'equipment'" [equipment]="l.equipment"></app-load-equipment>
-      <app-load-costs *ngIf="isTabVisited('costs')" [hidden]="tab !== 'costs'" [loadId]="l.execution.id" [summary]="l.costSummary" (changed)="reload()"></app-load-costs>
-      <app-load-billing *ngIf="isTabVisited('billing')" [hidden]="tab !== 'billing'" [loadId]="l.execution.id"></app-load-billing>
-      <app-load-notes *ngIf="isTabVisited('notes')" [hidden]="tab !== 'notes'" [loadId]="l.execution.id"></app-load-notes>
-      <app-load-documents *ngIf="isTabVisited('documents')" [hidden]="tab !== 'documents'" [loadId]="l.execution.id"></app-load-documents>
-      <app-load-activity *ngIf="isTabVisited('activity')" [hidden]="tab !== 'activity'" [loadId]="l.execution.id"></app-load-activity>
+      <app-load-stops
+        *ngIf="isTabVisited('stops')"
+        [hidden]="tab !== 'stops'"
+        [loadId]="l.execution.id"
+        [loadStatus]="l.execution.status"
+        [stops]="l.execution.stops"
+        (changed)="reload()"
+      ></app-load-stops>
+      <app-load-items
+        *ngIf="isTabVisited('items')"
+        [hidden]="tab !== 'items'"
+        [loadId]="l.execution.id"
+        [items]="l.items"
+        (changed)="reload()"
+      ></app-load-items>
+      <app-load-equipment
+        *ngIf="isTabVisited('equipment')"
+        [hidden]="tab !== 'equipment'"
+        [equipment]="l.equipment"
+      ></app-load-equipment>
+      <app-load-tenders
+        *ngIf="canViewCarrierOffers() && isTabVisited('tenders')"
+        [hidden]="tab !== 'tenders'"
+        [loadId]="l.execution.id"
+        (changed)="reload()"
+      ></app-load-tenders>
+      <app-load-costs
+        *ngIf="canViewCosts() && isTabVisited('costs')"
+        [hidden]="tab !== 'costs'"
+        [loadId]="l.execution.id"
+        [summary]="l.costSummary"
+        (changed)="reload()"
+      ></app-load-costs>
+      <app-load-billing
+        *ngIf="canViewFinancials() && isTabVisited('billing')"
+        [hidden]="tab !== 'billing'"
+        [loadId]="l.execution.id"
+      ></app-load-billing>
+      <app-load-exceptions
+        *ngIf="canViewExceptions() && isTabVisited('exceptions')"
+        [hidden]="tab !== 'exceptions'"
+        [loadId]="l.execution.id"
+      ></app-load-exceptions>
+      <app-load-notes
+        *ngIf="isTabVisited('notes')"
+        [hidden]="tab !== 'notes'"
+        [loadId]="l.execution.id"
+      ></app-load-notes>
+      <app-load-documents
+        *ngIf="isTabVisited('documents')"
+        [hidden]="tab !== 'documents'"
+        [loadId]="l.execution.id"
+      ></app-load-documents>
+      <app-load-activity
+        *ngIf="isTabVisited('activity')"
+        [hidden]="tab !== 'activity'"
+        [loadId]="l.execution.id"
+      ></app-load-activity>
     </div>
   </div>
 

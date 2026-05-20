@@ -3,8 +3,10 @@ using LogisticsPlatform.Application.DTOs.Loads.LoadStop;
 using LogisticsPlatform.Application.Interfaces.Repositories.Loads;
 using LogisticsPlatform.Application.Interfaces.Services.Loads;
 using LogisticsPlatform.Application.Interfaces.Services.Orders;
+using LogisticsPlatform.Application.Interfaces.Services.Security;
 using LogisticsPlatform.Domain.Entities;
 using LogisticsPlatform.Domain.Enums;
+using LogisticsPlatform.Domain.Security;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,22 +21,32 @@ namespace LogisticsPlatform.Application.Services
         private readonly ILoadRepository _loadRepo;
         private readonly ILoadStatusCalculatorService _statusCalculator;
         private readonly IOrderLoadSyncService _orderLoadSyncService;
+        private readonly IPermissionService _permission;
 
 
         public LoadStopService(
             ILoadStopRepository repository,
             ILoadRepository loadRepo,
             ILoadStatusCalculatorService statusCalculator,
-            IOrderLoadSyncService orderLoadSyncService)
+            IOrderLoadSyncService orderLoadSyncService,
+            IPermissionService permission)
         {
             _repository = repository;
             _loadRepo = loadRepo;
             _statusCalculator = statusCalculator;
             _orderLoadSyncService = orderLoadSyncService;
+            _permission = permission;
         }
 
-        public async Task AddAsync(Guid loadId, CreateLoadStopDto dto)
+        public async Task AddAsync(Guid loadId, CreateLoadStopDto dto, Guid userId)
         {
+            if (!await _permission.HasPermissionAsync(userId, Permission.Load_Update))
+                throw new ForbiddenException("You are not allowed to update load stops.");
+
+            var load = await _loadRepo.GetByIdAsync(loadId)
+                ?? throw new SendGrid.Helpers.Errors.Model.NotFoundException("Load not found");
+            await EnsureCompletedCorrectionAllowedAsync(load, userId);
+
             var stop = new LoadStop
             {
                 LoadId = loadId,
@@ -57,6 +69,13 @@ namespace LogisticsPlatform.Application.Services
 
                 AppointmentType = dto.AppointmentType,
                 FlexMinutes = dto.FlexMinutes,
+                TimeZone = NormalizeTimeZone(dto.TimeZone),
+                AppointmentStatus = dto.AppointmentStatus,
+                AppointmentConfirmed = dto.AppointmentConfirmed,
+                AppointmentConfirmationNumber = dto.AppointmentConfirmationNumber,
+                AppointmentNumber = dto.AppointmentNumber,
+                StopReference = dto.StopReference,
+                PONumbers = dto.PONumbers,
 
                 Notes = dto.Notes
 
@@ -69,10 +88,17 @@ namespace LogisticsPlatform.Application.Services
 
         }
 
-        public async Task UpdateAsync(Guid stopId, UpdateLoadStopDto dto)
+        public async Task UpdateAsync(Guid stopId, UpdateLoadStopDto dto, Guid userId)
         {
+            if (!await _permission.HasPermissionAsync(userId, Permission.Load_Update))
+                throw new ForbiddenException("You are not allowed to update load stops.");
+
             var stop = await _repository.GetByIdAsync(stopId)
                 ?? throw new Exception("Load stop not found");
+            var load = await _loadRepo.GetByIdAsync(stop.LoadId)
+                ?? throw new SendGrid.Helpers.Errors.Model.NotFoundException("Load not found");
+            await EnsureCompletedCorrectionAllowedAsync(load, userId);
+
             stop.StopType = dto.StopType;
             stop.Sequence = dto.Sequence;
 
@@ -92,6 +118,13 @@ namespace LogisticsPlatform.Application.Services
 
             stop.AppointmentType = dto.AppointmentType;
             stop.FlexMinutes = dto.FlexMinutes;
+            stop.TimeZone = NormalizeTimeZone(dto.TimeZone ?? stop.TimeZone);
+            stop.AppointmentStatus = dto.AppointmentStatus;
+            stop.AppointmentConfirmed = dto.AppointmentConfirmed;
+            stop.AppointmentConfirmationNumber = dto.AppointmentConfirmationNumber;
+            stop.AppointmentNumber = dto.AppointmentNumber;
+            stop.StopReference = dto.StopReference;
+            stop.PONumbers = dto.PONumbers;
 
             stop.Notes = dto.Notes;
 
@@ -152,14 +185,32 @@ namespace LogisticsPlatform.Application.Services
         }
 
 
-        public async Task DeleteAsync(Guid stopId)
+        public async Task DeleteAsync(Guid stopId, Guid userId)
         {
+            if (!await _permission.HasPermissionAsync(userId, Permission.Load_Update))
+                throw new ForbiddenException("You are not allowed to update load stops.");
+
             var stop = await _repository.GetByIdAsync(stopId)
                 ?? throw new Exception("Load stop not found");
+            var load = await _loadRepo.GetByIdAsync(stop.LoadId)
+                ?? throw new SendGrid.Helpers.Errors.Model.NotFoundException("Load not found");
+            await EnsureCompletedCorrectionAllowedAsync(load, userId);
 
             await _repository.DeleteAsync(stop);
             await _loadRepo.SaveChangesAsync(); 
 
+        }
+
+        private static string NormalizeTimeZone(string? timeZone)
+            => string.IsNullOrWhiteSpace(timeZone) ? "UTC" : timeZone.Trim();
+
+        private async Task EnsureCompletedCorrectionAllowedAsync(Load load, Guid userId)
+        {
+            if (load.Status != LoadStatus.Completed)
+                return;
+
+            if (!await _permission.HasPermissionAsync(userId, Permission.Load_CompletedCorrection))
+                throw new BusinessRuleException("Completed load stops are locked. Correction permission is required.");
         }
     }
 }

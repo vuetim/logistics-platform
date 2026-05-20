@@ -1,0 +1,101 @@
+<div class="tab-section">
+  <div class="tab-header">
+    <div>
+      <h3>Carrier Offers</h3>
+      <p>Internal carrier offer history. Dispatcher can mark phone/email confirmations as covered.</p>
+    </div>
+  </div>
+
+  <div class="editor-panel" *ngIf="canCreate()">
+    <div class="editor-grid">
+      <label>
+        Carrier
+        <select [(ngModel)]="form.carrierId">
+          <option value="">Select carrier</option>
+          <option *ngFor="let carrier of carriers" [value]="carrier.id">{{ carrier.name }}</option>
+        </select>
+      </label>
+      <label>
+        Offered rate
+        <input type="number" [(ngModel)]="form.offeredRate" />
+      </label>
+      <label>
+        Currency
+        <input [(ngModel)]="form.currency" />
+      </label>
+      <label>
+        Rate confirmation
+        <input [(ngModel)]="form.rateConfirmationNumber" />
+      </label>
+      <label>
+        Method
+        <select [(ngModel)]="form.tenderMethod">
+          <option value="Manual">Manual phone/email</option>
+          <option value="Email">Email</option>
+          <option value="Portal">Carrier portal</option>
+          <option value="EDI">EDI/API</option>
+        </select>
+      </label>
+      <label>
+        Expires
+        <input type="datetime-local" [(ngModel)]="form.tenderExpiresAt" />
+      </label>
+      <label>
+        Email to
+        <input type="email" [(ngModel)]="form.emailTo" placeholder="carrier dispatch email" />
+      </label>
+      <label class="full">
+        Tender notes
+        <textarea [(ngModel)]="form.tenderNotes"></textarea>
+      </label>
+    </div>
+    <div class="editor-actions">
+      <button class="tab-action primary-action" (click)="tender()" [disabled]="!form.carrierId">Tender Carrier</button>
+    </div>
+  </div>
+
+  <div class="empty" *ngIf="!loading && !assignments.length">No carrier tenders yet.</div>
+
+  <div class="table-wrap" *ngIf="assignments.length">
+    <table>
+      <thead>
+        <tr>
+          <th>Carrier</th>
+          <th>Status</th>
+          <th>Rate</th>
+          <th>Method</th>
+          <th>Confirmation</th>
+          <th>Timeline</th>
+          <th>Notes</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of assignments">
+          <td><strong>{{ item.carrierName }}</strong></td>
+          <td><span class="badge">{{ statusLabel(item.status) }}</span></td>
+          <td>{{ money(item.offeredRate) }} {{ item.currency || 'USD' }}</td>
+          <td>{{ item.tenderMethod || '-' }}</td>
+          <td>{{ item.rateConfirmationNumber || '-' }}</td>
+          <td>
+            <span>Tendered {{ item.tenderedAt | date: 'short' }}</span>
+            <span *ngIf="item.acceptedAt">Accepted {{ item.acceptedAt | date: 'short' }}</span>
+            <span *ngIf="item.rejectedAt">Rejected {{ item.rejectedAt | date: 'short' }}</span>
+          </td>
+          <td>
+            <span>{{ item.tenderNotes || '-' }}</span>
+            <span *ngIf="item.acceptedByName">Accepted by {{ item.acceptedByName }}</span>
+            <span *ngIf="item.rejectedReason">{{ item.rejectedReason }}</span>
+          </td>
+          <td>
+            <div class="row-actions">
+              <button *ngIf="canAccept(item)" (click)="accept(item)">Accept / Cover</button>
+              <button *ngIf="canReject(item)" (click)="reject(item)">Reject</button>
+              <span class="muted" *ngIf="!canAccept(item) && !canReject(item)">No action</span>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -6,10 +6,12 @@ using LogisticsPlatform.Domain.Enums;
 public class LoadAlertService : ILoadAlertService
 {
     private readonly ILoadAlertRepository _repo;
+    private readonly ILoadExceptionRepository _exceptions;
 
-    public LoadAlertService(ILoadAlertRepository repo)
+    public LoadAlertService(ILoadAlertRepository repo, ILoadExceptionRepository exceptions)
     {
         _repo = repo;
+        _exceptions = exceptions;
     }
 
     public async Task HandleEtaDelayAsync(LoadStop stop)
@@ -50,5 +52,33 @@ public class LoadAlertService : ILoadAlertService
         };
 
         await _repo.AddAsync(alert);
+
+        if (severity is AlertSeverity.Critical or AlertSeverity.Severe)
+        {
+            var exceptionExists = await _exceptions.ExistsOpenAsync(
+                stop.LoadId,
+                stop.Id,
+                "eta-delay",
+                "running-late");
+
+            if (!exceptionExists)
+            {
+                await _exceptions.AddAsync(new LoadException
+                {
+                    LoadId = stop.LoadId,
+                    LoadStopId = stop.Id,
+                    ExceptionKey = "eta-delay",
+                    ExceptionValue = "ETA delay",
+                    ReasonKey = "running-late",
+                    ReasonValue = $"Predicted {minutes} minutes late",
+                    ResponsiblePartyKey = "carrier",
+                    ResponsiblePartyValue = "Carrier",
+                    Status = LoadExceptionStatus.Open,
+                    Description = $"Automatic ETA exception for {stop.LocationName} ({stop.StopType}).",
+                    OccurredAt = DateTime.UtcNow,
+                    CreatedByUserId = Guid.Empty
+                });
+            }
+        }
     }
 }

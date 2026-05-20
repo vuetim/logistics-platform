@@ -1,11 +1,16 @@
 ﻿using LogisticsPlatform.Application.Common.Exceptions;
 using LogisticsPlatform.Application.DTOs.Financial;
 using LogisticsPlatform.Application.Interfaces.Repositories.Loads;
+using LogisticsPlatform.Application.Interfaces.Repositories.Orders;
 using LogisticsPlatform.Application.Interfaces.Services.Customers;
+using LogisticsPlatform.Application.Interfaces.Services.Notifications;
+using LogisticsPlatform.Application.Interfaces.Services.Security;
 using LogisticsPlatform.Domain.Entities;
 using LogisticsPlatform.Domain.Entities.Financial;
 using LogisticsPlatform.Domain.Enums;
+using LogisticsPlatform.Domain.Security;
 using SendGrid.Helpers.Errors.Model;
+using ForbiddenException = LogisticsPlatform.Application.Common.Exceptions.ForbiddenException;
 
 namespace LogisticsPlatform.Application.Services.Financial
 {
@@ -13,64 +18,31 @@ namespace LogisticsPlatform.Application.Services.Financial
     {
         private readonly ICustomerInvoiceRepository _repo;
         private readonly ILoadRepository _loads;
+        private readonly IOrderRepository _orders;
+        private readonly IPermissionService _permission;
+        private readonly INotificationService _notifications;
 
         public CustomerInvoiceService(
             ICustomerInvoiceRepository repo,
-            ILoadRepository loads )
+            ILoadRepository loads,
+            IOrderRepository orders,
+            IPermissionService permission,
+            INotificationService notifications)
         {
             _repo = repo;
             _loads = loads;
-            
+            _orders = orders;
+            _permission = permission;
+            _notifications = notifications;
         }
 
-        /// <summary>
-        /// 
-        /// - If invoice for this load exists => return mapped DTO
-        /// - If not => auto-create a draft invoice from load data and return it
-        /// </summary>
         public async Task<CustomerInvoiceDto> GetAsync(Guid loadId)
         {
-            // 1) Provon me gjet invoice ekzistues për këtë load
             var existing = await _repo.GetByLoadIdAsync(loadId);
-            if (existing != null)
-            {
-                // Nëse invoice është Draft → rifreskoje nga load
-                if (existing.Status == InvoiceStatus.Draft)
-                {
-                    var loadForRefresh = await _loads.GetByIdAsync(loadId)
-                        ?? throw new NotFoundException("Load not found.");
+            if (existing == null)
+                throw new NotFoundException("Invoice not found.");
 
-                    await RecalculateDraftInvoiceAsync(existing, loadForRefresh);
-                    await _repo.SaveChangesAsync();
-                }
-
-                return Map(existing);
-            }
-
-            // 2) Nuk ekziston → auto-create draft invoice nga load
-            var load = await _loads.GetByIdAsync(loadId)
-                ?? throw new NotFoundException("Load not found.");
-
-            if (load.CustomerId == null)
-                throw new BusinessValidationException("Cannot generate customer invoice: load has no assigned customer.");
-
-            //  invoice mund të krijohet edhe pa delivered, prandaj nuk e kushtëzojmë me status
-            var today = DateTime.UtcNow;
-
-            var dueDate = today.AddDays((int)load.Customer.Billing.Terms);
-
-
-            var dto = new CreateInvoiceDto
-            {
-                InvoiceDate = today,
-                DueDate = dueDate,
-                Notes = "Auto-created draft invoice."
-            };
-
-            // Auto create as system / createdByUser
-            var created = await CreateInternalAsync(load, dto, load.CreatedByUserId, isAuto: true);
-
-            return Map(created);
+            return Map(existing);
         }
 
         public async Task<List<CustomerInvoiceDto>> ListAsync()
@@ -202,6 +174,9 @@ namespace LogisticsPlatform.Application.Services.Financial
 
         public async Task UpdateStatusAsync(Guid invoiceId, InvoiceStatus status, Guid userId)
         {
+            if (!await _permission.HasPermissionAsync(userId, Permission.Financial_Invoice_UpdateStatus))
+                throw new ForbiddenException("You are not allowed to update invoice status.");
+
             var invoice = await _repo.GetByIdAsync(invoiceId)
                 ?? throw new NotFoundException("Invoice not found.");
 
@@ -209,11 +184,19 @@ namespace LogisticsPlatform.Application.Services.Financial
             invoice.UpdatedAt = DateTime.UtcNow;
             invoice.UpdatedByUserId = userId;
 
+            await SyncOrderBillingStatusAsync(invoice);
             await _repo.SaveChangesAsync();
+            await _notifications.NotifyInvoiceEventAsync(
+                invoice.LoadId,
+                userId,
+                $"Invoice {invoice.InvoiceNumber} status changed to {status}");
         }
 
         public async Task<CustomerInvoiceDto> RecordPaymentAsync(Guid invoiceId, RecordInvoicePaymentDto dto, Guid userId)
         {
+            if (!await _permission.HasPermissionAsync(userId, Permission.Financial_Invoice_RecordPayment))
+                throw new ForbiddenException("You are not allowed to record invoice payments.");
+
             var invoice = await _repo.GetByIdAsync(invoiceId)
                 ?? throw new NotFoundException("Invoice not found.");
 
@@ -229,7 +212,12 @@ namespace LogisticsPlatform.Application.Services.Financial
             invoice.UpdatedAt = DateTime.UtcNow;
             invoice.UpdatedByUserId = userId;
 
+            await SyncOrderBillingStatusAsync(invoice);
             await _repo.SaveChangesAsync();
+            await _notifications.NotifyInvoiceEventAsync(
+                invoice.LoadId,
+                userId,
+                $"Payment recorded for invoice {invoice.InvoiceNumber}: {invoice.AmountPaid:N2}");
             return Map(invoice);
         }
 
@@ -297,6 +285,28 @@ namespace LogisticsPlatform.Application.Services.Financial
                 invoice.AmountPaid = invoice.TotalAmount;
 
             invoice.DueDate = invoice.InvoiceDate.AddDays((int)load.Customer.Billing.Terms);
+        }
+
+        private async Task SyncOrderBillingStatusAsync(CustomerInvoice invoice)
+        {
+            if (invoice.Load?.Orders == null || invoice.Load.Orders.Count == 0)
+                return;
+
+            var targetStatus = invoice.Status switch
+            {
+                InvoiceStatus.Sent => OrderStatus.Billed,
+                InvoiceStatus.Paid => OrderStatus.Completed,
+                _ => (OrderStatus?)null
+            };
+
+            if (!targetStatus.HasValue)
+                return;
+
+            foreach (var orderId in invoice.Load.Orders.Select(x => x.OrderId).Distinct())
+            {
+                var order = await _orders.GetByIdWithLoadsAsync(orderId);
+                order?.TrySyncStatusFromExecution(targetStatus.Value);
+            }
         }
 
     }

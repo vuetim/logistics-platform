@@ -148,15 +148,15 @@ namespace LogisticsPlatform.Infrastructure.Persistence.Repositories.Queries
         {
             var query = _context.Orders
                 .AsNoTracking()
-                .Include(o => o.Customer)
                 .AsQueryable();
 
             // Filters
             if (!string.IsNullOrWhiteSpace(parameters.Search))
             {
+                var search = parameters.Search.Trim();
                 query = query.Where(o =>
-                    o.OrderNumber.Contains(parameters.Search) ||
-                    o.Customer.Name.Contains(parameters.Search));
+                    o.OrderNumber.Contains(search) ||
+                    o.Customer.Name.Contains(search));
             }
 
             if (parameters.Status.HasValue)

@@ -1,9 +1,10 @@
-import { AuthGuard } from "../../../core/auth/auth.guard";
-import { PermissionGuard } from "../../../core/auth/permissions/permission.guard";
-import { UsersPageComponent } from "./users-page/users-page.component";
+import { Routes } from '@angular/router';
+import { AuthGuard } from '../../../core/auth/auth.guard';
+import { PermissionGuard } from '../../../core/auth/permissions/permission.guard';
+import { UsersPageComponent } from './users-page/users-page.component';
 
 
-export default [
+const routes: Routes = [
     {
         path: '',
         component: UsersPageComponent,
@@ -13,3 +14,5 @@ export default [
         }
     }
 ];
+
+export default routes;

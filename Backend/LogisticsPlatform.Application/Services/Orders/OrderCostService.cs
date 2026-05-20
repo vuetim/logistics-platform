@@ -4,10 +4,13 @@ using LogisticsPlatform.Application.Extensions;
 using LogisticsPlatform.Application.Interfaces.Repositories.Orders;
 using LogisticsPlatform.Application.Interfaces.Services.ActivityLog;
 using LogisticsPlatform.Application.Interfaces.Services.Orders;
+using LogisticsPlatform.Application.Interfaces.Services.Security;
 using LogisticsPlatform.Domain.Entities;
 using LogisticsPlatform.Domain.Enums;
+using LogisticsPlatform.Domain.Security;
 using SendGrid.Helpers.Errors.Model;
 using System;
+using ForbiddenException = LogisticsPlatform.Application.Common.Exceptions.ForbiddenException;
 
 namespace LogisticsPlatform.Application.Services.Orders;
 
@@ -16,19 +19,25 @@ public class OrderCostService : IOrderCostService
     private readonly IOrderRepository _orders;
     private readonly IOrderCostRepository _costs;
     private readonly IActivityLogService _activityLog;
+    private readonly IPermissionService _permission;
 
     public OrderCostService(
         IOrderRepository orders,
         IOrderCostRepository costs,
-        IActivityLogService activityLog)
+        IActivityLogService activityLog,
+        IPermissionService permission)
     {
         _orders = orders;
         _costs = costs;
         _activityLog = activityLog;
+        _permission = permission;
     }
 
-    public async Task<OrderCostDto> GetAsync(Guid orderId)
+    public async Task<OrderCostDto> GetAsync(Guid orderId, Guid userId)
     {
+        if (!await _permission.HasPermissionAsync(userId, Permission.OrderCost_View))
+            throw new ForbiddenException("You are not allowed to view order costs.");
+
         var order = await _orders.GetByIdAsync(orderId)
             ?? throw new NotFoundException("Order not found.");
 
@@ -89,6 +98,9 @@ public class OrderCostService : IOrderCostService
 
     public async Task UpdateAsync(Guid orderId, UpdateOrderCostDto dto, Guid userId)
     {
+        if (!await _permission.HasPermissionAsync(userId, Permission.OrderCost_Update))
+            throw new ForbiddenException("You are not allowed to update order costs.");
+
         var order = await _orders.GetByIdWithLoadsAsync(orderId)
             ?? throw new NotFoundException("Order not found.");
 

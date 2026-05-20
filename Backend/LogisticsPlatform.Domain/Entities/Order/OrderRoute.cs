@@ -38,6 +38,10 @@ namespace LogisticsPlatform.Domain.Entities
         public AppointmentType AppointmentType { get; set; } = AppointmentType.Appointment;
         public int? FlexMinutes { get; set; }
         public bool HasTime { get; set; } = true;
+        public string TimeZone { get; set; } = "UTC";
+        public AppointmentStatus AppointmentStatus { get; set; } = AppointmentStatus.Pending;
+        public bool AppointmentConfirmed { get; set; }
+        public string? AppointmentConfirmationNumber { get; set; }
         public string? StopReference { get; set; }      // pickup / delivery ref
         public string? AppointmentNumber { get; set; }  // known at planning
 

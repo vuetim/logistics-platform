@@ -37,6 +37,8 @@ public class LoadRepository : ILoadRepository
         return await _context.Loads
             .Include(l => l.Customer)
             .Include(l => l.Carrier)
+            .Include(l => l.Cost)
+                .ThenInclude(c => c.LineItems)
             .Include(l => l.Stops)
             .Include(l => l.Orders)
                 .ThenInclude(lo => lo.Order)

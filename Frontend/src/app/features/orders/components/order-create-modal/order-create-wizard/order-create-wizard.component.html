@@ -1,6 +1,8 @@
 <div class="wizard-grid">
+  <div class="validation-banner" *ngIf="validationMessage">{{ validationMessage }}</div>
+
   <div class="form-row">
-    <label for="customerId" title="Customer account that owns this order.">Customer</label>
+    <label for="customerId">Customer <app-field-info text="Customer account that owns the order and receives the invoice."></app-field-info></label>
     <select id="customerId" [(ngModel)]="order.customerId">
       <option value="">Select Customer</option>
       <option *ngFor="let customer of customers" [value]="customer.id">
@@ -10,7 +12,7 @@
   </div>
 
   <div class="form-row">
-    <label for="orderType" title="Business type of this order, usually Transportation.">Order Type</label>
+    <label for="orderType">Order Type <app-field-info text="Transportation is the standard freight movement order. Storage is for warehouse-only work."></app-field-info></label>
     <select id="orderType" [(ngModel)]="order.orderType">
       <option value="Transportation">Transportation</option>
       <option value="Storage">Storage</option>
@@ -18,7 +20,7 @@
   </div>
 
   <div class="form-row">
-    <label for="direction" title="Inbound: into your network. Outbound: out of your network.">Direction</label>
+    <label for="direction">Direction <app-field-info text="Inbound moves freight into the customer network. Outbound moves freight out."></app-field-info></label>
     <select id="direction" [(ngModel)]="order.direction">
       <option value="Outbound">Outbound</option>
       <option value="Inbound">Inbound</option>
@@ -26,17 +28,17 @@
   </div>
 
   <div class="form-row">
-    <label for="startDate" title="Order window start: commercial/planning validity start.">Order Window Start</label>
+    <label for="startDate">Order Window Start <app-field-info text="Earliest date/time the order is valid for planning. Planned pickup should not be before this."></app-field-info></label>
     <input id="startDate" type="datetime-local" [(ngModel)]="startDateInput" title="Commercial/order validity start date and time." />
   </div>
 
   <div class="form-row">
-    <label for="endDate" title="Order window end: commercial/planning validity end.">Order Window End</label>
+    <label for="endDate">Order Window End <app-field-info text="Latest date/time the order should be planned inside. Planned delivery should not be after this."></app-field-info></label>
     <input id="endDate" type="datetime-local" [(ngModel)]="endDateInput" title="Commercial/order validity end date and time." />
   </div>
 
   <div class="form-row">
-    <label for="plannedPickupDate" title="Operational planned first pickup date/time for execution planning.">Planned Pickup (Operational)</label>
+    <label for="plannedPickupDate">Planned Pickup <app-field-info text="Expected first pickup appointment/window. This becomes the first load pickup when creating a load from the order."></app-field-info></label>
     <input
       id="plannedPickupDate"
       type="datetime-local"
@@ -46,7 +48,7 @@
   </div>
 
   <div class="form-row">
-    <label for="plannedDeliveryDate" title="Operational planned final delivery date/time for execution planning.">Planned Delivery (Operational)</label>
+    <label for="plannedDeliveryDate">Planned Delivery <app-field-info text="Expected final delivery appointment/window. Must be after planned pickup."></app-field-info></label>
     <input
       id="plannedDeliveryDate"
       type="datetime-local"
@@ -56,7 +58,7 @@
   </div>
 
   <div class="form-row">
-    <label for="preferredCarrierId" title="Optional preferred carrier to prioritize during planning/tendering.">Preferred Carrier</label>
+    <label for="preferredCarrierId">Preferred Carrier <app-field-info text="Optional carrier preference. It can prefill the load but should still go through tender/coverage logic."></app-field-info></label>
     <select id="preferredCarrierId" [(ngModel)]="order.preferredCarrierId">
       <option [ngValue]="null">No preference</option>
       <option *ngFor="let carrier of carriers" [ngValue]="carrier.id">
@@ -66,43 +68,48 @@
   </div>
 
   <div class="form-row">
-    <label for="primaryPONumber" title="Primary customer Purchase Order reference for billing and traceability.">PO Number</label>
-    <input id="primaryPONumber" [(ngModel)]="order.primaryPONumber" title="Purchase order reference." />
+    <label for="primaryPONumber">PO Number <app-field-info text="Customer purchase order reference. Used for billing, customer traceability, and order-to-load linkage."></app-field-info></label>
+    <input id="primaryPONumber" maxlength="80" [(ngModel)]="order.primaryPONumber" title="Purchase order reference." />
   </div>
 
   <div class="form-row">
-    <label for="primaryBolNumber" title="Bill of Lading reference number.">BOL Number</label>
-    <input id="primaryBolNumber" [(ngModel)]="order.primaryBolNumber" title="Bill of Lading number." />
+    <label for="primaryBolNumber">BOL Number <app-field-info text="Bill of Lading reference. Usually identifies the shipment paperwork and can copy to the load."></app-field-info></label>
+    <input id="primaryBolNumber" maxlength="80" [(ngModel)]="order.primaryBolNumber" title="Bill of Lading number." />
   </div>
 
   <div class="form-row">
-    <label for="primaryProNumber" title="Carrier PRO tracking/reference number if available.">Pro Number</label>
-    <input id="primaryProNumber" [(ngModel)]="order.primaryProNumber" title="Carrier PRO reference number." />
+    <label for="primaryProNumber">PRO Number <app-field-info text="Carrier shipment/tracking reference. Often provided by the carrier and may become the load tracking number."></app-field-info></label>
+    <input id="primaryProNumber" maxlength="80" [(ngModel)]="order.primaryProNumber" title="Carrier PRO reference number." />
   </div>
 
   <div class="form-row">
-    <label for="totalWeight" title="Estimated total shipment weight (all items).">Total Weight</label>
-    <input id="totalWeight" type="number" [(ngModel)]="order.totalWeight" title="Total planned weight for this order." />
+    <label for="commodity">Commodity <app-field-info text="Short freight description, such as produce, machinery, frozen goods, or mixed pallets."></app-field-info></label>
+    <input id="commodity" maxlength="160" [(ngModel)]="order.commodity" title="Commodity or freight description." />
   </div>
 
   <div class="form-row">
-    <label for="totalPallets" title="Estimated total pallet count across all items.">Total Pallets</label>
-    <input id="totalPallets" type="number" [(ngModel)]="order.totalPallets" title="Total planned pallets for this order." />
+    <label for="totalWeight">Total Weight <app-field-info text="Estimated total shipment weight. Keep non-negative; detailed item weights can refine this later."></app-field-info></label>
+    <input id="totalWeight" type="number" min="0" [(ngModel)]="order.totalWeight" title="Total planned weight for this order." />
   </div>
 
   <div class="form-row">
-    <label for="totalVolume" title="Estimated total volume for planning/capacity.">Total Volume</label>
-    <input id="totalVolume" type="number" [(ngModel)]="order.totalVolume" title="Total planned shipment volume." />
+    <label for="totalPallets">Total Pallets <app-field-info text="Estimated pallet count for capacity planning and pickup/delivery handling."></app-field-info></label>
+    <input id="totalPallets" type="number" min="0" [(ngModel)]="order.totalPallets" title="Total planned pallets for this order." />
+  </div>
+
+  <div class="form-row">
+    <label for="totalVolume">Total Volume <app-field-info text="Estimated cube/volume for capacity planning when dimensions are known."></app-field-info></label>
+    <input id="totalVolume" type="number" min="0" [(ngModel)]="order.totalVolume" title="Total planned shipment volume." />
   </div>
 
   <div class="form-row full">
-    <label for="dispatchNotes" title="Operational instructions for dispatch team.">Dispatch Notes</label>
-    <textarea id="dispatchNotes" [(ngModel)]="order.dispatchNotes" title="Internal/operational dispatch instructions."></textarea>
+    <label for="dispatchNotes">Dispatch Notes <app-field-info text="Internal instructions for dispatch, pickup constraints, site contacts, or driver handling notes."></app-field-info></label>
+    <textarea id="dispatchNotes" maxlength="2000" [(ngModel)]="order.dispatchNotes" title="Internal/operational dispatch instructions."></textarea>
   </div>
 
   <div class="form-row full">
-    <label for="deliveryNotes" title="Delivery-specific handling/site instructions.">Delivery Notes</label>
-    <textarea id="deliveryNotes" [(ngModel)]="order.deliveryNotes" title="Final delivery instructions for operations."></textarea>
+    <label for="deliveryNotes">Delivery Notes <app-field-info text="Delivery-site instructions, receiving constraints, appointment notes, or unloading details."></app-field-info></label>
+    <textarea id="deliveryNotes" maxlength="2000" [(ngModel)]="order.deliveryNotes" title="Final delivery instructions for operations."></textarea>
   </div>
 
   <div class="form-actions">

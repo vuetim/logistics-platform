@@ -1,0 +1,157 @@
+<div class="dispatcher-panel">
+  <div class="panel-header">
+    <button (click)="save()" [disabled]="saving || !canSave()">Save Load</button>
+  </div>
+
+  <div class="form-grid">
+    <label>
+      <span
+        >Carrier
+        <app-field-info
+          text="Assigned carrier for execution. Once accepted, this is the carrier responsible for pickup and delivery."
+        ></app-field-info
+      ></span>
+      <select [(ngModel)]="form.carrierId" [disabled]="!canEditCommercial()">
+        <option value="">No carrier</option>
+        <option *ngFor="let carrier of carriers" [value]="carrier.id">
+          {{ carrier.name }}
+        </option>
+      </select>
+    </label>
+    <label>
+      <span
+        >Carrier rate
+        <app-field-info
+          text="Base linehaul amount payable to the carrier. Carrier accessorials are managed in Costs."
+        ></app-field-info
+      ></span>
+      <input type="number" min="0" [(ngModel)]="form.carrierRate" [readonly]="!canEditCommercial()" />
+    </label>
+    <label>
+      <span
+        >Customer rate
+        <app-field-info
+          text="Base linehaul amount billable to the customer. Customer accessorials are managed in Costs."
+        ></app-field-info
+      ></span>
+      <input type="number" min="0" [(ngModel)]="form.customerRate" [readonly]="!canEditCommercial()" />
+    </label>
+    <label>
+      <span
+        >Accessorials
+        <app-field-info
+          text="Read-only customer accessorial snapshot from cost line items. Edit accessorials in the Costs tab."
+        ></app-field-info
+      ></span>
+      <input type="number" min="0" [(ngModel)]="form.accessorials" readonly />
+    </label>
+    <label>
+      <span
+        >Origin
+        <app-field-info
+          text="Load origin display value, normally derived from the first pickup stop."
+        ></app-field-info
+      ></span>
+      <input maxlength="250" [(ngModel)]="form.origin" [readonly]="!canEditOperational()" />
+    </label>
+    <label>
+      <span
+        >Destination
+        <app-field-info
+          text="Load destination display value, normally derived from the final delivery stop."
+        ></app-field-info
+      ></span>
+      <input maxlength="250" [(ngModel)]="form.destination" [readonly]="!canEditOperational()" />
+    </label>
+    <label>
+      <span
+        >Rate confirmation
+        <app-field-info
+          text="Carrier rate confirmation reference for the agreed carrier pay and load terms."
+        ></app-field-info
+      ></span>
+      <input maxlength="80" [(ngModel)]="form.rateConfirmationNumber" [readonly]="!canEditOperational()" />
+    </label>
+    <label>
+      <span
+        >Tracking #
+        <app-field-info
+          text="Operational tracking reference. Often carrier PRO or an external tracker/load ID."
+        ></app-field-info
+      ></span>
+      <input maxlength="120" [(ngModel)]="form.trackingNumber" [readonly]="!canEditOperational()" />
+    </label>
+    <label>
+      <span
+        >BOL
+        <app-field-info
+          text="Bill of Lading reference copied from the order when available; editable if execution paperwork changes."
+        ></app-field-info
+      ></span>
+      <input maxlength="80" [(ngModel)]="form.bolNumber" [readonly]="!canEditOperational()" />
+    </label>
+    <label>
+      <span
+        >PRO
+        <app-field-info
+          text="Carrier shipment/reference number. Can be used for carrier tracking and customer visibility."
+        ></app-field-info
+      ></span>
+      <input maxlength="80" [(ngModel)]="form.proNumber" [readonly]="!canEditOperational()" />
+    </label>
+    <label>
+      <span
+        >Driver
+        <app-field-info
+          text="Driver name used after dispatch for operations and customer updates."
+        ></app-field-info
+      ></span>
+      <input maxlength="120" [(ngModel)]="form.driverName" [readonly]="!canEditOperational()" />
+    </label>
+    <label>
+      <span
+        >Driver phone
+        <app-field-info
+          text="Driver or dispatch contact phone for live execution communication."
+        ></app-field-info
+      ></span>
+      <input maxlength="40" [(ngModel)]="form.driverPhone" [readonly]="!canEditOperational()" />
+    </label>
+    <label>
+      <span
+        >Driver email
+        <app-field-info
+          text="Optional driver/dispatch email. Backend validates email format when provided."
+        ></app-field-info
+      ></span>
+      <input type="email" maxlength="160" [(ngModel)]="form.driverEmail" [readonly]="!canEditOperational()" />
+    </label>
+    <label>
+      <span
+        >Truck #
+        <app-field-info
+          text="Power unit/truck identifier used for dispatch and check-in."
+        ></app-field-info
+      ></span>
+      <input maxlength="40" [(ngModel)]="form.truckNumber" [readonly]="!canEditOperational()" />
+    </label>
+    <label>
+      <span
+        >Trailer #
+        <app-field-info
+          text="Trailer identifier used for facility check-in, tracking, and paperwork."
+        ></app-field-info
+      ></span>
+      <input maxlength="40" [(ngModel)]="form.trailerNumber" [readonly]="!canEditOperational()" />
+    </label>
+    <label>
+      <span
+        >Carrier SCAC
+        <app-field-info
+          text="Carrier SCAC code when available. Useful for EDI, paperwork, and carrier identity."
+        ></app-field-info
+      ></span>
+      <input maxlength="10" [(ngModel)]="form.carrierSCAC" [readonly]="!canEditOperational()" />
+    </label>
+  </div>
+</div>

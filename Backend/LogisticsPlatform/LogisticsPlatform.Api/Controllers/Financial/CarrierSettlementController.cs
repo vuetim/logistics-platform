@@ -1,6 +1,7 @@
 ﻿using LogisticsPlatform.Application.DTOs.Financial;
 using LogisticsPlatform.Application.Interfaces.Services.Carriers;
 using LogisticsPlatform.Application.Interfaces.Services.Security;
+using LogisticsPlatform.Domain.Security;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -14,13 +15,16 @@ namespace LogisticsPlatform.Api.Controllers.Financial
     {
         private readonly ICarrierSettlementService _service;
         private readonly IPdfService _pdf;
+        private readonly IPermissionService _permissions;
 
         public CarrierSettlementController(
             ICarrierSettlementService service,
-            IPdfService pdf)
+            IPdfService pdf,
+            IPermissionService permissions)
         {
             _service = service;
             _pdf = pdf;
+            _permissions = permissions;
         }
 
         // GET settlement by loadId
@@ -28,8 +32,9 @@ namespace LogisticsPlatform.Api.Controllers.Financial
         [HttpGet]
         public async Task<IActionResult> Get(Guid loadId)
         {
-            // Nëse ekziston settlement → kthehet
-            // Nëse nuk ekziston → krijohet auto draft nga load (GetAsync = GetOrCreate)
+            if (!await _permissions.HasPermissionAsync(GetUserId(), Permission.Financial_View))
+                return Forbid();
+
             var settlement = await _service.GetAsync(loadId);
             return Ok(settlement);
         }
@@ -39,7 +44,9 @@ namespace LogisticsPlatform.Api.Controllers.Financial
         [HttpPost]
         public async Task<IActionResult> Create(Guid loadId, [FromBody] CreateSettlementDto dto)
         {
-            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var userId = GetUserId();
+            if (!await _permissions.HasPermissionAsync(userId, Permission.Financial_Settlement_UpdateStatus))
+                return Forbid();
 
             var settlement = await _service.CreateAsync(loadId, dto, userId);
             return Ok(settlement);
@@ -50,11 +57,17 @@ namespace LogisticsPlatform.Api.Controllers.Financial
         [HttpGet("{settlementId:guid}/pdf")]
         public async Task<IActionResult> GetPdf(Guid loadId, Guid settlementId)
         {
+            if (!await _permissions.HasPermissionAsync(GetUserId(), Permission.Financial_View))
+                return Forbid();
+
             var settlement = await _service.GetByIdAsync(settlementId);
             var bytes = _pdf.GenerateCarrierSettlementPdf(settlement);
 
             return File(bytes, "application/pdf",
                 $"carrier-settlement-{settlementId}.pdf");
         }
+
+        private Guid GetUserId()
+            => Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
     }
 }

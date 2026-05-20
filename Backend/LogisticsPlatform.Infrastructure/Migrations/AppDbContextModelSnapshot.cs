@@ -964,6 +964,10 @@ namespace LogisticsPlatform.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<decimal?>("DistanceMiles")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
                     b.Property<string>("DriverEmail")
                         .HasColumnType("nvarchar(max)");
 
@@ -971,6 +975,13 @@ namespace LogisticsPlatform.Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("DriverPhone")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("DurationMinutes")
+                        .HasColumnType("int");
+
+                    b.Property<string>("EncodedPolyline")
+                        .HasMaxLength(8000)
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("HasDelayRisk")
@@ -985,9 +996,21 @@ namespace LogisticsPlatform.Infrastructure.Migrations
                     b.Property<bool>("IsTemperatureControlled")
                         .HasColumnType("bit");
 
+                    b.Property<decimal?>("LastKnownLatitude")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<DateTime?>("LastKnownLocationAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal?>("LastKnownLongitude")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
                     b.Property<string>("LoadNumber")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)");
 
                     b.Property<int>("Mode")
                         .HasColumnType("int");
@@ -1017,8 +1040,16 @@ namespace LogisticsPlatform.Infrastructure.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
+                    b.Property<string>("TrackingExternalId")
+                        .HasMaxLength(160)
+                        .HasColumnType("nvarchar(160)");
+
                     b.Property<string>("TrackingNumber")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TrackingProvider")
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)");
 
                     b.Property<string>("TrailerNumber")
                         .HasColumnType("nvarchar(max)");
@@ -1036,13 +1067,27 @@ namespace LogisticsPlatform.Infrastructure.Migrations
 
                     b.HasIndex("CarrierId");
 
+                    b.HasIndex("CreatedAt");
+
                     b.HasIndex("CreatedByUserId");
+
+                    b.HasIndex("CustomerId");
 
                     b.HasIndex("IsArchived");
 
+                    b.HasIndex("LoadNumber");
+
+                    b.HasIndex("Mode");
+
                     b.HasIndex("Status");
 
+                    b.HasIndex("TrackingExternalId");
+
+                    b.HasIndex("CarrierId", "Status");
+
                     b.HasIndex("CustomerId", "Status");
+
+                    b.HasIndex("IsArchived", "CreatedAt");
 
                     b.HasIndex("IsArchived", "Status");
 
@@ -1099,6 +1144,14 @@ namespace LogisticsPlatform.Infrastructure.Migrations
                     b.Property<DateTime?>("AcceptedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("AcceptedByEmail")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("AcceptedByName")
+                        .HasMaxLength(160)
+                        .HasColumnType("nvarchar(160)");
+
                     b.Property<Guid>("CarrierId")
                         .HasColumnType("uniqueidentifier");
 
@@ -1109,7 +1162,8 @@ namespace LogisticsPlatform.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Currency")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -1122,13 +1176,27 @@ namespace LogisticsPlatform.Infrastructure.Migrations
                         .HasColumnType("decimal(18,4)");
 
                     b.Property<string>("RateConfirmationNumber")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)");
 
                     b.Property<DateTime?>("RejectedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("RejectedReason")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("Status")
                         .HasColumnType("int");
+
+                    b.Property<DateTime?>("TenderExpiresAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("TenderMethod")
+                        .HasMaxLength(40)
+                        .HasColumnType("nvarchar(40)");
+
+                    b.Property<string>("TenderNotes")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("TenderedAt")
                         .HasColumnType("datetime2");
@@ -1141,6 +1209,12 @@ namespace LogisticsPlatform.Infrastructure.Migrations
                     b.HasIndex("CarrierId");
 
                     b.HasIndex("LoadId");
+
+                    b.HasIndex("TenderExpiresAt");
+
+                    b.HasIndex("CarrierId", "Status");
+
+                    b.HasIndex("LoadId", "IsActive");
 
                     b.ToTable("LoadCarrierAssignments");
                 });
@@ -1349,6 +1423,102 @@ namespace LogisticsPlatform.Infrastructure.Migrations
                     b.ToTable("LoadEquipment");
                 });
 
+            modelBuilder.Entity("LogisticsPlatform.Domain.Entities.LoadException", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("AffectedItemName")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("AffectedItemReference")
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("CreatedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("EdiReasonCode")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("ExceptionKey")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)");
+
+                    b.Property<string>("ExceptionValue")
+                        .IsRequired()
+                        .HasMaxLength(160)
+                        .HasColumnType("nvarchar(160)");
+
+                    b.Property<Guid>("LoadId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("LoadStopId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("OccurredAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("OrderId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal?>("Quantity")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<string>("ReasonKey")
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)");
+
+                    b.Property<string>("ReasonValue")
+                        .HasMaxLength(160)
+                        .HasColumnType("nvarchar(160)");
+
+                    b.Property<string>("ResolutionNotes")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ResolvedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ResponsiblePartyKey")
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)");
+
+                    b.Property<string>("ResponsiblePartyValue")
+                        .HasMaxLength(160)
+                        .HasColumnType("nvarchar(160)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Unit")
+                        .HasMaxLength(40)
+                        .HasColumnType("nvarchar(40)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LoadStopId");
+
+                    b.HasIndex("OrderId");
+
+                    b.HasIndex("LoadId", "Status");
+
+                    b.ToTable("LoadExceptions");
+                });
+
             modelBuilder.Entity("LogisticsPlatform.Domain.Entities.LoadNote", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1408,8 +1578,18 @@ namespace LogisticsPlatform.Infrastructure.Migrations
                     b.Property<string>("AddressLine2")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("AppointmentConfirmationNumber")
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
+
+                    b.Property<bool>("AppointmentConfirmed")
+                        .HasColumnType("bit");
+
                     b.Property<string>("AppointmentNumber")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("AppointmentStatus")
+                        .HasColumnType("int");
 
                     b.Property<int>("AppointmentType")
                         .HasColumnType("int");
@@ -1476,6 +1656,10 @@ namespace LogisticsPlatform.Infrastructure.Migrations
                     b.Property<string>("Notes")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("PONumbers")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
                     b.Property<DateTime?>("PlannedArrivalFrom")
                         .HasColumnType("datetime2");
 
@@ -1518,6 +1702,11 @@ namespace LogisticsPlatform.Infrastructure.Migrations
                     b.Property<int>("StopType")
                         .HasColumnType("int");
 
+                    b.Property<string>("TimeZone")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
@@ -1525,7 +1714,54 @@ namespace LogisticsPlatform.Infrastructure.Migrations
 
                     b.HasIndex("LoadId");
 
+                    b.HasIndex("StopType", "PlannedArrivalFrom");
+
+                    b.HasIndex("StopType", "PlannedArrivalTo");
+
+                    b.HasIndex("LoadId", "StopType", "Sequence");
+
                     b.ToTable("LoadStops");
+                });
+
+            modelBuilder.Entity("LogisticsPlatform.Domain.Entities.LoadStopServiceRequirement", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeliveryService")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsPickupService")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("LoadStopId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ServiceKey")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)");
+
+                    b.Property<string>("ServiceValue")
+                        .IsRequired()
+                        .HasMaxLength(160)
+                        .HasColumnType("nvarchar(160)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LoadStopId", "ServiceKey");
+
+                    b.ToTable("LoadStopServiceRequirements");
                 });
 
             modelBuilder.Entity("LogisticsPlatform.Domain.Entities.Order", b =>
@@ -1564,7 +1800,8 @@ namespace LogisticsPlatform.Infrastructure.Migrations
 
                     b.Property<string>("OrderNumber")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)");
 
                     b.Property<int>("OrderType")
                         .HasColumnType("int");
@@ -1612,11 +1849,33 @@ namespace LogisticsPlatform.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CreatedAt");
+
                     b.HasIndex("CreatedByUserId");
 
                     b.HasIndex("CustomerId");
 
+                    b.HasIndex("Direction");
+
+                    b.HasIndex("EndDate");
+
+                    b.HasIndex("OrderNumber");
+
+                    b.HasIndex("Phase");
+
+                    b.HasIndex("PlannedDeliveryDate");
+
+                    b.HasIndex("PlannedPickupDate");
+
                     b.HasIndex("PreferredCarrierId");
+
+                    b.HasIndex("StartDate");
+
+                    b.HasIndex("Status");
+
+                    b.HasIndex("CustomerId", "Status");
+
+                    b.HasIndex("Status", "CreatedAt");
 
                     b.ToTable("Orders");
                 });
@@ -1981,8 +2240,17 @@ namespace LogisticsPlatform.Infrastructure.Migrations
                     b.Property<string>("AddressLine2")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("AppointmentConfirmationNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("AppointmentConfirmed")
+                        .HasColumnType("bit");
+
                     b.Property<string>("AppointmentNumber")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("AppointmentStatus")
+                        .HasColumnType("int");
 
                     b.Property<int>("AppointmentType")
                         .HasColumnType("int");
@@ -2060,12 +2328,22 @@ namespace LogisticsPlatform.Infrastructure.Migrations
                     b.Property<int>("StopType")
                         .HasColumnType("int");
 
+                    b.Property<string>("TimeZone")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
                     b.HasIndex("OrderId");
+
+                    b.HasIndex("StopType", "PlannedArrivalFrom");
+
+                    b.HasIndex("StopType", "PlannedArrivalTo");
+
+                    b.HasIndex("OrderId", "IsActive", "StopType", "Sequence");
 
                     b.ToTable("OrderRoutes");
                 });
@@ -2158,32 +2436,38 @@ namespace LogisticsPlatform.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa1"),
-                            CreatedAt = new DateTime(2026, 5, 5, 23, 27, 11, 386, DateTimeKind.Utc).AddTicks(9735),
+                            CreatedAt = new DateTime(2025, 11, 26, 16, 47, 48, 0, DateTimeKind.Utc),
                             Name = "Admin"
                         },
                         new
                         {
                             Id = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa2"),
-                            CreatedAt = new DateTime(2026, 5, 5, 23, 27, 11, 386, DateTimeKind.Utc).AddTicks(9762),
+                            CreatedAt = new DateTime(2025, 11, 26, 16, 47, 48, 0, DateTimeKind.Utc),
                             Name = "Broker"
                         },
                         new
                         {
                             Id = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa3"),
-                            CreatedAt = new DateTime(2026, 5, 5, 23, 27, 11, 386, DateTimeKind.Utc).AddTicks(9764),
+                            CreatedAt = new DateTime(2025, 11, 26, 16, 47, 48, 0, DateTimeKind.Utc),
                             Name = "Operator"
                         },
                         new
                         {
                             Id = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa4"),
-                            CreatedAt = new DateTime(2026, 5, 5, 23, 27, 11, 386, DateTimeKind.Utc).AddTicks(9767),
+                            CreatedAt = new DateTime(2025, 11, 26, 16, 47, 48, 0, DateTimeKind.Utc),
                             Name = "Dispatcher"
                         },
                         new
                         {
                             Id = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa5"),
-                            CreatedAt = new DateTime(2026, 5, 5, 23, 27, 11, 386, DateTimeKind.Utc).AddTicks(9769),
+                            CreatedAt = new DateTime(2025, 11, 26, 16, 47, 48, 0, DateTimeKind.Utc),
                             Name = "Accounting"
+                        },
+                        new
+                        {
+                            Id = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa6"),
+                            CreatedAt = new DateTime(2025, 11, 26, 16, 47, 48, 0, DateTimeKind.Utc),
+                            Name = "Sales"
                         });
                 });
 
@@ -2214,6 +2498,72 @@ namespace LogisticsPlatform.Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("RolePermissions");
+                });
+
+            modelBuilder.Entity("LogisticsPlatform.Domain.Entities.Security.UserNotification", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ActorUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime?>("ReadAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Route")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<Guid>("TargetId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("TargetType")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(160)
+                        .HasColumnType("nvarchar(160)");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ActorUserId");
+
+                    b.HasIndex("ExpiresAt");
+
+                    b.HasIndex("UserId", "IsRead", "ExpiresAt");
+
+                    b.ToTable("UserNotifications", (string)null);
                 });
 
             modelBuilder.Entity("LogisticsPlatform.Domain.Entities.Security.UserPermission", b =>
@@ -2320,6 +2670,10 @@ namespace LogisticsPlatform.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<decimal>("Accessorials")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
                     b.Property<string>("BillTo")
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
@@ -2333,6 +2687,10 @@ namespace LogisticsPlatform.Infrastructure.Migrations
 
                     b.Property<Guid>("OrderId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("QuotedTotal")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
 
                     b.Property<decimal>("TaxRate")
                         .HasPrecision(18, 4)
@@ -2675,6 +3033,30 @@ namespace LogisticsPlatform.Infrastructure.Migrations
                     b.Navigation("Load");
                 });
 
+            modelBuilder.Entity("LogisticsPlatform.Domain.Entities.LoadException", b =>
+                {
+                    b.HasOne("LogisticsPlatform.Domain.Entities.Load", "Load")
+                        .WithMany("Exceptions")
+                        .HasForeignKey("LoadId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LogisticsPlatform.Domain.Entities.LoadStop", "LoadStop")
+                        .WithMany()
+                        .HasForeignKey("LoadStopId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("LogisticsPlatform.Domain.Entities.Order", "Order")
+                        .WithMany()
+                        .HasForeignKey("OrderId");
+
+                    b.Navigation("Load");
+
+                    b.Navigation("LoadStop");
+
+                    b.Navigation("Order");
+                });
+
             modelBuilder.Entity("LogisticsPlatform.Domain.Entities.LoadNote", b =>
                 {
                     b.HasOne("LogisticsPlatform.Domain.Entities.User", "CreatedByUser")
@@ -2703,6 +3085,17 @@ namespace LogisticsPlatform.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Load");
+                });
+
+            modelBuilder.Entity("LogisticsPlatform.Domain.Entities.LoadStopServiceRequirement", b =>
+                {
+                    b.HasOne("LogisticsPlatform.Domain.Entities.LoadStop", "LoadStop")
+                        .WithMany("Services")
+                        .HasForeignKey("LoadStopId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("LoadStop");
                 });
 
             modelBuilder.Entity("LogisticsPlatform.Domain.Entities.Order", b =>
@@ -2846,6 +3239,25 @@ namespace LogisticsPlatform.Infrastructure.Migrations
                     b.Navigation("Role");
                 });
 
+            modelBuilder.Entity("LogisticsPlatform.Domain.Entities.Security.UserNotification", b =>
+                {
+                    b.HasOne("LogisticsPlatform.Domain.Entities.User", "ActorUser")
+                        .WithMany()
+                        .HasForeignKey("ActorUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("LogisticsPlatform.Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ActorUser");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("LogisticsPlatform.Domain.Entities.Security.UserPermission", b =>
                 {
                     b.HasOne("LogisticsPlatform.Domain.Entities.User", "User")
@@ -2923,6 +3335,8 @@ namespace LogisticsPlatform.Infrastructure.Migrations
 
                     b.Navigation("Equipment");
 
+                    b.Navigation("Exceptions");
+
                     b.Navigation("Items");
 
                     b.Navigation("Notes");
@@ -2935,6 +3349,11 @@ namespace LogisticsPlatform.Infrastructure.Migrations
             modelBuilder.Entity("LogisticsPlatform.Domain.Entities.LoadCost", b =>
                 {
                     b.Navigation("LineItems");
+                });
+
+            modelBuilder.Entity("LogisticsPlatform.Domain.Entities.LoadStop", b =>
+                {
+                    b.Navigation("Services");
                 });
 
             modelBuilder.Entity("LogisticsPlatform.Domain.Entities.Order", b =>

@@ -19,7 +19,11 @@ public class LoadCostsController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> Get(Guid loadId)
     {
-        var result = await _service.GetAsync(loadId);
+        var userId = Guid.Parse(
+            User.FindFirstValue(ClaimTypes.NameIdentifier)!
+        );
+
+        var result = await _service.GetAsync(loadId, userId);
         return Ok(result);
     }
 

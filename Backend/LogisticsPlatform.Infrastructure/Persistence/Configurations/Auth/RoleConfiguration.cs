@@ -12,14 +12,17 @@ namespace LogisticsPlatform.Infrastructure.Persistence.Configurations.Auth
 {
     public class RoleConfiguration : IEntityTypeConfiguration<Role>
     {
+        private static readonly DateTime SeedCreatedAt = new(2025, 11, 26, 16, 47, 48, DateTimeKind.Utc);
+
         public void Configure(EntityTypeBuilder<Role> builder)
         {
             builder.HasData(
-                new Role { Id = Guid.Parse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa1"), Name = RoleNames.Admin },
-                new Role { Id = Guid.Parse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa2"), Name = RoleNames.Broker },
-                new Role { Id = Guid.Parse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa3"), Name = RoleNames.Operator },
-                new Role { Id = Guid.Parse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa4"), Name = RoleNames.Dispatcher },
-                new Role { Id = Guid.Parse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa5"), Name = RoleNames.Accounting }
+                new Role { Id = Guid.Parse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa1"), Name = RoleNames.Admin, CreatedAt = SeedCreatedAt },
+                new Role { Id = Guid.Parse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa2"), Name = RoleNames.Broker, CreatedAt = SeedCreatedAt },
+                new Role { Id = Guid.Parse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa3"), Name = RoleNames.Operator, CreatedAt = SeedCreatedAt },
+                new Role { Id = Guid.Parse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa4"), Name = RoleNames.Dispatcher, CreatedAt = SeedCreatedAt },
+                new Role { Id = Guid.Parse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa5"), Name = RoleNames.Accounting, CreatedAt = SeedCreatedAt },
+                new Role { Id = Guid.Parse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa6"), Name = RoleNames.Sales, CreatedAt = SeedCreatedAt }
             );
         }
     }

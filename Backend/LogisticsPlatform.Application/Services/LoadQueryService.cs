@@ -6,8 +6,10 @@ using LogisticsPlatform.Application.DTOs.Pagination;
 using LogisticsPlatform.Application.Interfaces.Repositories.Loads;
 using LogisticsPlatform.Application.Interfaces.Repositories.Queries;
 using LogisticsPlatform.Application.Interfaces.Services.Loads;
+using LogisticsPlatform.Application.Interfaces.Services.Security;
 using LogisticsPlatform.Domain.Entities;
 using LogisticsPlatform.Domain.Enums;
+using LogisticsPlatform.Domain.Security;
 
 namespace LogisticsPlatform.Application.Services
 {
@@ -15,13 +17,16 @@ namespace LogisticsPlatform.Application.Services
     {
         private readonly ILoadQueryRepository _repo;
         private readonly ILoadCostRepository _loadCostRepo;
+        private readonly IPermissionService _permission;
 
         public LoadQueryService(
             ILoadQueryRepository repo,
-            ILoadCostRepository loadCostRepo)
+            ILoadCostRepository loadCostRepo,
+            IPermissionService permission)
         {
             _repo = repo;
             _loadCostRepo = loadCostRepo;
+            _permission = permission;
         }
 
         public async Task<PagedResult<LoadListItemDto>> GetPagedAsync(LoadQueryParameters parameters)
@@ -32,16 +37,20 @@ namespace LogisticsPlatform.Application.Services
             return await _repo.GetPagedAsync(parameters);
         }
 
-        public async Task<LoadDetailsDto?> GetDetailsAsync(Guid loadId)
+        public async Task<LoadDetailsDto?> GetDetailsAsync(Guid loadId, Guid userId)
         {
             var load = await _repo.GetByIdAsync(loadId);
             if (load == null)
                 return null;
 
+            var canViewTracking = await _permission.HasPermissionAsync(userId, Permission.Load_Tracking_View);
+            var canViewCosts = await _permission.HasPermissionAsync(userId, Permission.LoadCost_View);
             var orderLink = load.Orders.FirstOrDefault();
 
-            // 🔥 LoadCost (nga db)
-            var loadCost = await _loadCostRepo.GetByLoadIdAsync(loadId);
+            // LoadCost from database
+            var loadCost = canViewCosts
+                ? await _loadCostRepo.GetByLoadIdAsync(loadId)
+                : null;
 
             var totalBillable = loadCost?
                 .LineItems.Where(x => x.IsCustomer)
@@ -74,13 +83,21 @@ namespace LogisticsPlatform.Application.Services
                     CarrierId = load.CarrierId,
                     CarrierName = load.Carrier?.Name,
 
-                    CustomerRate = load.CustomerRate,
-                    CarrierRate = load.CarrierRate,
-                    Accessorials = load.Accessorials,
+                    CustomerRate = canViewCosts ? load.CustomerRate : null,
+                    CarrierRate = canViewCosts ? load.CarrierRate : null,
+                    Accessorials = canViewCosts ? load.Accessorials : null,
                     BolNumber = load.BolNumber,
                     ProNumber = load.ProNumber,
                     RateConfirmationNumber = load.RateConfirmationNumber,
                     TrackingNumber = load.TrackingNumber,
+                    DistanceMiles = canViewTracking ? load.DistanceMiles : null,
+                    DurationMinutes = canViewTracking ? load.DurationMinutes : null,
+                    EncodedPolyline = canViewTracking ? load.EncodedPolyline : null,
+                    LastKnownLatitude = canViewTracking ? load.LastKnownLatitude : null,
+                    LastKnownLongitude = canViewTracking ? load.LastKnownLongitude : null,
+                    LastKnownLocationAt = canViewTracking ? load.LastKnownLocationAt : null,
+                    TrackingProvider = canViewTracking ? load.TrackingProvider : null,
+                    TrackingExternalId = canViewTracking ? load.TrackingExternalId : null,
                     DriverName = load.DriverName,
                     DriverPhone = load.DriverPhone,
                     DriverEmail = load.DriverEmail,
@@ -125,10 +142,19 @@ namespace LogisticsPlatform.Application.Services
                             State = s.State,
                             PostalCode = s.PostalCode,
                             Country = s.Country,
+                            Latitude = canViewTracking ? s.Latitude : null,
+                            Longitude = canViewTracking ? s.Longitude : null,
                             PlannedArrivalFrom = s.PlannedArrivalFrom,
                             PlannedArrivalTo = s.PlannedArrivalTo,
                             AppointmentType = s.AppointmentType,
                             FlexMinutes = s.FlexMinutes,
+                            TimeZone = s.TimeZone,
+                            AppointmentStatus = s.AppointmentStatus,
+                            AppointmentConfirmed = s.AppointmentConfirmed,
+                            AppointmentConfirmationNumber = s.AppointmentConfirmationNumber,
+                            AppointmentNumber = s.AppointmentNumber,
+                            StopReference = s.StopReference,
+                            PONumbers = s.PONumbers,
                             RevisedArrivalFrom = s.RevisedArrivalFrom,
                             RevisedArrivalTo = s.RevisedArrivalTo,
                             ActualArrival = s.ActualArrival,
@@ -147,6 +173,10 @@ namespace LogisticsPlatform.Application.Services
                     {
                         OrderId = orderLink.Order.Id,
                         OrderNumber = orderLink.Order.OrderNumber,
+                        PrimaryPONumber = orderLink.Order.PrimaryPONumber,
+                        PrimaryBolNumber = orderLink.Order.PrimaryBolNumber,
+                        PrimaryProNumber = orderLink.Order.PrimaryProNumber,
+                        Commodity = orderLink.Order.Commodity,
                         OrderType = orderLink.Order.OrderType,
                         Direction = orderLink.Order.Direction,
                         PlannedPickupDate = orderLink.Order.PlannedPickupDate,
@@ -168,6 +198,11 @@ namespace LogisticsPlatform.Application.Services
                                 PlannedArrivalTo = r.PlannedArrivalTo,
                                 HasTime = r.HasTime,
                                 CopyToLoad = r.CopyToLoad,
+                                TimeZone = r.TimeZone,
+                                AppointmentStatus = r.AppointmentStatus,
+                                AppointmentConfirmed = r.AppointmentConfirmed,
+                                AppointmentConfirmationNumber = r.AppointmentConfirmationNumber,
+                                PONumbers = r.PONumbers,
                                 Notes = r.Notes,
                                 IsActive = r.IsActive
                             })
@@ -232,14 +267,16 @@ namespace LogisticsPlatform.Application.Services
                 // ==================
                 // COST SUMMARY
                 // ==================
-                CostSummary = new LoadCostSummaryDto
-                {
-                    CustomerRate = customerBase,
-                    CarrierRate = carrierBase,
-                    TotalBillable = totalBillableWithBase,
-                    TotalPayable = totalPayableWithBase,
-                    Margin = totalBillableWithBase - totalPayableWithBase
-                }
+                CostSummary = canViewCosts
+                    ? new LoadCostSummaryDto
+                    {
+                        CustomerRate = customerBase,
+                        CarrierRate = carrierBase,
+                        TotalBillable = totalBillableWithBase,
+                        TotalPayable = totalPayableWithBase,
+                        Margin = totalBillableWithBase - totalPayableWithBase
+                    }
+                    : null
             };
         }
 

@@ -15,6 +15,8 @@ export class PermissionGuard implements CanActivate {
 
         if (!perms || perms.length === 0) return true;
 
+        if (this.auth.hasRole('Admin')) return true;
+
         const hasAny = perms.some(p => this.auth.hasPermission(p));
         if (!hasAny) {
             this.router.navigate(['/unauthorized']);

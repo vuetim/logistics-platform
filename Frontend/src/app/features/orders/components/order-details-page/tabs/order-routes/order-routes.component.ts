@@ -2,6 +2,7 @@ import { DatePipe, NgFor, NgIf } from "@angular/common";
 import { Component, OnInit } from "@angular/core";
 import { AuthFacade } from "../../../../../../core/auth/auth.facade";
 import { StopType } from "../../../../../../core/enums/orders/stop-type.enum";
+import { AppointmentType } from "../../../../../../core/enums/loads/appointment-type.enum";
 import { CreateOrderRouteDto } from "../../../../../../core/models/orders/order-routes/create-order-route.dto";
 import { OrderRouteDto } from "../../../../../../core/models/orders/order-routes/order-route.model";
 import { UpdateOrderRouteDto } from "../../../../../../core/models/orders/order-routes/update-order-route.dto";
@@ -22,6 +23,7 @@ export class OrderRoutesComponent
   extends BaseEntityCrudTabComponent<OrderRouteDto, CreateOrderRouteDto, UpdateOrderRouteDto>
   implements OnInit {
   private readonly stopTypeLookup = new Map(enumToOptions(StopType).map((x: { value: number; label: string }) => [x.value, x.label]));
+  private readonly appointmentTypeLookup = new Map(enumToOptions(AppointmentType).map((x: { value: number; label: string }) => [x.value, x.label]));
 
   constructor(
     auth: AuthFacade,
@@ -64,6 +66,12 @@ export class OrderRoutesComponent
   stopTypeLabel(value: number | string) {
     const normalized = this.normalizeStopType(value);
     return this.stopTypeLookup.get(normalized) ?? value;
+  }
+
+  appointmentTypeLabel(value?: number | string | null) {
+    if (value == null) return '-';
+    const numeric = typeof value === 'number' ? value : Number(value);
+    return this.appointmentTypeLookup.get(numeric) ?? value;
   }
 
   private normalizeStopType(value: number | string | null | undefined): number {

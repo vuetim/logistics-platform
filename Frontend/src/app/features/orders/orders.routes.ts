@@ -1,9 +1,9 @@
+import { Routes } from '@angular/router';
+import { AuthGuard } from '../../core/auth/auth.guard';
+import { PermissionGuard } from '../../core/auth/permissions/permission.guard';
+import { OrdersPageComponent } from './components/orders-page/orders-page.component';
 
-import { AuthGuard } from "../../core/auth/auth.guard";
-import { PermissionGuard } from "../../core/auth/permissions/permission.guard";
-import { OrdersPageComponent } from "./components/orders-page/orders-page.component";
-
-export default [
+const routes: Routes = [
     {
         path: '',
         component: OrdersPageComponent,
@@ -31,3 +31,5 @@ export default [
                 .then(m => m.OrderDetailsPageComponent)
     }
 ];
+
+export default routes;

@@ -4,6 +4,10 @@ public class LoadOrderSnapshotDto
 {
     public Guid OrderId { get; set; }
     public string OrderNumber { get; set; } = string.Empty;
+    public string? PrimaryPONumber { get; set; }
+    public string? PrimaryBolNumber { get; set; }
+    public string? PrimaryProNumber { get; set; }
+    public string? Commodity { get; set; }
 
     public OrderType OrderType { get; set; }
     public OrderDirection Direction { get; set; }

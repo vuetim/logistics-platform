@@ -4,4 +4,5 @@ export interface SidebarItem {
     icon?: string;
     children?: SidebarItem[];
     disabled?: boolean;
+    permission?: string;
 }

@@ -24,8 +24,13 @@ namespace LogisticsPlatform.Application.DTOs.Loads.LoadStop
         public DateTime? PlannedDepartureTo { get; set; }
         public string? AppointmentNumber { get; set; }
         public string? StopReference { get; set; }
+        public string? PONumbers { get; set; }
         public AppointmentType AppointmentType { get; set; } = AppointmentType.Appointment;
         public int? FlexMinutes { get; set; }
+        public string? TimeZone { get; set; }
+        public AppointmentStatus AppointmentStatus { get; set; } = AppointmentStatus.Pending;
+        public bool AppointmentConfirmed { get; set; }
+        public string? AppointmentConfirmationNumber { get; set; }
 
         public string? Notes { get; set; }
     }

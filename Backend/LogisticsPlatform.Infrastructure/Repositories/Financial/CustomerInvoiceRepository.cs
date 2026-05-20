@@ -19,6 +19,8 @@ namespace LogisticsPlatform.Infrastructure.Repositories.Financial
                 .Include(i => i.LineItems)
                 .Include(i => i.Customer)
                 .Include(i => i.Load)
+                    .ThenInclude(l => l.Orders)
+                .Include(i => i.Load)
                     .ThenInclude(l => l.Items)
                 .Include(i => i.Load)
                     .ThenInclude(l => l.Stops)
@@ -30,6 +32,8 @@ namespace LogisticsPlatform.Infrastructure.Repositories.Financial
             return _context.CustomerInvoices
                 .Include(i => i.LineItems)
                 .Include(i => i.Customer)
+                .Include(i => i.Load)
+                    .ThenInclude(l => l.Orders)
                 .Include(i => i.Load)
                     .ThenInclude(l => l.Items)
                 .Include(i => i.Load)

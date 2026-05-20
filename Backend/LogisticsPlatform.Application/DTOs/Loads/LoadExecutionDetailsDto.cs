@@ -38,6 +38,14 @@ public class LoadExecutionDetailsDto
     public string? ProNumber { get; set; }
     public string? RateConfirmationNumber { get; set; }
     public string? TrackingNumber { get; set; }
+    public decimal? DistanceMiles { get; set; }
+    public int? DurationMinutes { get; set; }
+    public string? EncodedPolyline { get; set; }
+    public decimal? LastKnownLatitude { get; set; }
+    public decimal? LastKnownLongitude { get; set; }
+    public DateTime? LastKnownLocationAt { get; set; }
+    public string? TrackingProvider { get; set; }
+    public string? TrackingExternalId { get; set; }
 
     public string? DriverName { get; set; }
     public string? DriverPhone { get; set; }

@@ -1,20 +1,67 @@
 <div class="header-left">
   <div class="logo">
-    <img src="#" alt="Logo" />
+    <img src="../../../../assets/logo.png" alt="Logo" />
   </div>
 </div>
 
 <div class="header-right">
   <button class="icon-btn">+</button>
-  <button class="icon-btn">
-    <span class="material-icons">search</span>
-  </button>
+  <div class="search-wrap">
+    <button class="icon-btn" (click)="toggleSearch()">
+      <span class="material-icons">search</span>
+    </button>
+    <div class="search-panel" *ngIf="searchOpen">
+      <input
+        type="search"
+        placeholder="Search loads, customers..."
+        [(ngModel)]="searchQuery"
+        (ngModelChange)="onSearchChanged()"
+      />
+      <div class="panel-state" *ngIf="searchLoading">Searching...</div>
+      <div class="panel-state" *ngIf="!searchLoading && searchQuery.trim().length >= 2 && !searchResults.length">
+        No results
+      </div>
+      <button
+        class="search-result"
+        *ngFor="let result of searchResults"
+        (click)="openSearchResult(result)"
+      >
+        <span class="result-type">{{ result.type }}</span>
+        <strong>{{ result.title }}</strong>
+        <small>{{ result.subtitle }}</small>
+      </button>
+    </div>
+  </div>
+
+  <div class="notifications-wrap">
+    <button class="icon-btn notification-btn" (click)="toggleNotifications()">
+      <span class="material-icons">notifications</span>
+      <span class="badge" *ngIf="unreadCount > 0">{{ unreadCount }}</span>
+    </button>
+    <div class="notifications-panel" *ngIf="notificationsOpen">
+      <div class="panel-head">
+        <strong>Notifications</strong>
+        <button *ngIf="unreadCount > 0" (click)="markAllRead($event)">Mark all read</button>
+      </div>
+      <div class="panel-state" *ngIf="!notifications.length">No notifications</div>
+      <button
+        class="notification-item"
+        *ngFor="let notification of notifications"
+        [class.unread]="!notification.isRead"
+        (click)="openNotification(notification)"
+      >
+        <strong>{{ notification.actorName }} - {{ notification.title }}</strong>
+        <span>{{ notification.message }}</span>
+        <small>{{ notification.createdAt | date: 'short' }}</small>
+      </button>
+    </div>
+  </div>
 
   <div class="avatar" (click)="toggle()">
     <span class="material-icons">account_circle</span>
 
     <app-user-menu
-      *ngIf="open"
+      *ngIf="userMenuOpen"
       [name]="auth.getUserName()"
       [email]="auth.getUserEmail()"
       [roles]="auth.getRoles()"

@@ -1,0 +1,58 @@
+<main class="tender-page">
+  <section class="tender-shell" *ngIf="!loading && tender as t">
+    <header>
+      <img src="../../../../assets/logo.png" alt="Logo" />
+      <span class="status">{{ t.status }}</span>
+    </header>
+
+    <div class="summary">
+      <div>
+        <label>Load</label>
+        <h1>{{ t.loadNumber }}</h1>
+        <p>{{ t.origin }} to {{ t.destination }}</p>
+      </div>
+      <div class="rate-box">
+        <label>Offered rate</label>
+        <strong>{{ money(t.offeredRate) }} {{ t.currency }}</strong>
+        <span *ngIf="t.tenderExpiresAt">Expires {{ t.tenderExpiresAt | date: 'short' }}</span>
+      </div>
+    </div>
+
+    <section class="panel">
+      <h2>Stops</h2>
+      <div class="stop" *ngFor="let stop of t.stops">
+        <span>{{ stop.sequence }}</span>
+        <div>
+          <strong>{{ stop.stopType }} - {{ stop.locationName || (stop.city + ', ' + stop.state) }}</strong>
+          <small>{{ stop.city }}, {{ stop.state }} {{ stop.country }}</small>
+          <small>{{ stop.plannedArrivalFrom | date: 'short' }} - {{ stop.plannedArrivalTo | date: 'short' }}</small>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" *ngIf="t.tenderNotes">
+      <h2>Notes</h2>
+      <p>{{ t.tenderNotes }}</p>
+    </section>
+
+    <section class="panel response" *ngIf="!completedMessage">
+      <h2>Response</h2>
+      <div class="form-grid">
+        <label>Name<input [(ngModel)]="form.contactName" maxlength="160" /></label>
+        <label>Email<input type="email" [(ngModel)]="form.contactEmail" maxlength="200" /></label>
+        <label>Phone<input [(ngModel)]="form.contactPhone" maxlength="40" /></label>
+        <label class="full">Notes<textarea [(ngModel)]="form.notes" maxlength="500"></textarea></label>
+      </div>
+      <div class="actions">
+        <button class="reject" (click)="reject()" [disabled]="submitting">Reject</button>
+        <button class="accept" (click)="accept()" [disabled]="submitting">Accept Tender</button>
+      </div>
+    </section>
+
+    <div class="done" *ngIf="completedMessage">{{ completedMessage }}</div>
+    <div class="error" *ngIf="error">{{ error }}</div>
+  </section>
+
+  <section class="tender-shell state" *ngIf="loading">Loading tender...</section>
+  <section class="tender-shell state error" *ngIf="!loading && !tender">{{ error }}</section>
+</main>

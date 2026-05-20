@@ -28,7 +28,7 @@ export class CreateUserModalComponent {
   password = '';
   role = 'Operator';
 
-  roles = ['Admin', 'Operator', 'Dispatcher', 'Broker'];
+  roles = ['Admin', 'Operator', 'Dispatcher', 'Broker', 'Sales'];
   loading = false;
 
   constructor(

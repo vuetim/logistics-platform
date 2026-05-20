@@ -38,7 +38,8 @@ namespace LogisticsPlatform.Api.Controllers
         [HttpGet("{id}", Name = "GetLoadDetails")]
         public async Task<IActionResult> GetDetails(Guid id)
         {
-            var result = await _queries.GetDetailsAsync(id);
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var result = await _queries.GetDetailsAsync(id, userId);
             if (result == null) return NotFound();
             return Ok(result);
         }

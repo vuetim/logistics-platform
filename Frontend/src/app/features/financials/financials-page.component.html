@@ -58,7 +58,13 @@
             <td>{{ money(invoice.balanceDue) }}</td>
             <td>{{ invoice.paymentReference || '-' }}</td>
             <td><a [routerLink]="['/loads', invoice.loadId]" [queryParams]="{ tab: 'billing' }">Open Load Billing</a></td>
-            <td><button type="button" class="action-button" (click)="recordInvoicePayment(invoice)">Record Payment</button></td>
+            <td>
+              <div class="table-actions">
+                <button type="button" class="action-button" *ngIf="canUpdateInvoiceStatus(invoice.status)" (click)="markInvoiceSent(invoice)">Mark Sent</button>
+                <button type="button" class="action-button" *ngIf="canRecordInvoicePayment(invoice.status, invoice.balanceDue)" (click)="recordInvoicePayment(invoice)">Record Payment</button>
+                <button type="button" class="action-button" *ngIf="canCancelInvoice(invoice.status)" (click)="cancelInvoice(invoice)">Cancel</button>
+              </div>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -94,7 +100,13 @@
             <td>{{ money(settlement.balanceDue) }}</td>
             <td>{{ settlement.paymentReference || '-' }}</td>
             <td><a [routerLink]="['/loads', settlement.loadId]" [queryParams]="{ tab: 'billing' }">Open Load Billing</a></td>
-            <td><button type="button" class="action-button" (click)="recordSettlementPayment(settlement)">Record Payment</button></td>
+            <td>
+              <div class="table-actions">
+                <button type="button" class="action-button" *ngIf="canUpdateSettlementStatus(settlement.status)" (click)="markSettlementSent(settlement)">Mark Sent</button>
+                <button type="button" class="action-button" *ngIf="canRecordSettlementPayment(settlement.status, settlement.balanceDue)" (click)="recordSettlementPayment(settlement)">Record Payment</button>
+                <button type="button" class="action-button" *ngIf="canCancelSettlement(settlement.status)" (click)="cancelSettlement(settlement)">Cancel</button>
+              </div>
+            </td>
           </tr>
         </tbody>
       </table>

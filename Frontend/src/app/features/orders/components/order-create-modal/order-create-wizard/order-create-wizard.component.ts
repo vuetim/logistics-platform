@@ -7,11 +7,12 @@ import { CustomersService } from '../../../../../data-access/customers/customers
 import { CustomerListItem } from '../../../../../core/models/customers/customer-list-item.model';
 import { CarriersService } from '../../../../../data-access/carriers/carriers.service';
 import { CarrierListItem } from '../../../../../core/models/carriers/carrier-list-item.model';
+import { FieldInfoComponent } from '../../../../../shared/UI/field-info/field-info.component';
 
 @Component({
     selector: 'app-order-create-wizard',
     standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [CommonModule, FormsModule, FieldInfoComponent],
     templateUrl: './order-create-wizard.component.html',
     styleUrl: './order-create-wizard.component.css'
 })
@@ -30,6 +31,7 @@ export class OrderCreateWizardComponent implements OnInit {
         primaryPONumber: null,
         primaryBolNumber: null,
         primaryProNumber: null,
+        commodity: null,
         totalWeight: null,
         totalPallets: null,
         totalVolume: null,
@@ -44,6 +46,7 @@ export class OrderCreateWizardComponent implements OnInit {
     customers: CustomerListItem[] = [];
     carriers: CarrierListItem[] = [];
     loading = false;
+    validationMessage = '';
 
     constructor(
         private ordersService: OrdersService,
@@ -60,14 +63,40 @@ export class OrderCreateWizardComponent implements OnInit {
     }
 
     submit() {
+        this.validationMessage = '';
         if (!this.order.customerId || !this.startDateInput || !this.endDateInput) {
+            this.validationMessage = 'Customer, order window start, and order window end are required.';
             return;
         }
 
         const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+        const start = new Date(this.startDateInput);
+        const end = new Date(this.endDateInput);
+        const plannedPickup = this.plannedPickupInput ? new Date(this.plannedPickupInput) : null;
+        const plannedDelivery = this.plannedDeliveryInput ? new Date(this.plannedDeliveryInput) : null;
 
-        const startIso = new Date(this.startDateInput).toISOString();
-        const endIso = new Date(this.endDateInput).toISOString();
+        if (end < start) {
+            this.validationMessage = 'Order window end cannot be before order window start.';
+            return;
+        }
+
+        if (plannedPickup && plannedPickup < start) {
+            this.validationMessage = 'Planned pickup cannot be before order window start.';
+            return;
+        }
+
+        if (plannedDelivery && plannedDelivery > end) {
+            this.validationMessage = 'Planned delivery cannot be after order window end.';
+            return;
+        }
+
+        if (plannedPickup && plannedDelivery && plannedDelivery < plannedPickup) {
+            this.validationMessage = 'Planned delivery cannot be before planned pickup.';
+            return;
+        }
+
+        const startIso = start.toISOString();
+        const endIso = end.toISOString();
         this.order.startDate = { date: startIso, timezone, hasTime: true };
         this.order.endDate = { date: endIso, timezone, hasTime: true };
         this.order.startDateType = { key: '33091', value: 'On a specific date' };

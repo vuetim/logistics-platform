@@ -21,6 +21,8 @@ public class LoadStopDetailsDto
     public string State { get; set; } = string.Empty;
     public string PostalCode { get; set; } = string.Empty;
     public string Country { get; set; } = string.Empty;
+    public decimal? Latitude { get; set; }
+    public decimal? Longitude { get; set; }
 
     // ======================
     // PLANNED (order snapshot)
@@ -29,8 +31,13 @@ public class LoadStopDetailsDto
     public DateTime? PlannedArrivalTo { get; set; }
     public AppointmentType AppointmentType { get; set; }
     public int? FlexMinutes { get; set; }
+    public string TimeZone { get; set; } = "UTC";
+    public AppointmentStatus AppointmentStatus { get; set; }
+    public bool AppointmentConfirmed { get; set; }
+    public string? AppointmentConfirmationNumber { get; set; }
     public string? AppointmentNumber { get; set; }
     public string? StopReference { get; set; }
+    public string? PONumbers { get; set; }
 
     // ======================
     // REVISED (dispatcher)
@@ -72,13 +79,20 @@ public class LoadStopDetailsDto
             State = stop.State,
             PostalCode = stop.PostalCode,
             Country = stop.Country,
+            Latitude = stop.Latitude,
+            Longitude = stop.Longitude,
 
             PlannedArrivalFrom = stop.PlannedArrivalFrom,
             PlannedArrivalTo = stop.PlannedArrivalTo,
             AppointmentType = stop.AppointmentType,
             FlexMinutes = stop.FlexMinutes,
+            TimeZone = stop.TimeZone,
+            AppointmentStatus = stop.AppointmentStatus,
+            AppointmentConfirmed = stop.AppointmentConfirmed,
+            AppointmentConfirmationNumber = stop.AppointmentConfirmationNumber,
             AppointmentNumber = stop.AppointmentNumber,
             StopReference = stop.StopReference,
+            PONumbers = stop.PONumbers,
 
             RevisedArrivalFrom = stop.RevisedArrivalFrom,
             RevisedArrivalTo = stop.RevisedArrivalTo,

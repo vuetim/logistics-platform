@@ -1,0 +1,129 @@
+<div class="tab-section">
+  <div class="tab-header">
+    <div>
+      <h3>Exceptions</h3>
+      <p>Shortage, overage, damage, missed appointment, rejected freight, and other operational exceptions.</p>
+    </div>
+  </div>
+
+  <div class="editor-panel" *ngIf="canCreate()">
+    <div class="editor-grid">
+      <label>
+        Type
+        <input [(ngModel)]="form.exceptionValue" placeholder="Quantity, Damage, Appointment, Late truck" />
+      </label>
+      <label>
+        Reason
+        <input [(ngModel)]="form.reasonValue" placeholder="Overage, Shortage, Weather, Driver related" />
+      </label>
+      <label>
+        Responsible party
+        <input [(ngModel)]="form.responsiblePartyValue" placeholder="Carrier, pickup, delivery, customer" />
+      </label>
+      <label>
+        Status
+        <select [(ngModel)]="form.status">
+          <option *ngFor="let option of statusOptions" [ngValue]="option.value">{{ option.label }}</option>
+        </select>
+      </label>
+      <label>
+        Item
+        <input [(ngModel)]="form.affectedItemName" />
+      </label>
+      <label>
+        Reference
+        <input [(ngModel)]="form.affectedItemReference" />
+      </label>
+      <label>
+        Quantity
+        <input type="number" [(ngModel)]="form.quantity" />
+      </label>
+      <label>
+        Unit
+        <input [(ngModel)]="form.unit" />
+      </label>
+      <label class="full">
+        Description
+        <textarea [(ngModel)]="form.description"></textarea>
+      </label>
+    </div>
+    <div class="editor-actions">
+      <button class="tab-action primary-action" (click)="create()" [disabled]="!form.exceptionValue.trim()">Add Exception</button>
+    </div>
+  </div>
+
+  <div class="empty" *ngIf="!exceptions.length">No exceptions recorded.</div>
+
+  <h4 class="section-title" *ngIf="openExceptions.length">Open exceptions</h4>
+  <div class="table-wrap" *ngIf="openExceptions.length">
+    <table>
+      <thead>
+        <tr>
+          <th>Exception</th>
+          <th>Reason</th>
+          <th>Responsible</th>
+          <th>Status</th>
+          <th>Affected</th>
+          <th>Occurred</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of openExceptions">
+          <td>
+            <strong>{{ item.exceptionValue }}</strong>
+            <span>{{ item.description || '-' }}</span>
+          </td>
+          <td>{{ item.reasonValue || '-' }}</td>
+          <td>{{ item.responsiblePartyValue || '-' }}</td>
+          <td><span class="badge">{{ statusLabel(item.status) }}</span></td>
+          <td>
+            <span>{{ item.affectedItemName || '-' }}</span>
+            <span *ngIf="item.quantity">{{ item.quantity }} {{ item.unit }}</span>
+          </td>
+          <td>{{ item.occurredAt | date: 'short' }}</td>
+          <td>
+            <div class="row-actions">
+              <button *ngIf="canUpdate()" (click)="updateStatus(item, Status.InReview)">Review</button>
+              <button *ngIf="canUpdate()" (click)="updateStatus(item, Status.Resolved)">Resolve</button>
+              <button *ngIf="canUpdate()" (click)="updateStatus(item, Status.Rejected)">Reject</button>
+              <span class="muted" *ngIf="!canUpdate()">Read only</span>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h4 class="section-title" *ngIf="closedExceptions.length">Resolved history</h4>
+  <div class="table-wrap" *ngIf="closedExceptions.length">
+    <table>
+      <thead>
+        <tr>
+          <th>Exception</th>
+          <th>Reason</th>
+          <th>Responsible</th>
+          <th>Status</th>
+          <th>Affected</th>
+          <th>Occurred</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of closedExceptions">
+          <td>
+            <strong>{{ item.exceptionValue }}</strong>
+            <span>{{ item.description || '-' }}</span>
+          </td>
+          <td>{{ item.reasonValue || '-' }}</td>
+          <td>{{ item.responsiblePartyValue || '-' }}</td>
+          <td><span class="badge">{{ statusLabel(item.status) }}</span></td>
+          <td>
+            <span>{{ item.affectedItemName || '-' }}</span>
+            <span *ngIf="item.quantity">{{ item.quantity }} {{ item.unit }}</span>
+          </td>
+          <td>{{ item.occurredAt | date: 'short' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -36,5 +36,45 @@ public enum Permission
     Customer_Create,
     Customer_Update,
     Customer_Delete,
+
+    // TRACKING / MAPS
+    Load_Tracking_View,
+    Load_Tracking_Update,
+
+    // FINANCIALS
+    Financial_Invoice_UpdateStatus,
+    Financial_Invoice_RecordPayment,
+    Financial_Settlement_UpdateStatus,
+    Financial_Settlement_RecordPayment,
+
+    // CARRIER OFFERS / TENDERS
+    CarrierOffer_View,
+    CarrierOffer_View_All,
+    CarrierOffer_Create,
+    CarrierOffer_Accept,
+    CarrierOffer_Reject,
+
+    // OPERATIONAL EXCEPTIONS
+    LoadException_View,
+    LoadException_Create,
+    LoadException_Update,
+
+    // STOP SERVICES
+    LoadStopService_View,
+    LoadStopService_Create,
+    LoadStopService_Delete,
+
+    // COMPLETED LOAD CORRECTIONS
+    Load_CompletedCorrection,
+
+    // COSTS / BILLING VIEW AND EDIT
+    OrderCost_View,
+    OrderCost_Update,
+    LoadCost_View,
+    LoadCost_Update,
+    Financial_View,
+
+    // LOAD OPERATIONAL DETAILS
+    Load_Operational_Update,
 }
 

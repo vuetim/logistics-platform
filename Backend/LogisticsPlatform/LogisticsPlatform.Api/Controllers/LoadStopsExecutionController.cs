@@ -1,4 +1,6 @@
 ﻿using LogisticsPlatform.Application.Interfaces.Services.Loads;
+using LogisticsPlatform.Application.Interfaces.Services.Security;
+using LogisticsPlatform.Domain.Security;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -11,10 +13,12 @@ namespace LogisticsPlatform.Api.Controllers
     public class LoadStopsExecutionController : ControllerBase
     {
         private readonly ILoadStopExecutionService _service;
+        private readonly IPermissionService _permissions;
 
-        public LoadStopsExecutionController(ILoadStopExecutionService service)
+        public LoadStopsExecutionController(ILoadStopExecutionService service, IPermissionService permissions)
         {
             _service = service;
+            _permissions = permissions;
         }
 
         private Guid GetUserId()
@@ -31,6 +35,8 @@ namespace LogisticsPlatform.Api.Controllers
         public async Task<IActionResult> MarkEnRoute(Guid stopId)
         {
             var userId = GetUserId();
+            if (!await CanUpdateExecutionAsync(userId))
+                return Forbid();
             await _service.MarkEnRouteAsync(stopId, userId);
             return NoContent();
         }
@@ -40,6 +46,8 @@ namespace LogisticsPlatform.Api.Controllers
         public async Task<IActionResult> MarkArrived(Guid stopId)
         {
             var userId = GetUserId();
+            if (!await CanUpdateExecutionAsync(userId))
+                return Forbid();
             await _service.MarkArrivedAsync(stopId, userId);
             return NoContent();
         }
@@ -49,6 +57,8 @@ namespace LogisticsPlatform.Api.Controllers
         public async Task<IActionResult> MarkLoaded(Guid stopId)
         {
             var userId = GetUserId();
+            if (!await CanUpdateExecutionAsync(userId))
+                return Forbid();
             await _service.MarkLoadedAsync(stopId, userId);
             return NoContent();
         }
@@ -58,8 +68,16 @@ namespace LogisticsPlatform.Api.Controllers
         public async Task<IActionResult> MarkUnloaded(Guid stopId)
         {
             var userId = GetUserId();
+            if (!await CanUpdateExecutionAsync(userId))
+                return Forbid();
             await _service.MarkUnloadedAsync(stopId, userId);
             return NoContent();
+        }
+
+        private async Task<bool> CanUpdateExecutionAsync(Guid userId)
+        {
+            return await _permissions.HasPermissionAsync(userId, Permission.Load_Tracking_Update)
+                || await _permissions.HasPermissionAsync(userId, Permission.Load_ChangeStatus);
         }
     }
 }

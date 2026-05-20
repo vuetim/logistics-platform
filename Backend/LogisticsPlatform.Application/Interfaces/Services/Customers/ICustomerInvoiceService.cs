@@ -6,15 +6,13 @@ namespace LogisticsPlatform.Application.Interfaces.Services.Customers
 {
     /// <summary>
     /// Customer invoice service 
-    /// - GetAsync(loadId) => Get or Auto-Create Draft Invoice for that load
-    /// - CreateAsync(...)  => Manual create (nëse don explicit)
+    /// - GetAsync(loadId) => Read existing invoice for that load
+    /// - CreateAsync(...) => Explicit invoice creation
     /// </summary>
     public interface ICustomerInvoiceService
     {
         /// <summary>
         /// Gets the customer invoice for a given load.
-        /// If none exists, automatically generates a draft invoice from the load
-        /// (CustomerRate + customer accessorials).
         /// </summary>
         Task<CustomerInvoiceDto> GetAsync(Guid loadId);
 
@@ -25,7 +23,6 @@ namespace LogisticsPlatform.Application.Interfaces.Services.Customers
 
         /// <summary>
         /// Manually creates a customer invoice for a load.
-        /// Usually used only if you want explicit creation, besides the auto GetOrCreate.
         /// </summary>
         Task<CustomerInvoiceDto> CreateAsync(Guid loadId, CreateInvoiceDto dto, Guid userId);
 

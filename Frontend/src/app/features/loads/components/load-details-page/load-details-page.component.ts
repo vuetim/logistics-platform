@@ -8,8 +8,11 @@ import { LoadDetailsDto } from "../../../../core/models/loads/load-details.dto";
 import { LoadsService } from "../../../../data-access/loads/loads.service";
 import { LoadStatus } from "../../../../core/enums/loads/load-status.enum";
 import { ModeType } from "../../../../core/enums/loads/mode-type.enum";
+import { EquipmentType } from "../../../../core/enums/loads/equipment-type.enum";
 import { OrderDirection } from "../../../../core/enums/orders/order-direction.enum";
 import { OrderType } from "../../../../core/enums/orders/order-type.enum";
+import { StopType } from "../../../../core/enums/orders/stop-type.enum";
+import { AppointmentType } from "../../../../core/enums/loads/appointment-type.enum";
 import { LoadStopsComponent } from "./tabs/load-stops/load-stops.component";
 import { LoadItemsComponent } from "./tabs/load-items/load-items.component";
 import { LoadEquipmentComponent } from "./tabs/load-equipment/load-equipment.component";
@@ -17,10 +20,15 @@ import { LoadCostsComponent } from "./tabs/load-costs/load-costs.component";
 import { LoadNotesComponent } from "./tabs/load-notes/load-notes.component";
 import { LoadDocumentsComponent } from "./tabs/load-documents/load-documents.component";
 import { LoadActivityComponent } from "./tabs/load-activity/load-activity.component";
-import { LoadDispatcherPanelComponent } from "./load-dispatcher-panel/load-dispatcher-panel.component";
 import { LoadBillingComponent } from "./tabs/load-billing/load-billing.component";
+import { LoadRouteMapComponent } from "./load-route-map/load-route-map.component";
+import { AuthFacade } from "../../../../core/auth/auth.facade";
+import { Permission } from "../../../../core/auth/permissions/permission.enum";
+import { LoadTendersComponent } from "./tabs/load-tenders/load-tenders.component";
+import { LoadExceptionsComponent } from "./tabs/load-exceptions/load-exceptions.component";
+import { LoadOperationalPanelComponent } from "./load-operational-panel/load-operational-panel.component";
 
-type TabKey = 'overview' | 'stops' | 'items' | 'equipment' | 'costs' | 'billing' | 'notes' | 'documents' | 'activity';
+type TabKey = 'overview' | 'stops' | 'items' | 'equipment' | 'tenders' | 'costs' | 'billing' | 'exceptions' | 'notes' | 'documents' | 'activity';
 
 @Component({
   selector: 'app-load-details-page',
@@ -37,8 +45,11 @@ type TabKey = 'overview' | 'stops' | 'items' | 'equipment' | 'costs' | 'billing'
     LoadNotesComponent,
     LoadDocumentsComponent,
     LoadActivityComponent,
-    LoadDispatcherPanelComponent,
-    LoadBillingComponent
+    LoadOperationalPanelComponent,
+    LoadBillingComponent,
+    LoadRouteMapComponent,
+    LoadTendersComponent,
+    LoadExceptionsComponent
   ],
   templateUrl: './load-details-page.component.html',
   styleUrl: './load-details-page.component.css'
@@ -62,8 +73,9 @@ export class LoadDetailsPageComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private loadsService: LoadsService,
-    private toastr: ToastrService
-  ) {}
+    private toastr: ToastrService,
+    private auth: AuthFacade
+  ) { }
 
   ngOnInit() {
     this.loadId = this.route.snapshot.paramMap.get('id')!;
@@ -94,7 +106,7 @@ export class LoadDetailsPageComponent implements OnInit {
   }
 
   private isValidTab(value: string): value is TabKey {
-    return ['overview', 'stops', 'items', 'equipment', 'costs', 'billing', 'notes', 'documents', 'activity'].includes(value);
+    return ['overview', 'stops', 'items', 'equipment', 'tenders', 'costs', 'billing', 'exceptions', 'notes', 'documents', 'activity'].includes(value);
   }
 
   isTabVisited(t: TabKey) {
@@ -104,9 +116,11 @@ export class LoadDetailsPageComponent implements OnInit {
   statusLabel(value: number | string) {
     if (typeof value === 'string') {
       const numeric = (LoadStatus as any)[value];
+      if (value.toLowerCase() === 'accepted') return 'Covered';
       return typeof numeric === 'number' ? this.humanize(value) : this.humanize(String(value));
     }
 
+    if (value === LoadStatus.Accepted) return 'Covered';
     return this.humanize(LoadStatus[value] ?? String(value));
   }
 
@@ -156,17 +170,105 @@ export class LoadDetailsPageComponent implements OnInit {
     });
   }
 
+  equipmentText(load: LoadDetailsDto) {
+    if (!load.equipment?.length) return '-';
+    return load.equipment
+      .map(e => `${e.quantity || 1} ${this.humanize(EquipmentType[e.equipmentType] ?? e.equipmentType)}`)
+      .join(', ');
+  }
+
+  stopTypeLabel(value: number | string) {
+    if (typeof value === 'string') return this.humanize(value);
+    return this.humanize(StopType[value] ?? String(value));
+  }
+
+  appointmentLabel(value: number | string) {
+    if (typeof value === 'string') return this.humanize(value);
+    return this.humanize(AppointmentType[value] ?? String(value));
+  }
+
+  cityState(stop: { city?: string | null; state?: string | null; country?: string | null }) {
+    return [stop.city, stop.state || stop.country].filter(Boolean).join(', ') || '-';
+  }
+
+  stopWindow(stop: { plannedArrivalFrom?: string | null; plannedArrivalTo?: string | null }) {
+    const from = stop.plannedArrivalFrom ? new Date(stop.plannedArrivalFrom) : null;
+    const to = stop.plannedArrivalTo ? new Date(stop.plannedArrivalTo) : null;
+    const fromText = from && !Number.isNaN(from.getTime()) ? from.toLocaleString() : '-';
+    const toText = to && !Number.isNaN(to.getTime()) ? to.toLocaleString() : '';
+    return toText ? `${fromText} - ${toText}` : fromText;
+  }
+
+  stopClass(stop: { stopType: number | string }) {
+    const key = typeof stop.stopType === 'string' ? stop.stopType.toLowerCase() : StopType[stop.stopType]?.toLowerCase();
+    return {
+      pickup: key === 'pickup',
+      delivery: key === 'delivery'
+    };
+  }
+
+  overviewStops(load: LoadDetailsDto) {
+    const stops = [...(load.execution.stops || [])];
+    const typeRank = (stop: { stopType: number | string }) => {
+      const key = typeof stop.stopType === 'string' ? stop.stopType.toLowerCase() : StopType[stop.stopType]?.toLowerCase();
+      if (key === 'pickup') return 0;
+      if (key === 'delivery') return 2;
+      return 1;
+    };
+
+    return stops.sort((a, b) => {
+      const rankDiff = typeRank(a) - typeRank(b);
+      return rankDiff !== 0 ? rankDiff : a.sequence - b.sequence;
+    });
+  }
+
+  marginPercent(load: LoadDetailsDto) {
+    const billable = Number(load.costSummary?.totalBillable ?? 0);
+    const margin = Number(load.costSummary?.margin ?? load.execution.margin ?? 0);
+    if (!billable) return '';
+    return `(${((margin / billable) * 100).toFixed(1)}%)`;
+  }
+
+  canViewTracking() {
+    return this.auth.hasRole('Admin') || this.auth.hasPermission(Permission.Load_Tracking_View);
+  }
+
+  canViewCarrierOffers() {
+    return this.hasAny(Permission.CarrierOffer_View, Permission.CarrierOffer_View_All, Permission.Load_Tender);
+  }
+
+  canViewExceptions() {
+    return this.hasAny(Permission.LoadException_View);
+  }
+
+  canViewCosts() {
+    return this.hasAny(Permission.LoadCost_View);
+  }
+
+  canViewFinancials() {
+    return this.hasAny(Permission.Financial_View);
+  }
+
   canMarkAccepted() {
     const status = this.statusKey(this.load?.execution.status);
-    return !!this.load?.execution.carrierId && status !== 'accepted' && status !== 'dispatched' && status !== 'intransit' && status !== 'delivered' && status !== 'completed';
+    return this.hasAny(Permission.Load_ChangeStatus) &&
+      !!this.load?.execution.carrierId &&
+      status !== 'accepted' &&
+      status !== 'dispatched' &&
+      status !== 'intransit' &&
+      status !== 'delivered' &&
+      status !== 'completed';
   }
 
   canDispatch() {
-    return this.statusKey(this.load?.execution.status) === 'accepted' && !!this.load?.execution.carrierId;
+    return this.hasAny(Permission.Load_Dispatch) &&
+      this.statusKey(this.load?.execution.status) === 'accepted' &&
+      !!this.load?.execution.carrierId;
   }
 
   canComplete() {
-    return this.statusKey(this.load?.execution.status) === 'delivered';
+    return this.hasAny(Permission.Load_ChangeStatus) &&
+      this.statusKey(this.load?.execution.status) === 'delivered';
   }
 
   markAccepted() {
@@ -239,5 +341,9 @@ export class LoadDetailsPageComponent implements OnInit {
 
   private humanize(value: unknown) {
     return String(value).replace(/([A-Z])/g, ' $1').trim();
+  }
+
+  private hasAny(...permissions: Permission[]) {
+    return this.auth.hasRole('Admin') || permissions.some(p => this.auth.hasPermission(p));
   }
 }

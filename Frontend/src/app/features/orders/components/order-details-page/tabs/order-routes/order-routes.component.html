@@ -25,6 +25,10 @@
           <th>State</th>
           <th>Postal</th>
           <th>Country</th>
+          <th>Coordinates</th>
+          <th>Appointment</th>
+          <th>Time zone</th>
+          <th>POs</th>
           <th>Arrival window</th>
           <th>Copy</th>
           <th>Notes</th>
@@ -50,6 +54,15 @@
           <td>{{ r.state }}</td>
           <td>{{ r.postalCode || '-' }}</td>
           <td>{{ r.country }}</td>
+          <td>
+            <span *ngIf="r.latitude != null && r.longitude != null; else noCoordinates">
+              {{ r.latitude }}, {{ r.longitude }}
+            </span>
+            <ng-template #noCoordinates>-</ng-template>
+          </td>
+          <td>{{ appointmentTypeLabel(r.appointmentType) }}</td>
+          <td>{{ r.timeZone || 'UTC' }}</td>
+          <td>{{ r.poNumbers || '-' }}</td>
           <td>
             {{ r.plannedArrivalFrom ? (r.plannedArrivalFrom | date : 'short') : '-' }}
             -

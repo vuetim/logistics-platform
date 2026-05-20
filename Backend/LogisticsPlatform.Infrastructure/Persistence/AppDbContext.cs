@@ -62,6 +62,8 @@ public class AppDbContext : DbContext
 
     public DbSet<CarrierStopPerformance> CarrierStopPerformances { get; set; }
     public DbSet<LoadAlert> LoadAlerts => Set<LoadAlert>();
+    public DbSet<LoadException> LoadExceptions => Set<LoadException>();
+    public DbSet<LoadStopServiceRequirement> LoadStopServiceRequirements => Set<LoadStopServiceRequirement>();
 
     public DbSet<DelayResponsibility> DelayResponsibilities { get; set; }
     public DbSet<LoadDelayResponsibility> LoadDelayResponsibilities { get; set; }
@@ -71,6 +73,7 @@ public class AppDbContext : DbContext
     public DbSet<UserPermission> UserPermissions => Set<UserPermission>();
     public DbSet<RolePermission> RolePermissions => Set<RolePermission>();
     public DbSet<UserTablePreference> UserTablePreferences => Set<UserTablePreference>();
+    public DbSet<UserNotification> UserNotifications => Set<UserNotification>();
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

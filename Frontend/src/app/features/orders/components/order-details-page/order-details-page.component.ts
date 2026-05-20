@@ -20,6 +20,8 @@ import { OrderDirection } from "../../../../core/enums/orders/order-direction.en
 import { OrderType } from "../../../../core/enums/orders/order-type.enum";
 import { ToastrService } from "ngx-toastr";
 import { HttpErrorResponse } from "@angular/common/http";
+import { CreateLoadFromOrderDto } from "../../../../core/models/orders/create-load-from-order.dto";
+import { CreateLoadFromOrderModalComponent } from "./create-load-from-order-modal/create-load-from-order-modal.component";
 
 
 type TabKey = 'overview' | 'items' | 'routes' | 'equipment' | 'costs' | 'references' | 'notes' | 'documents';
@@ -38,7 +40,8 @@ type TabKey = 'overview' | 'items' | 'routes' | 'equipment' | 'costs' | 'referen
     OrderCostsComponent,
     OrderNotesComponent,
     OrderDocumentsComponent,
-    OrderExternalIdsComponent
+    OrderExternalIdsComponent,
+    CreateLoadFromOrderModalComponent
   ],
   templateUrl: './order-details-page.component.html',
   styleUrl: './order-details-page.component.css'
@@ -55,6 +58,7 @@ export class OrderDetailsPageComponent implements OnInit {
   canUpdate = false;
   canCreateFromOrder = false;
   showEditModal = false;
+  showCreateLoadModal = false;
   private readonly statusLookup = new Map(enumToOptions(OrderStatus).map(x => [x.value, x.label]));
   private readonly phaseLookup = new Map(enumToOptions(OrderPhase).map(x => [x.value, x.label]));
   private readonly directionLookup = new Map(enumToOptions(OrderDirection).map(x => [x.value, x.label]));
@@ -141,9 +145,15 @@ export class OrderDetailsPageComponent implements OnInit {
 
   createLoadFromOrder() {
     if (!this.order || !this.canCreateLoad(this.order)) return;
+    this.showCreateLoadModal = true;
+  }
+
+  onCreateLoadClose(dto: CreateLoadFromOrderDto | null) {
+    this.showCreateLoadModal = false;
+    if (!dto || !this.order || !this.canCreateLoad(this.order)) return;
 
     this.actionLoading = true;
-    this.ordersService.createLoadFromOrder(this.order.id).subscribe({
+    this.ordersService.createLoadFromOrder(dto).subscribe({
       next: res => {
         this.actionLoading = false;
         this.toastr.success(`Load created: ${res.loadId}`);

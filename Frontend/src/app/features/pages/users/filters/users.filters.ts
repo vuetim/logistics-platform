@@ -14,7 +14,8 @@ export const USER_FILTERS: FilterConfig[] = [
             { label: 'Admin', value: 'Admin' },
             { label: 'Operator', value: 'Operator' },
             { label: 'Dispatcher', value: 'Dispatcher' },
-            { label: 'Broker', value: 'Broker' }
+            { label: 'Broker', value: 'Broker' },
+            { label: 'Sales', value: 'Sales' }
         ]
     },
     {

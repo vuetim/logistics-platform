@@ -26,7 +26,7 @@ export class EditUserModalComponent implements OnInit {
   isActive = true;
   newPassword = '';
 
-  roles = ['Admin', 'Operator', 'Dispatcher', 'Broker'];
+  roles = ['Admin', 'Operator', 'Dispatcher', 'Broker', 'Sales'];
   permissions = Object.values(Permission);
   permissionState: Record<Permission, boolean | null> = {} as any;
 

@@ -21,11 +21,19 @@ export class FinancialsService {
     });
   }
 
+  updateInvoiceStatus(invoiceId: string, status: number) {
+    return this.api.updateInvoiceStatus(invoiceId, status);
+  }
+
   recordSettlementPayment(settlementId: string, amountPaid: number, paymentReference?: string | null, paidAt?: string | null) {
     return this.api.recordSettlementPayment(settlementId, {
       amountPaid,
       paidAt: paidAt ? new Date(paidAt).toISOString() : new Date().toISOString(),
       paymentReference: paymentReference || null
     });
+  }
+
+  updateSettlementStatus(settlementId: string, status: number) {
+    return this.api.updateSettlementStatus(settlementId, status);
   }
 }

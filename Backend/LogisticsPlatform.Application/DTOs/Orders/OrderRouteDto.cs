@@ -14,16 +14,25 @@ public class OrderRouteDto
     public string State { get; set; } = string.Empty;
     public string PostalCode { get; set; } = string.Empty;
     public string Country { get; set; } = string.Empty;
+    public decimal? Latitude { get; set; }
+    public decimal? Longitude { get; set; }
 
     public DateTime? PlannedArrivalFrom { get; set; }
     public DateTime? PlannedArrivalTo { get; set; }
 
+    public AppointmentType AppointmentType { get; set; }
+    public int? FlexMinutes { get; set; }
     public bool HasTime { get; set; }
+    public string TimeZone { get; set; } = "UTC";
+    public AppointmentStatus AppointmentStatus { get; set; }
+    public bool AppointmentConfirmed { get; set; }
+    public string? AppointmentConfirmationNumber { get; set; }
     public bool CopyToLoad { get; set; }
     public DateTime? AppointmentFrom { get; set; }
     public DateTime? AppointmentTo { get; set; }
     public string? StopReference { get; set; }      // pickup / delivery ref
     public string? AppointmentNumber { get; set; }  // known at planning
+    public string? PONumbers { get; set; }
 
     public string? Notes { get; set; }
 

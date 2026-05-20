@@ -14,6 +14,11 @@ namespace LogisticsPlatform.Application.BackgroundJobs
                 j => j.ExecuteAsync(),
                 Cron.MinuteInterval(5));
 
+            RecurringJob.AddOrUpdate<NotificationCleanupJob>(
+                "notification-cleanup",
+                j => j.ExecuteAsync(),
+                Cron.Hourly);
+
             return Task.CompletedTask;
         }
 

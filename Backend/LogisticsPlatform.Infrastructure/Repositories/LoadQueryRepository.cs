@@ -25,19 +25,17 @@ namespace LogisticsPlatform.Infrastructure.Repositories
             LoadQueryParameters parameters)
         {
             var query = _context.Loads
-                .Include(l => l.Customer)
-                .Include(l => l.Carrier)
-                .Include(l => l.Stops)
+                .AsNoTracking()
                 .AsQueryable();
 
             // 🔍 SEARCH
             if (!string.IsNullOrWhiteSpace(parameters.Search))
             {
-                var s = parameters.Search.ToLower();
+                var s = parameters.Search.Trim();
                 query = query.Where(l =>
-                    l.LoadNumber.ToLower().Contains(s) ||
-                    l.Customer.Name.ToLower().Contains(s) ||
-                    (l.Carrier != null && l.Carrier.Name.ToLower().Contains(s))
+                    l.LoadNumber.Contains(s) ||
+                    l.Customer.Name.Contains(s) ||
+                    (l.Carrier != null && l.Carrier.Name.Contains(s))
                 );
             }
 
@@ -51,8 +49,6 @@ namespace LogisticsPlatform.Infrastructure.Repositories
             if (parameters.CarrierId.HasValue)
                 query = query.Where(l => l.CarrierId == parameters.CarrierId);
 
-            if (parameters.Mode.HasValue)
-                query = query.Where(l => l.Mode == parameters.Mode);
             if (parameters.Mode.HasValue)
                 query = query.Where(l => l.Mode == parameters.Mode);
 
@@ -102,6 +98,10 @@ namespace LogisticsPlatform.Infrastructure.Repositories
                     ? query.OrderByDescendingDynamic(parameters.SortBy)
                     : query.OrderByDynamic(parameters.SortBy);
             }
+            else
+            {
+                query = query.OrderByDescending(l => l.CreatedAt);
+            }
 
             var total = await query.CountAsync();
 
@@ -114,9 +114,13 @@ namespace LogisticsPlatform.Infrastructure.Repositories
                     LoadNumber = l.LoadNumber,
                     CustomerName = l.Customer.Name,
                     CarrierName = l.Carrier != null ? l.Carrier.Name : null,
+                    Origin = l.Origin,
+                    Destination = l.Destination,
                     Status = l.Status,
                     ModeType = l.Mode,
                     HasEquipment = l.HasEquipment,
+                    PickupStops = l.Stops.Count(s => s.StopType == StopType.Pickup),
+                    DeliveryStops = l.Stops.Count(s => s.StopType == StopType.Delivery),
 
                     PickupDate = l.Stops
                         .Where(s => s.StopType == StopType.Pickup)
@@ -177,6 +181,7 @@ namespace LogisticsPlatform.Infrastructure.Repositories
         public async Task<Load?> GetByIdAsync(Guid id)
         {
             return await _context.Loads
+                .AsNoTracking()
                 .Include(l => l.Customer)
                 .Include(l => l.Carrier)
                 .Include(l => l.Stops)
@@ -187,6 +192,7 @@ namespace LogisticsPlatform.Infrastructure.Repositories
                 .Include(l => l.Orders)
                     .ThenInclude(lo => lo.Order)
                         .ThenInclude(o => o.OrderRoutes)
+                .AsSplitQuery()
                 .FirstOrDefaultAsync(l => l.Id == id);
         }
 

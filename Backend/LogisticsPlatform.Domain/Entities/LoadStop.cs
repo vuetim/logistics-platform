@@ -37,6 +37,10 @@ namespace LogisticsPlatform.Domain.Entities
 
         public AppointmentType AppointmentType { get; set; } = AppointmentType.Appointment;
         public int? FlexMinutes { get; set; }
+        public string TimeZone { get; set; } = "UTC";
+        public AppointmentStatus AppointmentStatus { get; set; } = AppointmentStatus.Pending;
+        public bool AppointmentConfirmed { get; set; }
+        public string? AppointmentConfirmationNumber { get; set; }
 
         // ======================
         // REVISED (dispatcher update)
@@ -58,6 +62,7 @@ namespace LogisticsPlatform.Domain.Entities
 
         public string? AppointmentNumber { get; set; }
         public string StopReference { get; set; }
+        public string? PONumbers { get; set; }
         public string? ContactName { get; set; }
         public string? ContactPhone { get; set; }
         public DateTime? PredictedArrivalAt { get; set; }
@@ -76,6 +81,7 @@ namespace LogisticsPlatform.Domain.Entities
         public int? MinutesLate { get; set; }
         public string? DelayRiskReason { get; set; }
 
+        public ICollection<LoadStopServiceRequirement> Services { get; set; } = new List<LoadStopServiceRequirement>();
 
     }
 }

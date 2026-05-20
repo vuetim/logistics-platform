@@ -3,6 +3,8 @@
     <div card-actions class="card-header">
       <div class="toolbar">
         <app-ui-button variant="ghost" (click)="toggleFilters()">Filters</app-ui-button>
+        <button type="button" class="view-toggle" [class.active]="viewMode === 'table'" (click)="viewMode = 'table'">Table</button>
+        <button type="button" class="view-toggle" [class.active]="viewMode === 'cards'" (click)="viewMode = 'cards'">Cards</button>
       </div>
     </div>
 
@@ -46,8 +48,12 @@
       </div>
     </div>
 
-    <div class="table-wrap">
+    <div class="table-wrap" *ngIf="viewMode === 'table'">
       <app-entity-table [columns]="columns" [rows]="loads" [actions]="actions"></app-entity-table>
+    </div>
+
+    <div class="load-cards-grid" *ngIf="viewMode === 'cards'">
+      <app-load-summary-card *ngFor="let load of loads" [load]="load"></app-load-summary-card>
     </div>
 
     <div card-footer>

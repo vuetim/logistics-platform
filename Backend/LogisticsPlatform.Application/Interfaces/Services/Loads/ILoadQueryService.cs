@@ -6,6 +6,6 @@ namespace LogisticsPlatform.Application.Interfaces.Services.Loads
     public interface ILoadQueryService
     {
         Task<PagedResult<LoadListItemDto>> GetPagedAsync(LoadQueryParameters parameters);
-        Task<LoadDetailsDto?> GetDetailsAsync(Guid id);
+        Task<LoadDetailsDto?> GetDetailsAsync(Guid id, Guid userId);
     }
 }

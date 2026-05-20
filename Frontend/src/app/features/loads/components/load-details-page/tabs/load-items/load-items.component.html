@@ -25,6 +25,7 @@
           <th>Declared</th>
           <th>Volume</th>
           <th>Notes</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -42,8 +43,18 @@
           <td>{{ item.declaredValue != null ? item.declaredValue + " " + (item.currency || "") : "-" }}</td>
           <td>{{ item.volume != null ? item.volume + " " + (item.volumeUnit || "") : "-" }}</td>
           <td>{{ item.notes || "-" }}</td>
+          <td class="row-actions">
+            <button type="button" (click)="edit(item)" [disabled]="busyItemId === item.id">Edit</button>
+            <button type="button" (click)="remove(item)" [disabled]="busyItemId === item.id">Remove</button>
+          </td>
         </tr>
       </tbody>
     </table>
   </div>
+
+  <app-load-item-modal
+    *ngIf="editing"
+    [item]="editing"
+    (close)="closeEdit($event)"
+  ></app-load-item-modal>
 </div>

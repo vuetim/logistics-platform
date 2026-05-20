@@ -39,6 +39,7 @@ namespace LogisticsPlatform.Domain.Entities
         public ICollection<LoadNote> Notes { get; set; } = new List<LoadNote>();
         public ICollection<LoadDocument> Documents { get; set; } = new List<LoadDocument>();
         public ICollection<LoadItem> Items { get; set; } = new List<LoadItem>();
+        public ICollection<LoadException> Exceptions { get; set; } = new List<LoadException>();
 
         //financials 
         public LoadCost? Cost { get; set; }
@@ -46,6 +47,14 @@ namespace LogisticsPlatform.Domain.Entities
         public string? ProNumber { get; set; }
         public string? RateConfirmationNumber { get; set; }
         public string? TrackingNumber { get; set; }
+        public decimal? DistanceMiles { get; set; }
+        public int? DurationMinutes { get; set; }
+        public string? EncodedPolyline { get; set; }
+        public decimal? LastKnownLatitude { get; set; }
+        public decimal? LastKnownLongitude { get; set; }
+        public DateTime? LastKnownLocationAt { get; set; }
+        public string? TrackingProvider { get; set; }
+        public string? TrackingExternalId { get; set; }
 
         public string? DriverName { get; set; }
         public string? DriverPhone { get; set; }

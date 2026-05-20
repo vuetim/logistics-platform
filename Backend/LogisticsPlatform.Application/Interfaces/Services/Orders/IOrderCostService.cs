@@ -9,7 +9,7 @@ namespace LogisticsPlatform.Application.Interfaces.Services.Orders
 {
     public interface IOrderCostService
     {
-        Task<OrderCostDto> GetAsync(Guid orderId);
+        Task<OrderCostDto> GetAsync(Guid orderId, Guid userId);
         Task UpdateAsync(Guid orderId, UpdateOrderCostDto dto, Guid userId);
     }
 }

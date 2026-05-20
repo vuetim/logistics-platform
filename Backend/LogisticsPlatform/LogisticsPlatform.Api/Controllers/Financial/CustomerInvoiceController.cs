@@ -2,6 +2,7 @@
 using LogisticsPlatform.Application.DTOs.Financial;
 using LogisticsPlatform.Application.Interfaces.Services.Customers;
 using LogisticsPlatform.Application.Interfaces.Services.Security;
+using LogisticsPlatform.Domain.Security;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -16,15 +17,18 @@ namespace LogisticsPlatform.Api.Controllers.Financial
         private readonly ICustomerInvoiceService _service;
         private readonly IPdfService _pdf;
         private readonly IEmailService _emailService;
+        private readonly IPermissionService _permissions;
 
         public CustomerInvoiceController(
             ICustomerInvoiceService service,
             IPdfService pdf,
-            IEmailService emailService)
+            IEmailService emailService,
+            IPermissionService permissions)
         {
             _service = service;
             _pdf = pdf;
             _emailService = emailService;
+            _permissions = permissions;
         }
 
         // GET invoice by loadId
@@ -32,8 +36,9 @@ namespace LogisticsPlatform.Api.Controllers.Financial
         [HttpGet]
         public async Task<IActionResult> Get(Guid loadId)
         {
-            // Nëse ekziston invoice → kthehet
-            // Nëse nuk ekziston → krijohet auto draft nga load (GetAsync = GetOrCreate)
+            if (!await _permissions.HasPermissionAsync(GetUserId(), Permission.Financial_View))
+                return Forbid();
+
             var result = await _service.GetAsync(loadId);
             return Ok(result);
         }
@@ -43,7 +48,9 @@ namespace LogisticsPlatform.Api.Controllers.Financial
         [HttpPost]
         public async Task<IActionResult> Create(Guid loadId, [FromBody] CreateInvoiceDto dto)
         {
-            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var userId = GetUserId();
+            if (!await _permissions.HasPermissionAsync(userId, Permission.Financial_Invoice_UpdateStatus))
+                return Forbid();
 
             var created = await _service.CreateAsync(loadId, dto, userId);
 
@@ -54,6 +61,9 @@ namespace LogisticsPlatform.Api.Controllers.Financial
         [HttpPost("{invoiceId:guid}/send")]
         public async Task<IActionResult> SendPdf(Guid loadId, Guid invoiceId, [FromBody] SendInvoiceEmailDto dto)
         {
+            if (!await _permissions.HasPermissionAsync(GetUserId(), Permission.Financial_Invoice_UpdateStatus))
+                return Forbid();
+
             var invoiceEntity = await _service.GetByIdAsync(invoiceId);
 
             var pdfBytes = _pdf.GenerateCustomerInvoicePdf(invoiceEntity);
@@ -74,11 +84,17 @@ namespace LogisticsPlatform.Api.Controllers.Financial
         [HttpGet("{invoiceId:guid}/pdf")]
         public async Task<IActionResult> GetPdf(Guid loadId, Guid invoiceId)
         {
+            if (!await _permissions.HasPermissionAsync(GetUserId(), Permission.Financial_View))
+                return Forbid();
+
             var invoiceEntity = await _service.GetByIdAsync(invoiceId);
 
             var pdfBytes = _pdf.GenerateCustomerInvoicePdf(invoiceEntity);
 
             return File(pdfBytes, "application/pdf", $"invoice-{invoiceEntity.InvoiceNumber}.pdf");
         }
+
+        private Guid GetUserId()
+            => Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
     }
 }

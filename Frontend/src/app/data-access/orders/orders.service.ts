@@ -4,6 +4,7 @@ import { OrdersApi } from "./orders.api";
 import { map } from "rxjs";
 import { OrdersQueryParameters } from "../../core/models/orders/orders-query-parameters.dto";
 import { UpdateOrderDto } from "../../core/models/orders/update-order.dto";
+import { CreateLoadFromOrderDto } from "../../core/models/orders/create-load-from-order.dto";
 
 @Injectable({ providedIn: 'root' })
 export class OrdersService {
@@ -50,8 +51,8 @@ export class OrdersService {
         return this.api.cancel(id);
     }
 
-    createLoadFromOrder(orderId: string) {
-        return this.api.createLoadFromOrder(orderId);
+    createLoadFromOrder(dto: CreateLoadFromOrderDto) {
+        return this.api.createLoadFromOrder(dto);
     }
 
     reset() {

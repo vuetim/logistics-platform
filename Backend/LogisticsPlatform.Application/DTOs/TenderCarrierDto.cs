@@ -13,6 +13,11 @@ namespace LogisticsPlatform.Application.DTOs
 
         public decimal? OfferedRate { get; set; }
         public string? Currency { get; set; }
+        public string? RateConfirmationNumber { get; set; }
+        public string? TenderMethod { get; set; }
+        public string? TenderNotes { get; set; }
+        public DateTime? TenderExpiresAt { get; set; }
+        public string? EmailTo { get; set; }
     }
 
 }

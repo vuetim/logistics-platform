@@ -1,0 +1,83 @@
+<app-page-layout>
+  <div class="offers-page">
+    <div class="offers-header">
+      <div>
+        <p class="eyebrow">Dispatch board</p>
+        <h2>Carrier Offers</h2>
+        <span>Open carrier tenders waiting for dispatcher confirmation.</span>
+      </div>
+      <button class="ghost-btn" (click)="load()" [disabled]="loading">Refresh</button>
+    </div>
+
+    <div class="loading" *ngIf="loading">Loading carrier offers...</div>
+
+    <div class="empty" *ngIf="!loading && !offers.length">
+      No open carrier offers.
+    </div>
+
+    <div class="offers-grid" *ngIf="!loading && offers.length">
+      <article
+        class="offer-card"
+        *ngFor="let offer of offers"
+        [class.expiring]="isExpiringSoon(offer)"
+      >
+        <div class="offer-top">
+          <div>
+            <strong>{{ offer.loadNumber }}</strong>
+            <span>{{ offer.customerName }}</span>
+          </div>
+          <span class="status-pill">{{ offer.loadStatus }}</span>
+        </div>
+
+        <div class="lane">
+          <span>{{ offer.origin || "-" }}</span>
+          <span class="arrow">-></span>
+          <span>{{ offer.destination || "-" }}</span>
+        </div>
+
+        <div class="metrics">
+          <div>
+            <label>Carrier</label>
+            <strong>{{ offer.carrierName }}</strong>
+          </div>
+          <div>
+            <label>Offer rate</label>
+            <strong>{{ money(offer.offeredRate) }} {{ offer.currency || "USD" }}</strong>
+          </div>
+          <div>
+            <label>Method</label>
+            <strong>{{ offer.tenderMethod || "Manual" }}</strong>
+          </div>
+          <div>
+            <label>Expires</label>
+            <strong>{{ offer.tenderExpiresAt ? (offer.tenderExpiresAt | date: "short") : "-" }}</strong>
+          </div>
+        </div>
+
+        <p class="notes" *ngIf="offer.tenderNotes">{{ offer.tenderNotes }}</p>
+
+        <div class="offer-actions">
+          <a class="ghost-btn" [routerLink]="['/loads', offer.loadId]" [queryParams]="{ tab: 'tenders' }">
+            Open load
+          </a>
+          <button
+            class="reject-btn"
+            *ngIf="canReject()"
+            (click)="reject(offer)"
+            [disabled]="actionId === offer.assignmentId"
+          >
+            Reject
+          </button>
+          <button
+            class="primary-btn"
+            *ngIf="canAccept()"
+            (click)="accept(offer)"
+            [disabled]="actionId === offer.assignmentId"
+          >
+            Accept / Cover
+          </button>
+        </div>
+      </article>
+    </div>
+  </div>
+</app-page-layout>

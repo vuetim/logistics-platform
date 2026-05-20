@@ -19,7 +19,11 @@ public class OrderCostsController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> Get(Guid orderId)
     {
-        var result = await _service.GetAsync(orderId);
+        var userId = Guid.Parse(
+            User.FindFirstValue(ClaimTypes.NameIdentifier)!
+        );
+
+        var result = await _service.GetAsync(orderId, userId);
         return Ok(result);
     }
 

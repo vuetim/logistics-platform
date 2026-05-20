@@ -10,10 +10,10 @@ namespace LogisticsPlatform.Application.Interfaces.Services.Loads
 {
     public interface ILoadStopService
     {
-        Task AddAsync(Guid loadId, CreateLoadStopDto dto);
-        Task UpdateAsync(Guid stopId, UpdateLoadStopDto dto);
+        Task AddAsync(Guid loadId, CreateLoadStopDto dto, Guid userId);
+        Task UpdateAsync(Guid stopId, UpdateLoadStopDto dto, Guid userId);
         Task UpdateStatusAsync(Guid stopId, StopStatus newStatus, Guid userId);
 
-        Task DeleteAsync(Guid stopId);
+        Task DeleteAsync(Guid stopId, Guid userId);
     }
 }

@@ -1,0 +1,190 @@
+<section class="route-shell" [class.card-only]="!showMap">
+  <aside class="route-panel">
+    <div class="route-panel__header">
+      <div class="route-panel__title">
+        <strong
+          [title]="
+            locationLine(originStop) + ' > ' + locationLine(destinationStop)
+          "
+        >
+          {{ locationLine(originStop) }}
+          &gt;
+          {{ locationLine(destinationStop) }}
+        </strong>
+
+        <span>
+          {{ load.execution.trackingNumber || load.execution.loadNumber }}
+        </span>
+      </div>
+
+      <div
+        class="tracking-status"
+        [class.active]="
+          load.execution.lastKnownLatitude && load.execution.lastKnownLongitude
+        "
+      >
+        <div class="tracking-status__dot"></div>
+
+        <span>
+          {{
+            load.execution.lastKnownLatitude &&
+            load.execution.lastKnownLongitude
+              ? "Tracking"
+              : "No tracker"
+          }}
+        </span>
+      </div>
+    </div>
+
+    <div class="route-progress">
+      <div class="route-progress__step">
+        <div class="route-progress__circle">
+          {{ load.summary?.pickupStops || 1 }}
+        </div>
+
+        <span>
+          Pickup{{ (load.summary?.pickupStops || 1) > 1 ? "s" : "" }}
+        </span>
+      </div>
+
+      <div class="route-progress__center" [class.completed]="isCompleted">
+        <div class="route-progress__line"></div>
+
+        <div class="route-progress__status">
+          <strong>
+            {{ routeStatusLabel }}
+          </strong>
+
+          <small [title]="statusLocation">
+            {{ statusLocation }}
+          </small>
+        </div>
+      </div>
+
+      <div class="route-progress__step">
+        <div class="route-progress__circle">
+          {{ load.summary?.deliveryStops || 1 }}
+        </div>
+
+        <span>
+          Deliver{{ (load.summary?.deliveryStops || 1) > 1 ? "ies" : "y" }}
+        </span>
+      </div>
+
+      <div class="route-progress__step complete">
+        <div class="route-progress__check" [class.visible]="isCompleted">
+          <span *ngIf="isCompleted">&#10003;</span>
+        </div>
+
+        <span>
+          {{ finalStageLabel }}
+        </span>
+      </div>
+    </div>
+
+    <div class="route-fields">
+      <div class="route-field">
+        <span>Pickup date</span>
+
+        <strong [title]="load.execution.plannedPickupDate">
+          {{ load.execution.plannedPickupDate | date: "MMM d, yy • h:mm a" }}
+        </strong>
+      </div>
+
+      <div class="route-field">
+        <span>Delivery date</span>
+
+        <strong [title]="load.execution.plannedDeliveryDate">
+          {{ load.execution.plannedDeliveryDate | date: "MMM d, yy • h:mm a" }}
+        </strong>
+      </div>
+
+      <div class="route-field">
+        <span>Carrier</span>
+
+        <strong [title]="load.execution.carrierName || '-'">
+          {{ load.execution.carrierName || "-" }}
+        </strong>
+      </div>
+
+      <div class="route-field">
+        <span>Equipment</span>
+
+        <strong [title]="equipmentText">
+          {{ equipmentText }}
+        </strong>
+      </div>
+
+      <div class="route-field">
+        <span>Customer bill</span>
+
+        <strong [title]="customerBillText">
+          {{ customerBillText }}
+        </strong>
+      </div>
+
+      <div class="route-field">
+        <span>Carrier pay</span>
+
+        <strong [title]="carrierPayText">
+          {{ carrierPayText }}
+        </strong>
+      </div>
+    </div>
+
+    <div
+      class="tracking-chip"
+      *ngIf="
+        load.execution.lastKnownLatitude && load.execution.lastKnownLongitude
+      "
+    >
+      <span> Last known </span>
+
+      <strong [title]="trackingProvider"> {{ trackingProvider }} </strong>
+
+      <small>
+        {{ load.execution.lastKnownLocationAt | date: "MMM d, yy • h:mm a" }}
+      </small>
+    </div>
+  </aside>
+
+  <div class="map-area" *ngIf="showMap">
+    <div
+      #mapCanvas
+      class="map-canvas"
+      [class.hidden]="!canUseMap || mapError"
+    ></div>
+
+    <div class="map-fallback" *ngIf="!canUseMap || mapError">
+      <div class="fallback-route">
+        <div
+          class="fallback-stop"
+          *ngFor="let stop of orderedStops; let i = index"
+          [ngClass]="stopClass(stop)"
+        >
+          <div class="pin">
+            {{ i + 1 }}
+          </div>
+
+          <div>
+            <strong>
+              {{ stopLabel(stop) }}
+            </strong>
+
+            <span>
+              {{ stop.locationName || locationLine(stop) }}
+            </span>
+
+            <small>
+              {{ locationLine(stop) }}
+            </small>
+          </div>
+        </div>
+      </div>
+
+      <p>
+        {{ mapError || "Add stop coordinates to render the live route." }}
+      </p>
+    </div>
+  </div>
+</section>

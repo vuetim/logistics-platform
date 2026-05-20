@@ -19,6 +19,7 @@ export const API_ENDPOINTS = {
     orderExternalIds: `${environment.apiBaseUrl}/orders`,
     loadsFromOrder: `${environment.apiBaseUrl}/loads/from-order`,
     loads: `${environment.apiBaseUrl}/loads`,
+    carrierOffers: `${environment.apiBaseUrl}/carrier-offers`,
     loadStops: `${environment.apiBaseUrl}/loads`,
     loadStopExecution: `${environment.apiBaseUrl}/load-stops`,
     loadItems: `${environment.apiBaseUrl}/loads`,
@@ -30,5 +31,8 @@ export const API_ENDPOINTS = {
     financialSettlements: `${environment.apiBaseUrl}/financials/settlements`,
     delayResponsibility: `${environment.apiBaseUrl}/delay-responsibility`,
     tablePreferences: `${environment.apiBaseUrl}/ui/table-preferences`,
+    notifications: `${environment.apiBaseUrl}/notifications`,
+    globalSearch: `${environment.apiBaseUrl}/search`,
+    publicCarrierTenders: `${environment.apiBaseUrl}/public/carrier-tenders`,
 
 };

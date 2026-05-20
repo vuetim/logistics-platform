@@ -4,6 +4,7 @@ using LogisticsPlatform.Application.Interfaces.Repositories.Loads;
 using LogisticsPlatform.Application.Interfaces.Services.ActivityLog;
 using LogisticsPlatform.Application.Interfaces.Services.Carriers;
 using LogisticsPlatform.Application.Interfaces.Services.Loads;
+using LogisticsPlatform.Application.Interfaces.Services.Notifications;
 using LogisticsPlatform.Application.Interfaces.Services.Orders;
 using LogisticsPlatform.Domain.Entities;
 using LogisticsPlatform.Domain.Enums;
@@ -22,6 +23,7 @@ namespace LogisticsPlatform.Application.Services
         private readonly ILoadAlertService _alertService;
         private readonly IDelayFaultAttributionService _delayFaultAttributionService;
         private readonly IOrderLoadSyncService _orderLoadSyncService;
+        private readonly INotificationService _notifications;
 
         public LoadStopExecutionService(
             ILoadStopRepository stops,
@@ -32,7 +34,8 @@ namespace LogisticsPlatform.Application.Services
             IEtaPredictionService etaPredictionService,
             ILoadAlertService alertService,
             IDelayFaultAttributionService delayFaultAttributionService,
-            IOrderLoadSyncService orderLoadSyncService)
+            IOrderLoadSyncService orderLoadSyncService,
+            INotificationService notifications)
         {
             _stops = stops;
             _loads = loads;
@@ -43,6 +46,7 @@ namespace LogisticsPlatform.Application.Services
             _alertService = alertService;
             _delayFaultAttributionService = delayFaultAttributionService;
             _orderLoadSyncService = orderLoadSyncService;
+            _notifications = notifications;
         }
 
         // PICKUP / DELIVERY WORKFLOW
@@ -167,6 +171,11 @@ namespace LogisticsPlatform.Application.Services
                 Details = null
             });
 
+            await _notifications.NotifyLoadStopEventAsync(
+                load.Id,
+                userId,
+                $"Stop #{stop.Sequence} ({stop.StopType}) {action}: {oldStopStatus} -> {stop.Status}");
+
             // 🔹 Load activity ONLY if changed
             if (oldLoadStatus != load.Status)
             {
@@ -194,6 +203,9 @@ namespace LogisticsPlatform.Application.Services
 
         private static void EnsureNotCompleted(LoadStop stop)
         {
+            if (stop.Load.Status == LoadStatus.Completed)
+                throw new BusinessRuleException("Completed load execution is locked.");
+
             if (stop.Status == StopStatus.Completed)
                 throw new BusinessRuleException("Completed stop cannot be changed.");
         }

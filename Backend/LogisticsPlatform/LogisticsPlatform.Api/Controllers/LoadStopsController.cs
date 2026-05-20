@@ -1,5 +1,6 @@
 ﻿using LogisticsPlatform.Application.DTOs.Loads.LoadStop;
 using LogisticsPlatform.Application.Interfaces.Services.Loads;
+using LogisticsPlatform.Infrastructure.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,21 +21,21 @@ public class LoadStopsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create(Guid loadId, CreateLoadStopDto dto)
     {
-        await _service.AddAsync(loadId, dto);
+        await _service.AddAsync(loadId, dto, User.GetUserId());
         return Ok();
     }
 
     [HttpPut("{stopId}")]
     public async Task<IActionResult> Update(Guid stopId, UpdateLoadStopDto dto)
     {
-        await _service.UpdateAsync(stopId, dto);
+        await _service.UpdateAsync(stopId, dto, User.GetUserId());
         return Ok();
     }
 
     [HttpDelete("{stopId}")]
     public async Task<IActionResult> Delete(Guid stopId)
     {
-        await _service.DeleteAsync(stopId);
+        await _service.DeleteAsync(stopId, User.GetUserId());
         return NoContent();
     }
 }

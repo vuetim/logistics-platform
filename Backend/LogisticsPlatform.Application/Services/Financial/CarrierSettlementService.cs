@@ -2,10 +2,14 @@
 using LogisticsPlatform.Application.DTOs.Financial;
 using LogisticsPlatform.Application.Interfaces.Repositories.Loads;
 using LogisticsPlatform.Application.Interfaces.Services.Carriers;
+using LogisticsPlatform.Application.Interfaces.Services.Notifications;
+using LogisticsPlatform.Application.Interfaces.Services.Security;
 using LogisticsPlatform.Domain.Entities;
 using LogisticsPlatform.Domain.Entities.Financial;
 using LogisticsPlatform.Domain.Enums;
+using LogisticsPlatform.Domain.Security;
 using SendGrid.Helpers.Errors.Model;
+using ForbiddenException = LogisticsPlatform.Application.Common.Exceptions.ForbiddenException;
 
 namespace LogisticsPlatform.Application.Services.Financial;
 
@@ -13,55 +17,28 @@ public class CarrierSettlementService : ICarrierSettlementService
 {
     private readonly ICarrierSettlementRepository _repo;
     private readonly ILoadRepository _loads;
+    private readonly IPermissionService _permission;
+    private readonly INotificationService _notifications;
 
     public CarrierSettlementService(
         ICarrierSettlementRepository repo,
-        ILoadRepository loads)
+        ILoadRepository loads,
+        IPermissionService permission,
+        INotificationService notifications)
     {
         _repo = repo;
         _loads = loads;
+        _permission = permission;
+        _notifications = notifications;
     }
 
-    /// <summary>
-    /// 
-    /// - Nëse ekziston settlement për këtë load → ktheje
-    /// - Nëse nuk ekziston → auto-create draft settlement nga load data
-    /// </summary>
     public async Task<CarrierSettlementDto> GetAsync(Guid loadId)
     {
-        // 1) Provo me gjet ekzistues
         var existing = await _repo.GetByLoadIdAsync(loadId);
-        if (existing != null)
-        {
-            // Nëse invoice është Draft → rifreskoje nga load
-            if (existing.Status == SettlementStatus.Draft)
-            {
-                var loadForRefresh = await _loads.GetByIdAsync(loadId)
-                    ?? throw new NotFoundException("Load not found.");
+        if (existing == null)
+            throw new NotFoundException("Settlement not found.");
 
-                await RecalculateDraftSettlementAsync(existing, loadForRefresh);
-                await _repo.SaveChangesAsync();
-            }
-
-            return Map(existing);
-        }
-
-        // 2) Nuk ekziston → auto-create
-        var load = await _loads.GetByIdAsync(loadId)
-            ?? throw new NotFoundException("Load not found.");
-
-        if (load.CarrierId == null)
-            throw new BusinessValidationException("Cannot generate carrier settlement: load has no assigned carrier.");
-
-        var dto = new CreateSettlementDto
-        {
-            SettlementDate = DateTime.UtcNow,
-            Notes = "Auto-created draft settlement."
-        };
-
-        var created = await CreateInternalAsync(load, dto, load.CreatedByUserId, isAuto: true);
-
-        return Map(created);
+        return Map(existing);
     }
 
     public async Task<List<CarrierSettlementDto>> ListAsync()
@@ -193,6 +170,9 @@ public class CarrierSettlementService : ICarrierSettlementService
 
     public async Task UpdateStatusAsync(Guid settlementId, SettlementStatus status, Guid userId)
     {
+        if (!await _permission.HasPermissionAsync(userId, Permission.Financial_Settlement_UpdateStatus))
+            throw new ForbiddenException("You are not allowed to update settlement status.");
+
         var settlement = await _repo.GetByIdAsync(settlementId)
             ?? throw new NotFoundException("Settlement not found.");
 
@@ -201,10 +181,17 @@ public class CarrierSettlementService : ICarrierSettlementService
         settlement.UpdatedByUserId = userId;
 
         await _repo.SaveChangesAsync();
+        await _notifications.NotifySettlementEventAsync(
+            settlement.LoadId,
+            userId,
+            $"Settlement {settlement.SettlementNumber} status changed to {status}");
     }
 
     public async Task<CarrierSettlementDto> RecordPaymentAsync(Guid settlementId, RecordSettlementPaymentDto dto, Guid userId)
     {
+        if (!await _permission.HasPermissionAsync(userId, Permission.Financial_Settlement_RecordPayment))
+            throw new ForbiddenException("You are not allowed to record settlement payments.");
+
         var settlement = await _repo.GetByIdAsync(settlementId)
             ?? throw new NotFoundException("Settlement not found.");
 
@@ -221,6 +208,10 @@ public class CarrierSettlementService : ICarrierSettlementService
         settlement.UpdatedByUserId = userId;
 
         await _repo.SaveChangesAsync();
+        await _notifications.NotifySettlementEventAsync(
+            settlement.LoadId,
+            userId,
+            $"Payment recorded for settlement {settlement.SettlementNumber}: {settlement.AmountPaid:N2}");
         return Map(settlement);
     }
 

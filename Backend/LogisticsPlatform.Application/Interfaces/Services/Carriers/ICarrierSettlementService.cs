@@ -8,7 +8,6 @@ public interface ICarrierSettlementService
 {
     /// <summary>
     /// Gets the carrier settlement for a load.
-    /// If it doesn't exist, auto-creates a draft settlement from load data .
     /// </summary>
     Task<CarrierSettlementDto> GetAsync(Guid loadId);
 
@@ -19,7 +18,6 @@ public interface ICarrierSettlementService
 
     /// <summary>
     /// Manual create (nëse ke buton explicit "Create Settlement").
-    /// Përndryshe GetAsync mjafton, se bën GetOrCreate.
     /// </summary>
     Task<CarrierSettlementDto> CreateAsync(Guid loadId, CreateSettlementDto dto, Guid userId);
 

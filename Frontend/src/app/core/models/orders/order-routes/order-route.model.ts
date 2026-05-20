@@ -9,14 +9,20 @@ export interface OrderRouteDto {
     state: string;
     postalCode: string;
     country: string;
+    latitude?: number | null;
+    longitude?: number | null;
     plannedArrivalFrom?: string | null;
     plannedArrivalTo?: string | null;
+    appointmentType?: number;
+    flexMinutes?: number | null;
+    timeZone?: string | null;
     hasTime: boolean;
     copyToLoad: boolean;
     appointmentFrom?: string | null;
     appointmentTo?: string | null;
     stopReference?: string | null;
     appointmentNumber?: string | null;
+    poNumbers?: string | null;
     notes?: string | null;
     isActive: boolean;
 }

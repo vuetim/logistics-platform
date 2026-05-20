@@ -101,4 +101,56 @@ export class LoadsService {
   deleteStop(loadId: string, stopId: string) {
     return this.api.deleteStop(loadId, stopId);
   }
+
+  updateItem(loadId: string, itemId: string, dto: unknown) {
+    return this.api.updateItem(loadId, itemId, dto);
+  }
+
+  deleteItem(loadId: string, itemId: string) {
+    return this.api.deleteItem(loadId, itemId);
+  }
+
+  getCarrierAssignments(loadId: string) {
+    return this.api.getCarrierAssignments(loadId);
+  }
+
+  tenderCarrier(loadId: string, dto: unknown) {
+    return this.api.tenderCarrier(loadId, dto);
+  }
+
+  acceptCarrierAssignment(loadId: string, assignmentId: string) {
+    return this.api.acceptCarrierAssignment(loadId, assignmentId);
+  }
+
+  rejectCarrierAssignment(loadId: string, assignmentId: string) {
+    return this.api.rejectCarrierAssignment(loadId, assignmentId);
+  }
+
+  getOpenCarrierOffers() {
+    return this.api.getOpenCarrierOffers();
+  }
+
+  getExceptions(loadId: string) {
+    return this.api.getExceptions(loadId);
+  }
+
+  createException(loadId: string, dto: unknown) {
+    return this.api.createException(loadId, dto);
+  }
+
+  updateException(loadId: string, exceptionId: string, dto: unknown) {
+    return this.api.updateException(loadId, exceptionId, dto);
+  }
+
+  getStopServices(stopId: string) {
+    return this.api.getStopServices(stopId);
+  }
+
+  createStopService(stopId: string, dto: unknown) {
+    return this.api.createStopService(stopId, dto);
+  }
+
+  deleteStopService(stopId: string, serviceId: string) {
+    return this.api.deleteStopService(stopId, serviceId);
+  }
 }

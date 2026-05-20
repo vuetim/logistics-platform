@@ -2,7 +2,7 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { API_ENDPOINTS } from "../../core/config/endpoints";
 import { PagedResult } from "../../core/models/pagination/paged-result.model";
-import { CarrierSettlementDto, CustomerInvoiceDto, LoadActivityDto, LoadCostDto, LoadDetailsDto, LoadDocumentDto, LoadNoteDto } from "../../core/models/loads/load-details.dto";
+import { CarrierSettlementDto, CustomerInvoiceDto, LoadActivityDto, LoadCarrierAssignmentDto, LoadCostDto, LoadDetailsDto, LoadDocumentDto, LoadExceptionDto, LoadNoteDto, LoadStopServiceDto, OpenCarrierOfferDto } from "../../core/models/loads/load-details.dto";
 import { LoadListItem } from "../../core/models/loads/load-list-item.model";
 import { LoadsQueryParameters } from "../../core/models/loads/loads-query-parameters.model";
 
@@ -112,5 +112,57 @@ export class LoadsApi {
 
   deleteStop(loadId: string, stopId: string) {
     return this.http.delete<void>(`${API_ENDPOINTS.loadStops}/${loadId}/stops/${stopId}`);
+  }
+
+  updateItem(loadId: string, itemId: string, dto: unknown) {
+    return this.http.put<void>(`${API_ENDPOINTS.loadItems}/${loadId}/items/${itemId}`, dto);
+  }
+
+  deleteItem(loadId: string, itemId: string) {
+    return this.http.delete<void>(`${API_ENDPOINTS.loadItems}/${loadId}/items/${itemId}`);
+  }
+
+  getCarrierAssignments(loadId: string) {
+    return this.http.get<LoadCarrierAssignmentDto[]>(`${this.baseUrl}/${loadId}/carrier-assignments`);
+  }
+
+  tenderCarrier(loadId: string, dto: unknown) {
+    return this.http.post<{ assignmentId: string }>(`${this.baseUrl}/${loadId}/carrier-assignments/tender`, dto);
+  }
+
+  acceptCarrierAssignment(loadId: string, assignmentId: string) {
+    return this.http.post<void>(`${this.baseUrl}/${loadId}/carrier-assignments/${assignmentId}/accept`, {});
+  }
+
+  rejectCarrierAssignment(loadId: string, assignmentId: string) {
+    return this.http.post<void>(`${this.baseUrl}/${loadId}/carrier-assignments/${assignmentId}/reject`, {});
+  }
+
+  getOpenCarrierOffers() {
+    return this.http.get<OpenCarrierOfferDto[]>(`${API_ENDPOINTS.carrierOffers}/open`);
+  }
+
+  getExceptions(loadId: string) {
+    return this.http.get<LoadExceptionDto[]>(`${this.baseUrl}/${loadId}/exceptions`);
+  }
+
+  createException(loadId: string, dto: unknown) {
+    return this.http.post<void>(`${this.baseUrl}/${loadId}/exceptions`, dto);
+  }
+
+  updateException(loadId: string, exceptionId: string, dto: unknown) {
+    return this.http.put<void>(`${this.baseUrl}/${loadId}/exceptions/${exceptionId}`, dto);
+  }
+
+  getStopServices(stopId: string) {
+    return this.http.get<LoadStopServiceDto[]>(`${API_ENDPOINTS.loadStopExecution}/${stopId}/services`);
+  }
+
+  createStopService(stopId: string, dto: unknown) {
+    return this.http.post<void>(`${API_ENDPOINTS.loadStopExecution}/${stopId}/services`, dto);
+  }
+
+  deleteStopService(stopId: string, serviceId: string) {
+    return this.http.delete<void>(`${API_ENDPOINTS.loadStopExecution}/${stopId}/services/${serviceId}`);
   }
 }

@@ -26,6 +26,11 @@ namespace LogisticsPlatform.Application.Services
         private readonly IOrderRepository _orders;
         private readonly ILoadFinancialAutomationService _financialAutomationService;
         private readonly IOrderLoadSyncService _orderLoadSyncService;
+        private readonly ILoadCreationPolicy _creationPolicy;
+        private readonly ILoadDispatchPolicy _dispatchPolicy;
+        private readonly IOrderToLoadRouteSelector _routeSelector;
+        private readonly IOrderToLoadSnapshotBuilder _snapshotBuilder;
+        private readonly ILoadNumberGenerator _numberGenerator;
 
         public LoadService(
             ILoadRepository loads,
@@ -35,7 +40,12 @@ namespace LogisticsPlatform.Application.Services
             IPermissionService permission,
             IOrderRepository orders,
             ILoadFinancialAutomationService loadFinancialAutomationService,
-            IOrderLoadSyncService orderLoadSyncService)
+            IOrderLoadSyncService orderLoadSyncService,
+            ILoadCreationPolicy creationPolicy,
+            ILoadDispatchPolicy dispatchPolicy,
+            IOrderToLoadRouteSelector routeSelector,
+            IOrderToLoadSnapshotBuilder snapshotBuilder,
+            ILoadNumberGenerator numberGenerator)
         {
             _loads = loads;
             _customers = customers;
@@ -45,6 +55,11 @@ namespace LogisticsPlatform.Application.Services
             _orders = orders;
             _financialAutomationService = loadFinancialAutomationService;
             _orderLoadSyncService = orderLoadSyncService;
+            _creationPolicy = creationPolicy;
+            _dispatchPolicy = dispatchPolicy;
+            _routeSelector = routeSelector;
+            _snapshotBuilder = snapshotBuilder;
+            _numberGenerator = numberGenerator;
         }
 
         // CREATE LOAD (manual) (Admin, Broker)
@@ -68,7 +83,7 @@ namespace LogisticsPlatform.Application.Services
 
             var load = new Load
             {
-                LoadNumber = $"L-{DateTime.UtcNow:yyyyMMddHHmmss}",
+                LoadNumber = _numberGenerator.Generate(),
 
                 CustomerId = customer.Id,
                 CarrierId = carrier?.Id,
@@ -105,24 +120,31 @@ namespace LogisticsPlatform.Application.Services
 
             var user = await GetUserOrThrow(userId);
 
-            if (!await _permission.HasPermissionAsync(userId, Permission.Load_Update))
+            var canUpdateLoad = await _permission.HasPermissionAsync(userId, Permission.Load_Update);
+            var canUpdateOperational = await _permission.HasPermissionAsync(userId, Permission.Load_Operational_Update);
+
+            if (!canUpdateLoad && !canUpdateOperational)
                 throw new Common.Exceptions.ForbiddenException("You are not allowed to update this load.");
+
+            if (!canUpdateLoad && HasProtectedLoadChanges(dto))
+                throw new Common.Exceptions.ForbiddenException("You are not allowed to update load commercial or assignment fields.");
 
             load.Origin = dto.Origin ?? load.Origin;
             load.Destination = dto.Destination ?? load.Destination;
 
-            if (dto.ModeType.HasValue)
+            if (canUpdateLoad && dto.ModeType.HasValue)
                 load.Mode = dto.ModeType.Value;
 
-            if (dto.CustomerRate.HasValue)
+            if (canUpdateLoad && dto.CustomerRate.HasValue)
                 load.CustomerRate = dto.CustomerRate.Value;
 
-            if (dto.CarrierRate.HasValue)
+            if (canUpdateLoad && dto.CarrierRate.HasValue)
                 load.CarrierRate = dto.CarrierRate.Value;
 
-            load.Accessorials = dto.Accessorials;
+            if (canUpdateLoad)
+                load.Accessorials = dto.Accessorials;
 
-            if (dto.CarrierId.HasValue)
+            if (canUpdateLoad && dto.CarrierId.HasValue)
                 load.CarrierId = dto.CarrierId.Value;
             load.BolNumber = dto.BolNumber ?? load.BolNumber;
             load.ProNumber = dto.ProNumber ?? load.ProNumber;
@@ -158,14 +180,17 @@ namespace LogisticsPlatform.Application.Services
             if (!await _permission.HasPermissionAsync(userId, Permission.Load_ChangeStatus))
                 throw new Common.Exceptions.ForbiddenException("You are not allowed to change load status.");
 
-            if (load.Status == LoadStatus.Completed)
-                throw new BusinessRuleException("Completed load cannot be changed.");
             if (newStatus == LoadStatus.Completed)
             {
+                if (load.Status == LoadStatus.Completed)
+                    throw new BusinessRuleException("Load is already completed.");
+
                 if (load.Status != LoadStatus.Delivered)
                     throw new BusinessRuleException("Load must be delivered before it can be completed.");
-
-                await _financialAutomationService.GenerateFinancialDocumentsAsync(load);
+            }
+            else if (load.Status == LoadStatus.Completed)
+            {
+                throw new BusinessRuleException("Completed load cannot be changed.");
             }
 
 
@@ -174,6 +199,11 @@ namespace LogisticsPlatform.Application.Services
             await _loads.UpdateAsync(load);
             await _loads.SaveChangesAsync();
             await _orderLoadSyncService.SyncFromLoadAsync(load);
+
+            if (newStatus == LoadStatus.Completed)
+            {
+                await _financialAutomationService.GenerateFinancialDocumentsAsync(load);
+            }
         }
 
         // CREATE LOAD FROM ORDER (snapshot)
@@ -181,266 +211,36 @@ namespace LogisticsPlatform.Application.Services
             CreateLoadFromOrderDto dto,
             Guid userId)
         {
-            // 1️⃣ Load user & permissions
+            _creationPolicy.ValidateDateOverrides(dto.PlannedPickupDate, dto.PlannedDeliveryDate);
+
             var user = await GetUserOrThrow(userId);
 
             if (!await _permission.HasPermissionAsync(userId, Permission.Load_CreateFromOrder))
                 throw new Common.Exceptions.ForbiddenException("Not allowed to create load from order.");
 
-            // 2️⃣ Load order with routes + items
             var order = await _orders.GetByIdWithRoutesAsync(dto.OrderId)
                 ?? throw new NotFoundException("Order not found.");
-
-            if (order.Status == OrderStatus.Draft)
-                throw new BusinessRuleException("Order must be submitted before creating a load.");
 
             var orderWithLoads = await _orders.GetByIdWithLoadsAsync(dto.OrderId)
                 ?? throw new NotFoundException("Order not found.");
 
-            if (orderWithLoads.Loads.Any(l => l.Load != null && !l.Load.IsArchived) && !dto.SplitOrder)
-                throw new BusinessRuleException("Order already has an active load. Use split flow if needed.");
+            _creationPolicy.EnsureCanCreateFromOrder(order, orderWithLoads, dto);
 
-            if (dto.SplitOrder)
-                throw new BusinessRuleException("SplitOrder is not implemented yet.");
+            var routes = _routeSelector.Select(order);
+            var snapshot = _snapshotBuilder.Build(order, dto, user.Id, routes);
 
-            // NOTE:
-            // GetByIdWithRoutesAsync duhet të përfshij:
-            //  .Include(o => o.OrderRoutes)
-            //  .Include(o => o.Items)
+            await _loads.AddAsync(snapshot.Load);
 
-            var activeRoutes = order.OrderRoutes
-                .Where(r => r.IsActive)
-                .OrderBy(r => r.Sequence)
-                .ToList();
-
-            var mandatoryPickup = activeRoutes
-                .Where(r => r.StopType == StopType.Pickup)
-                .OrderBy(r => r.Sequence)
-                .FirstOrDefault();
-
-            var mandatoryDelivery = activeRoutes
-                .Where(r => r.StopType == StopType.Delivery)
-                .OrderByDescending(r => r.Sequence)
-                .FirstOrDefault();
-
-            var mandatoryRouteIds = new[]
-                {
-                    mandatoryPickup?.Id,
-                    mandatoryDelivery?.Id
-                }
-                .Where(id => id.HasValue)
-                .Select(id => id!.Value)
-                .ToHashSet();
-
-            var routes = activeRoutes
-                .Where(r => r.CopyToLoad || mandatoryRouteIds.Contains(r.Id))
-                .OrderBy(r => r.Sequence)
-                .ToList();
-
-            if (!routes.Any())
-                throw new BusinessRuleException("No active routes to copy.");
-
-            if (mandatoryPickup == null || mandatoryDelivery == null)
-                throw new BusinessRuleException("Order must have at least one pickup and one delivery route to create a load.");
-
-            // (opsionale) nese biznesi kerkon patjeter items:
-            // if (!order.Items.Any())
-            //     throw new BusinessRuleException("Order has no items.");
-
-            // 3️⃣ Create Load (in-memory, pa SaveChanges ende)
-            var firstRoute = routes.First();
-            var lastRoute = routes.Last();
-            var orderCustomerRate = order.Cost?.QuotedTotal ?? order.CustomerRate ?? 0;
-
-            var load = new Load
+            foreach (var stop in snapshot.Stops)
             {
-                LoadNumber = $"L-{DateTime.UtcNow:yyyyMMddHHmmss}",
-
-                CustomerId = order.CustomerId,
-                CarrierId = dto.CarrierId ?? order.PreferredCarrierId,
-
-                Status = LoadStatus.Draft,
-                Mode = ModeType.TL, // TODO: me vone mund të vije nga Order/DTO
-
-                CustomerRate = orderCustomerRate,
-                CarrierRate = dto.CarrierRate ?? 0,
-                Accessorials = order.Cost?.Accessorials,
-                RateConfirmationNumber = dto.RateConfirmationNumber,
-
-                Origin = !string.IsNullOrWhiteSpace(firstRoute.LocationName)
-                    ? firstRoute.LocationName
-                    : $"{firstRoute.City}, {firstRoute.State}",
-                Destination = !string.IsNullOrWhiteSpace(lastRoute.LocationName)
-                    ? lastRoute.LocationName
-                    : $"{lastRoute.City}, {lastRoute.State}",
-
-                IsArchived = false,
-                CreatedByUserId = userId,
-                CreatedAt = DateTime.UtcNow
-            };
-
-            await _loads.AddAsync(load);
-
-            //  Snapshot OrderRoutes - LoadStops
-            foreach (var route in routes)
-            {
-                var plannedArrivalFrom = route.PlannedArrivalFrom;
-                var plannedArrivalTo = route.PlannedArrivalTo;
-
-                if (route.Id == firstRoute.Id && dto.PlannedPickupDate.HasValue)
-                {
-                    plannedArrivalFrom = dto.PlannedPickupDate.Value;
-                    plannedArrivalTo = dto.PlannedPickupDate.Value;
-                }
-
-                if (route.Id == lastRoute.Id && dto.PlannedDeliveryDate.HasValue)
-                {
-                    plannedArrivalFrom = dto.PlannedDeliveryDate.Value;
-                    plannedArrivalTo = dto.PlannedDeliveryDate.Value;
-                }
-
-                var stop = new LoadStop
-                {
-                    // lidhje me Load si navigation – EF do mbush LoadId
-                    Load = load,
-
-                    Sequence = route.Sequence,
-                    StopType = route.StopType,
-
-                    LocationName = route.LocationName,
-                    AddressLine1 = route.AddressLine1,
-                    AddressLine2 = route.AddressLine2,
-                    City = route.City,
-                    State = route.State,
-                    PostalCode = route.PostalCode,
-                    Country = route.Country,
-                    Latitude = route.Latitude,
-                    Longitude = route.Longitude,
-
-                    PlannedArrivalFrom = plannedArrivalFrom,
-                    PlannedArrivalTo = plannedArrivalTo,
-                    PlannedDepartureFrom = route.PlannedDepartureFrom,
-                    PlannedDepartureTo = route.PlannedDepartureTo,
-
-                    AppointmentType = route.AppointmentType,
-                    FlexMinutes = route.FlexMinutes,
-                    StopReference = route.StopReference,
-                    AppointmentNumber = route.AppointmentNumber,
-                    Status = StopStatus.Pending,
-                    Notes = route.Notes
-                };
-
                 await _loads.AddStopAsync(stop);
             }
 
-            //  Snapshot OrderItems - LoadItems
-            foreach (var orderItem in order.Items.Where(i => i.CopyToLoad))
-
-            {
-                var loadItem = new LoadItem
-                {
-                    Load = load,
-                    SourceOrderItemId = orderItem.Id,
-
-                    // Identification
-                    Name = orderItem.Name,
-                    CustomerReference = orderItem.CustomerReference,
-
-                    // Quantity & handling
-                    Quantity = orderItem.Quantity,
-                    QuantityUnit = orderItem.QuantityUnit,
-                    HandlingQuantity = orderItem.HandlingQuantity,
-                    HandlingUnit = orderItem.HandlingUnit,
-
-                    // Weight
-                    UnitNetWeight = orderItem.UnitNetWeight,
-                    UnitGrossWeight = orderItem.UnitGrossWeight,
-                    WeightUnit = orderItem.WeightUnit,
-
-                    // Dimensions
-                    Length = orderItem.Length,
-                    Width = orderItem.Width,
-                    Height = orderItem.Height,
-                    DimensionUnit = orderItem.DimensionUnit,
-
-                    // Volume
-                    Volume = orderItem.Volume,
-                    VolumeUnit = orderItem.VolumeUnit,
-
-                    // Temperature
-                    MinTemperature = orderItem.MinTemperature,
-                    MaxTemperature = orderItem.MaxTemperature,
-                    TemperatureUnit = orderItem.TemperatureUnit,
-
-                    // Hazmat
-                    IsHazmat = orderItem.IsHazmat,
-                    HazardClass = orderItem.HazardClass,
-                    IdentificationNumber = orderItem.IdentificationNumber,
-
-                    // Freight & commercial
-                    FreightClass = orderItem.FreightClass,
-                    DeclaredValue = orderItem.DeclaredValue,
-                    Currency = orderItem.Currency,
-
-                    Stackable = orderItem.Stackable,
-                    Notes = orderItem.Notes
-                };
-
-                load.Items.Add(loadItem);
-            }
-            // 4 Snapshot OrderEquipmentRequirement → LoadEquipment
-            var equipmentReqs = order.EquipmentRequirements
-                .Where(e => e.CopyToLoad)
-                .ToList();
-
-            foreach (var req in order.EquipmentRequirements.Where(e => e.CopyToLoad))
-            {
-                var loadEq = new LoadEquipment
-                {
-                    Load = load,
-                    SourceOrderEquipmentRequirementId = req.Id,
-
-                    EquipmentType = ParseEquipmentType(req.EquipmentType),
-                    Quantity = req.Quantity > 0 ? req.Quantity : 1,
-
-                    Length = ParseLength(req.EquipmentSize),
-
-                    Weight = req.MaxWeight,
-                    WeightUnit = req.WeightUnit,
-
-                    MinTemp = req.MinTemperature,
-                    MaxTemp = req.MaxTemperature,
-                    TempUnit = req.TemperatureUnit,
-                    IsPrefered = req.IsPrefered,
-                };
-
-                load.Equipment.Add(loadEq);
-            }
-            if (load.Equipment.Any())
-            {
-                load.HasEquipment = true;
-            }
-
-            if (load.Equipment.Any(e => e.EquipmentType == EquipmentType.Reefer))
-            {
-                load.IsTemperatureControlled = true;
-            }
-
-            // Link Order ↔ Load (LoadOrder)
-            var loadOrder = new LoadOrder
-            {
-                Load = load,
-                OrderId = order.Id,
-                PONumber = order.OrderNumber
-            };
-
-            await _loads.AddLoadOrderAsync(loadOrder);
-
-            // one SaveChanges for all
+            await _loads.AddLoadOrderAsync(snapshot.LoadOrder);
             await _loads.SaveChangesAsync();
             await _orderLoadSyncService.SyncByOrderIdAsync(order.Id);
 
-            return load.Id;
+            return snapshot.Load.Id;
         }
 
         // ARCHIVE LOAD (Admin only)
@@ -467,38 +267,19 @@ namespace LogisticsPlatform.Application.Services
                 ?? throw new Common.Exceptions.ForbiddenException("User not found.");
         }
 
-        private EquipmentType ParseEquipmentType(string type)
+        private static bool HasProtectedLoadChanges(UpdateLoadDto dto)
         {
-            if (string.IsNullOrWhiteSpace(type))
-                return EquipmentType.DryVan;
-
-            return type.ToLower() switch
-            {
-                "dry van" => EquipmentType.DryVan,
-                "van" => EquipmentType.DryVan,
-                "reefer" => EquipmentType.Reefer,
-                "refrigerated" => EquipmentType.Reefer,
-                "flatbed" => EquipmentType.Flatbed,
-                "stepdeck" => EquipmentType.StepDeck,
-                "step deck" => EquipmentType.StepDeck,
-                "power only" => EquipmentType.PowerOnly,
-                _ => EquipmentType.DryVan
-            };
+            return dto.CarrierId.HasValue
+                || dto.ModeType.HasValue
+                || dto.EquipmentType.HasValue
+                || dto.PickupDate.HasValue
+                || dto.DeliveryDate.HasValue
+                || dto.CustomerRate.HasValue
+                || dto.CarrierRate.HasValue
+                || dto.Accessorials.HasValue
+                || !string.IsNullOrWhiteSpace(dto.Summary);
         }
 
-        private decimal? ParseLength(string? size)
-        {
-            if (string.IsNullOrWhiteSpace(size))
-                return null;
-
-            // Examples: "53 ft", "48ft", "53"
-            var clean = new string(size.Where(char.IsDigit).ToArray());
-
-            if (decimal.TryParse(clean, out var length))
-                return length;
-
-            return null;
-        }
         public async Task DispatchAsync(Guid loadId, DispatchLoadDto dto, Guid userId)
         {
             var load = await _loads.GetByIdAsync(loadId)
@@ -509,12 +290,7 @@ namespace LogisticsPlatform.Application.Services
             if (!await _permission.HasPermissionAsync(userId, Permission.Load_Dispatch))
                 throw new ForbiddenException("You are not allowed to dispatch this load.");
 
-            // 🔒 Business rules
-            if (load.Status != LoadStatus.Accepted)
-                throw new BusinessRuleException("Only accepted loads can be dispatched.");
-
-            if (load.CarrierId == null)
-                throw new BusinessRuleException("Carrier must be assigned before dispatch.");
+            _dispatchPolicy.EnsureCanDispatch(load, dto);
 
             // Snapshot dispatcher data
             load.DriverName = dto.DriverName;
@@ -529,21 +305,6 @@ namespace LogisticsPlatform.Application.Services
             await _loads.UpdateAsync(load);
             await _loads.SaveChangesAsync();
             await _orderLoadSyncService.SyncFromLoadAsync(load);
-        }
-
-        private TemperatureUnit ParseTemperatureUnit(string? unit)
-        {
-            if (string.IsNullOrWhiteSpace(unit))
-                return TemperatureUnit.F;
-
-            return unit.ToLower() switch
-            {
-                "f" => TemperatureUnit.F,
-                "fahrenheit" => TemperatureUnit.F,
-                "c" => TemperatureUnit.C,
-                "celsius" => TemperatureUnit.C,
-                _ => TemperatureUnit.F
-            };
         }
 
     }

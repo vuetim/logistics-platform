@@ -12,6 +12,12 @@ export const routes: Routes = [
             import('./features/auth/auth.routes')
                 .then(m => m.authRoutes)
     },
+    {
+        path: 'carrier-tenders/:token',
+        loadComponent: () =>
+            import('./features/public/carrier-tender/carrier-tender-page.component')
+                .then(m => m.CarrierTenderPageComponent)
+    },
     //users
 
 

@@ -33,10 +33,19 @@ public class OrderRouteService : IOrderRouteService
             State = dto.State,
             PostalCode = dto.PostalCode,
             Country = dto.Country,
+            Latitude = dto.Latitude,
+            Longitude = dto.Longitude,
             StopReference = dto.StopReference,
             AppointmentNumber = dto.AppointmentNumber,
+            PONumbers = dto.PONumbers,
             PlannedArrivalFrom = dto.PlannedArrivalFrom,
             PlannedArrivalTo = dto.PlannedArrivalTo,
+            AppointmentType = dto.AppointmentType,
+            FlexMinutes = dto.FlexMinutes,
+            TimeZone = NormalizeTimeZone(dto.TimeZone),
+            AppointmentStatus = dto.AppointmentStatus,
+            AppointmentConfirmed = dto.AppointmentConfirmed,
+            AppointmentConfirmationNumber = dto.AppointmentConfirmationNumber,
 
             HasTime = dto.HasTime,
             CopyToLoad = dto.CopyToLoad,
@@ -66,12 +75,21 @@ public class OrderRouteService : IOrderRouteService
             State = r.State,
             PostalCode = r.PostalCode,
             Country = r.Country,
+            Latitude = r.Latitude,
+            Longitude = r.Longitude,
             PlannedArrivalFrom = r.PlannedArrivalFrom,
             PlannedArrivalTo = r.PlannedArrivalTo,
+            AppointmentType = r.AppointmentType,
+            FlexMinutes = r.FlexMinutes,
+            TimeZone = r.TimeZone,
+            AppointmentStatus = r.AppointmentStatus,
+            AppointmentConfirmed = r.AppointmentConfirmed,
+            AppointmentConfirmationNumber = r.AppointmentConfirmationNumber,
             HasTime = r.HasTime,
             CopyToLoad = r.CopyToLoad,
             StopReference = r.StopReference,
             AppointmentNumber = r.AppointmentNumber,
+            PONumbers = r.PONumbers,
             Notes = r.Notes,
             IsActive = r.IsActive
         }).ToList();
@@ -92,11 +110,20 @@ public class OrderRouteService : IOrderRouteService
         route.State = dto.State ?? route.State;
         route.PostalCode = dto.PostalCode ?? route.PostalCode;
         route.Country = dto.Country ?? route.Country;
+        route.Latitude = dto.Latitude ?? route.Latitude;
+        route.Longitude = dto.Longitude ?? route.Longitude;
 
         route.PlannedArrivalFrom = dto.PlannedArrivalFrom ?? route.PlannedArrivalFrom;
         route.PlannedArrivalTo = dto.PlannedArrivalTo ?? route.PlannedArrivalTo;
+        route.AppointmentType = dto.AppointmentType ?? route.AppointmentType;
+        route.FlexMinutes = dto.FlexMinutes ?? route.FlexMinutes;
+        route.TimeZone = NormalizeTimeZone(dto.TimeZone ?? route.TimeZone);
+        route.AppointmentStatus = dto.AppointmentStatus ?? route.AppointmentStatus;
+        route.AppointmentConfirmed = dto.AppointmentConfirmed ?? route.AppointmentConfirmed;
+        route.AppointmentConfirmationNumber = dto.AppointmentConfirmationNumber ?? route.AppointmentConfirmationNumber;
         route.StopReference = dto.StopReference ?? route.StopReference;
         route.AppointmentNumber = dto.AppointmentNumber ?? route.AppointmentNumber;
+        route.PONumbers = dto.PONumbers ?? route.PONumbers;
   
 
     route.HasTime = dto.HasTime ?? route.HasTime;
@@ -115,4 +142,7 @@ public class OrderRouteService : IOrderRouteService
         await _routes.DeleteAsync(route);
         await _routes.SaveChangesAsync();
     }
+
+    private static string NormalizeTimeZone(string? timeZone)
+        => string.IsNullOrWhiteSpace(timeZone) ? "UTC" : timeZone.Trim();
 }

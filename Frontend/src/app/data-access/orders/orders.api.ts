@@ -7,6 +7,7 @@ import { PagedResult } from "../../core/models/pagination/paged-result.model";
 import { OrderListItem } from "../../core/models/orders/order-list-item.model";
 import { OrdersQueryParameters } from "../../core/models/orders/orders-query-parameters.dto";
 import { UpdateOrderDto } from "../../core/models/orders/update-order.dto";
+import { CreateLoadFromOrderDto } from "../../core/models/orders/create-load-from-order.dto";
 
 @Injectable({ providedIn: 'root' })
 export class OrdersApi {
@@ -43,15 +44,7 @@ export class OrdersApi {
         return this.http.post(`${this.baseUrl}/${id}/cancel`, {});
     }
 
-    createLoadFromOrder(orderId: string) {
-        return this.http.post<{ loadId: string }>(API_ENDPOINTS.loadsFromOrder, {
-            orderId,
-            carrierId: null,
-            plannedPickupDate: null,
-            plannedDeliveryDate: null,
-            carrierRate: null,
-            rateConfirmationNumber: null,
-            splitOrder: false
-        });
+    createLoadFromOrder(dto: CreateLoadFromOrderDto) {
+        return this.http.post<{ loadId: string }>(API_ENDPOINTS.loadsFromOrder, dto);
     }
 }

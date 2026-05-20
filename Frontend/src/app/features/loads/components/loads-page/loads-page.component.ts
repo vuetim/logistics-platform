@@ -13,16 +13,18 @@ import { EntityTableComponent } from "../../../../shared/UI/entity-table/entity-
 import { PaginationComponent } from "../../../../shared/UI/pagination/pagination.component";
 import { LoadStatus } from "../../../../core/enums/loads/load-status.enum";
 import { ModeType } from "../../../../core/enums/loads/mode-type.enum";
+import { LoadSummaryCardComponent } from "../load-summary-card/load-summary-card.component";
 
 @Component({
   selector: 'app-loads-page',
   standalone: true,
-  imports: [NgIf, NgFor, FormsModule, KeyValuePipe, PageLayoutComponent, UiCardComponent, UiButtonComponent, EntityTableComponent, PaginationComponent],
+  imports: [NgIf, NgFor, FormsModule, KeyValuePipe, PageLayoutComponent, UiCardComponent, UiButtonComponent, EntityTableComponent, PaginationComponent, LoadSummaryCardComponent],
   templateUrl: './loads-page.component.html',
   styleUrl: './loads-page.component.css'
 })
 export class LoadsPageComponent extends GenericListPage<LoadsQueryParameters> implements OnInit {
   loads: LoadListItem[] = [];
+  viewMode: 'table' | 'cards' = 'table';
   filterModel = {
     search: '',
     status: '',
@@ -150,9 +152,11 @@ export class LoadsPageComponent extends GenericListPage<LoadsQueryParameters> im
   statusLabel(value: number | string) {
     if (typeof value === 'string') {
       const numeric = (LoadStatus as any)[value];
+      if (value.toLowerCase() === 'accepted') return 'Covered';
       return typeof numeric === 'number' ? this.humanize(value) : this.humanize(String(value));
     }
 
+    if (value === LoadStatus.Accepted) return 'Covered';
     return this.humanize(LoadStatus[value] ?? String(value));
   }
 

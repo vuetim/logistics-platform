@@ -5,6 +5,8 @@ import { ToastrService } from "ngx-toastr";
 import { ChargeType } from "../../../../../../core/enums/loads/charge-type.enum";
 import { LoadCostDto, LoadCostSummaryDto } from "../../../../../../core/models/loads/load-details.dto";
 import { LoadsService } from "../../../../../../data-access/loads/loads.service";
+import { AuthFacade } from "../../../../../../core/auth/auth.facade";
+import { Permission } from "../../../../../../core/auth/permissions/permission.enum";
 
 @Component({
   selector: 'app-load-costs',
@@ -20,14 +22,23 @@ export class LoadCostsComponent implements OnChanges {
   cost?: LoadCostDto;
   loading = false;
   saving = false;
+  canView = false;
+  canUpdate = false;
 
   readonly chargeTypes = Object.keys(ChargeType)
     .filter(k => !isNaN(Number((ChargeType as any)[k])))
     .map(k => ({ label: this.humanize(k), value: (ChargeType as any)[k] as number }));
 
-  constructor(private loadsService: LoadsService, private toastr: ToastrService) {}
+  constructor(
+    private loadsService: LoadsService,
+    private toastr: ToastrService,
+    private auth: AuthFacade
+  ) {}
 
   ngOnChanges() {
+    this.canView = this.canUse(Permission.LoadCost_View);
+    this.canUpdate = this.canUse(Permission.LoadCost_Update);
+    if (!this.canView) return;
     if (!this.loadId) return;
     this.loading = true;
     this.loadsService.getCosts(this.loadId).subscribe({
@@ -68,6 +79,8 @@ export class LoadCostsComponent implements OnChanges {
   }
 
   addLine(isCarrier = true) {
+    if (!this.canUpdate) return;
+
     if (!this.cost) {
       this.cost = { notes: null, totalAmount: 0, lineItems: [] };
     }
@@ -84,15 +97,17 @@ export class LoadCostsComponent implements OnChanges {
   }
 
   removeLine(index: number) {
+    if (!this.canUpdate) return;
     this.cost?.lineItems.splice(index, 1);
   }
 
   recalc(line: any) {
+    if (!this.canUpdate) return;
     line.amount = Number(line.qty || 0) * Number(line.price || 0);
   }
 
   save() {
-    if (!this.cost) return;
+    if (!this.cost || !this.canUpdate) return;
     this.saving = true;
     const dto = {
       notes: this.cost.notes || null,
@@ -161,5 +176,9 @@ export class LoadCostsComponent implements OnChanges {
     if (!err?.error) return "Unexpected server error.";
     if (typeof err.error === 'string') return err.error;
     return err.error.message || err.error.title || "Unexpected server error.";
+  }
+
+  private canUse(permission: Permission) {
+    return this.auth.hasRole('Admin') || this.auth.hasPermission(permission);
   }
 }

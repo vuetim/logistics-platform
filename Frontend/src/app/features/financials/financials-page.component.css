@@ -124,6 +124,12 @@ a:hover,
   color: #ffffff;
 }
 
+.table-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
 .modal-backdrop {
   position: fixed;
   inset: 0;

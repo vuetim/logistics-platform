@@ -1,0 +1,65 @@
+<a class="load-card" [routerLink]="['/loads', load.id]">
+  <div class="load-card__top">
+    <span class="load-number"> #{{ load.loadNumber }} </span>
+
+    <span class="status-badge" [class.completed]="isCompleted">
+      {{ routeStatusLabel }}
+    </span>
+  </div>
+
+  <div class="route-section">
+    <div class="route-line">
+      <span class="dot"></span>
+      <span class="line"></span>
+      <span class="dot"></span>
+    </div>
+
+    <div class="route-content">
+      <div class="route-item">
+        <small>Origin</small>
+        <strong>{{ load.origin || "-" }}</strong>
+      </div>
+
+      <div class="route-item">
+        <small>Destination</small>
+        <strong>{{ load.destination || "-" }}</strong>
+      </div>
+    </div>
+  </div>
+
+  <div class="load-fields">
+    <div class="field">
+      <small>Pickup date</small>
+      <strong>{{
+        dateText(load.pickupDate) | date: "MMM d, yy • h:mm a"
+      }}</strong>
+    </div>
+
+    <div class="field">
+      <small>Delivery date</small>
+      <strong>{{
+        dateText(load.deliveryDate) | date: "MMM d, yy • h:mm a"
+      }}</strong>
+    </div>
+
+    <div class="field">
+      <small>Carrier</small>
+      <strong>{{ load.carrierName || "-" }}</strong>
+    </div>
+
+    <div class="field">
+      <small>Customer bill</small>
+      <strong>${{ load.customerRate ?? 0 | number: "1.2-2" }}</strong>
+    </div>
+
+    <div class="field">
+      <small>Carrier pay</small>
+      <strong>${{ load.carrierRate ?? 0 | number: "1.2-2" }}</strong>
+    </div>
+
+    <div class="field">
+      <small>Margin</small>
+      <strong>${{ load.margin ?? 0 | number: "1.2-2" }}</strong>
+    </div>
+  </div>
+</a>

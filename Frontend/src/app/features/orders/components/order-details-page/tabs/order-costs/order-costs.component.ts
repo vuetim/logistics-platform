@@ -13,6 +13,7 @@ import { OrdersService } from "../../../../../../data-access/orders/orders.servi
 import { UiButtonComponent } from "../../../../../../shared/UI/ui-button/ui-button.component";
 import { ToastrService } from "ngx-toastr";
 import { HttpErrorResponse } from "@angular/common/http";
+import { Permission } from "../../../../../../core/auth/permissions/permission.enum";
 
 @Component({
   selector: 'app-order-costs',
@@ -55,8 +56,8 @@ export class OrderCostsComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.canView = this.auth.hasPermission('Load_View');
-    this.canUpdate = this.auth.hasPermission('Load_Update');
+    this.canView = this.auth.hasRole('Admin') || this.auth.hasPermission(Permission.OrderCost_View);
+    this.canUpdate = this.auth.hasRole('Admin') || this.auth.hasPermission(Permission.OrderCost_Update);
     this.loadBillToOptions();
     this.load();
   }

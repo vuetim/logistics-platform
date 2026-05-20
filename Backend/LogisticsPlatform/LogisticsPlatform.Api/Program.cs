@@ -9,6 +9,8 @@ using LogisticsPlatform.Application.Interfaces.Repositories.Loads;
 using LogisticsPlatform.Application.Interfaces.Repositories.Orders;
 using LogisticsPlatform.Application.Interfaces.Repositories.Queries;
 using LogisticsPlatform.Application.Interfaces.Repositories.Security;
+using LogisticsPlatform.Application.Interfaces.Repositories.Notifications;
+using LogisticsPlatform.Application.Interfaces.Repositories.Search;
 using LogisticsPlatform.Application.Interfaces.Repositories.Users;
 using LogisticsPlatform.Application.Interfaces.Security;
 using LogisticsPlatform.Application.Interfaces.Services;
@@ -18,6 +20,8 @@ using LogisticsPlatform.Application.Interfaces.Services.Carriers;
 using LogisticsPlatform.Application.Interfaces.Services.Customers;
 using LogisticsPlatform.Application.Interfaces.Services.Loads;
 using LogisticsPlatform.Application.Interfaces.Services.Orders;
+using LogisticsPlatform.Application.Interfaces.Services.Notifications;
+using LogisticsPlatform.Application.Interfaces.Services.Search;
 using LogisticsPlatform.Application.Interfaces.Services.Security;
 using LogisticsPlatform.Application.Interfaces.Services.Users;
 using LogisticsPlatform.Application.Jobs;
@@ -26,16 +30,23 @@ using LogisticsPlatform.Application.Security;
 using LogisticsPlatform.Application.Services;
 using LogisticsPlatform.Application.Services.Auth;
 using LogisticsPlatform.Application.Services.Financial;
+using LogisticsPlatform.Application.Services.Loads;
+using LogisticsPlatform.Application.Services.Notifications;
+using LogisticsPlatform.Application.Services.Loads.OrderToLoad;
 using LogisticsPlatform.Application.Services.Orders;
+using LogisticsPlatform.Application.Services.Search;
 using LogisticsPlatform.Application.Services.Users;
 using LogisticsPlatform.Infrastructure.Common;
 using LogisticsPlatform.Infrastructure.Persistence;
 using LogisticsPlatform.Infrastructure.Persistence.Repositories.Queries;
 using LogisticsPlatform.Infrastructure.Repositories;
 using LogisticsPlatform.Infrastructure.Repositories.Financial;
+using LogisticsPlatform.Infrastructure.Repositories.Notifications;
+using LogisticsPlatform.Infrastructure.Repositories.Search;
 using LogisticsPlatform.Infrastructure.Repositories.Security;
 using LogisticsPlatform.Infrastructure.Security;
 using LogisticsPlatform.Infrastructure.Services;
+using LogisticsPlatform.Infrastructure.Services.Documents;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder.Extensions;
 using Microsoft.EntityFrameworkCore;
@@ -138,6 +149,8 @@ builder.Services.AddScoped<ILoadCarrierAssignmentRepository, LoadCarrierAssignme
 //carrier performance 
 builder.Services.AddScoped<ICarrierPerformanceRepository, CarrierPerformanceRepository>();
 builder.Services.AddScoped<ILoadAlertRepository, LoadAlertRepository>();
+builder.Services.AddScoped<ILoadExceptionRepository, LoadExceptionRepository>();
+builder.Services.AddScoped<ILoadStopServiceRequirementRepository, LoadStopServiceRequirementRepository>();
 builder.Services.AddHostedService<HangfireStartupJob>();
 // Delay fault (system)
 builder.Services.AddScoped<IDelayFaultAttributionService, DelayFaultAttributionService>();
@@ -148,6 +161,9 @@ builder.Services.AddScoped<IDelayResponsibilityService, DelayResponsibilityServi
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 builder.Services.AddScoped<IAuthAuditLogRepository, AuthAuditLogRepository>();
 builder.Services.AddScoped<IUserQueryRepository, UserQueryRepository>();
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+builder.Services.AddScoped<INotificationRecipientRepository, NotificationRecipientRepository>();
+builder.Services.AddScoped<IGlobalSearchRepository, GlobalSearchRepository>();
 
 
 
@@ -172,11 +188,21 @@ builder.Services.AddScoped<ICarrierQueryService, CarrierQueryService>();
 builder.Services.AddScoped<ICarrierDocumentQueryService, CarrierDocumentQueryService>();
 builder.Services.AddScoped<ILoadQueryService, LoadQueryService>();
 builder.Services.AddScoped<ILoadService, LoadService>();
+builder.Services.AddScoped<ILoadCreationPolicy, LoadCreationPolicy>();
+builder.Services.AddScoped<ILoadDispatchPolicy, LoadDispatchPolicy>();
+builder.Services.AddScoped<ILoadNumberGenerator, LoadNumberGenerator>();
+builder.Services.AddScoped<IOrderToLoadRouteSelector, OrderToLoadRouteSelector>();
+builder.Services.AddScoped<ILoadCostSnapshotBuilder, LoadCostSnapshotBuilder>();
+builder.Services.AddScoped<IOrderToLoadSnapshotBuilder, OrderToLoadSnapshotBuilder>();
 builder.Services.AddScoped<ILoadStopService, LoadStopService>();
 builder.Services.AddScoped<ILoadEquipmentService, LoadEquipmentService>();
 builder.Services.AddScoped<ILoadDocumentService, LoadDocumentService>();
 builder.Services.AddScoped<ILoadNoteService, LoadNoteService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IOrderDatePolicy, OrderDatePolicy>();
+builder.Services.AddScoped<IOrderCancellationPolicy, OrderCancellationPolicy>();
+builder.Services.AddScoped<IOrderDetailsMapper, OrderDetailsMapper>();
+builder.Services.AddScoped<IOrderNumberGenerator, OrderNumberGenerator>();
 builder.Services.AddScoped<IOrderLoadSyncService, OrderLoadSyncService>();
 builder.Services.AddScoped<IOrderQueryService, OrderQueryService>();
 builder.Services.AddScoped<IOrderRouteService, OrderRouteService>();
@@ -197,6 +223,7 @@ builder.Services.AddScoped<ICarrierSettlementService, CarrierSettlementService>(
 builder.Services.AddScoped<ILoadFinancialSnapshotService, LoadFinancialSnapshotService>();
 builder.Services.AddScoped<ILoadFinancialAutomationService, LoadFinancialAutomationService>();
 builder.Services.AddScoped<IPdfService, PdfService>();
+builder.Services.AddScoped<IRateConfirmationService, RateConfirmationService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 
 //pdf 
@@ -210,7 +237,10 @@ builder.Services.AddScoped<CarrierScoreCardService>();
 
 builder.Services.AddScoped<IEtaPredictionService, EtaPredictionService>();
 builder.Services.AddScoped<EtaMonitoringJob>();
+builder.Services.AddScoped<NotificationCleanupJob>();
 builder.Services.AddScoped<ILoadAlertService, LoadAlertService>();
+builder.Services.AddScoped<ILoadExceptionService, LoadExceptionService>();
+builder.Services.AddScoped<ILoadStopServiceRequirementService, LoadStopServiceRequirementService>();
 // Delay fault (system)
 builder.Services.AddScoped<ILoadDelayResponsibilityRepository, LoadDelayResponsibilityRepository>();
 
@@ -222,6 +252,8 @@ builder.Services.AddScoped<IAuthAuditService, AuthAuditService>();
 //users
 builder.Services.AddScoped<IUserManagementService, UserManagementService>();
 builder.Services.AddScoped<IUserTablePreferenceService, UserTablePreferenceService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<IGlobalSearchService, GlobalSearchService>();
 
 builder.Services.AddScoped<IPermissionReadModel, PermissionReadModel>();
 builder.Services.AddScoped<IPermissionService, PermissionService>();
@@ -306,6 +338,13 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    await RolePermissionDefaultsSeeder.SeedAsync(db);
+}
+
 //app.UseHangfireDashboard("/hangfire");
 app.UseCors("AllowFrontend");
 // Middleware

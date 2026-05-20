@@ -3,13 +3,16 @@ using LogisticsPlatform.Application.DTOs.ActivityLog;
 using LogisticsPlatform.Application.DTOs.Costs;
 using LogisticsPlatform.Domain.Entities;
 using LogisticsPlatform.Domain.Enums;
-using SendGrid.Helpers.Errors.Model;
 using LogisticsPlatform.Application.Extensions;
 
 using System.Collections.Generic;
 using LogisticsPlatform.Application.Interfaces.Services.Loads;
 using LogisticsPlatform.Application.Interfaces.Services.ActivityLog;
 using LogisticsPlatform.Application.Interfaces.Repositories.Loads;
+using LogisticsPlatform.Application.Interfaces.Services.Security;
+using LogisticsPlatform.Domain.Security;
+using SendGrid.Helpers.Errors.Model;
+using ForbiddenException = LogisticsPlatform.Application.Common.Exceptions.ForbiddenException;
 
 namespace LogisticsPlatform.Application.Services;
 
@@ -18,19 +21,25 @@ public class LoadCostService : ILoadCostService
     private readonly ILoadRepository _loads;
     private readonly ILoadCostRepository _costs;
     private readonly IActivityLogService _activityLog;
+    private readonly IPermissionService _permission;
 
     public LoadCostService(
         ILoadRepository loads,
         ILoadCostRepository costs,
-        IActivityLogService activityLog)
+        IActivityLogService activityLog,
+        IPermissionService permission)
     {
         _loads = loads;
         _costs = costs;
         _activityLog = activityLog;
+        _permission = permission;
     }
 
-    public async Task<LoadCostDto> GetAsync(Guid loadId)
+    public async Task<LoadCostDto> GetAsync(Guid loadId, Guid userId)
     {
+        if (!await _permission.HasPermissionAsync(userId, Permission.LoadCost_View))
+            throw new ForbiddenException("You are not allowed to view load costs.");
+
         var load = await _loads.GetByIdAsync(loadId)
             ?? throw new NotFoundException("Load not found.");
 
@@ -65,6 +74,9 @@ public class LoadCostService : ILoadCostService
 
     public async Task UpdateAsync(Guid loadId, UpdateLoadCostDto dto, Guid userId)
     {
+        if (!await _permission.HasPermissionAsync(userId, Permission.LoadCost_Update))
+            throw new ForbiddenException("You are not allowed to update load costs.");
+
         var load = await _loads.GetByIdAsync(loadId)
             ?? throw new NotFoundException("Load not found.");
 

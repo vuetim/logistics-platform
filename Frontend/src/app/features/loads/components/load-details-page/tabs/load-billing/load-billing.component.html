@@ -16,7 +16,26 @@
         <div class="kv-row"><span>Date</span><strong>{{ invoice.invoiceDate | date: "shortDate" }}</strong></div>
         <div class="kv-row"><span>Due</span><strong>{{ invoice.dueDate ? (invoice.dueDate | date: "shortDate") : "-" }}</strong></div>
         <div class="kv-row"><span>Total</span><strong>{{ money(invoice.totalAmount) }}</strong></div>
-        <button type="button" class="tab-action" (click)="downloadInvoicePdf()">Download PDF</button>
+        <div class="line-items" *ngIf="invoice.lineItems?.length">
+          <div class="line-item header">
+            <span>Description</span>
+            <span>Qty</span>
+            <span>Price</span>
+            <span>Amount</span>
+          </div>
+          <div class="line-item" *ngFor="let line of invoice.lineItems">
+            <span>{{ line.description || "-" }}</span>
+            <span>{{ line.qty || 0 }}</span>
+            <span>{{ money(line.price) }}</span>
+            <span>{{ money(line.amount) }}</span>
+          </div>
+        </div>
+        <div class="row-actions billing-actions">
+          <button type="button" class="tab-action" *ngIf="canMarkInvoiceSent(invoice.status)" (click)="markInvoiceSent()">Mark Sent</button>
+          <button type="button" class="tab-action" *ngIf="canRecordPayment(invoice.status, invoice.balanceDue, 'invoice')" (click)="recordInvoicePayment()">Record Payment</button>
+          <button type="button" class="tab-action" *ngIf="canCancel(invoice.status, 'invoice')" (click)="cancelInvoice()">Cancel</button>
+          <button type="button" class="tab-action" (click)="downloadInvoicePdf()">Download PDF</button>
+        </div>
       </ng-container>
     </div>
 
@@ -29,7 +48,26 @@
         <div class="kv-row"><span>Date</span><strong>{{ settlement.settlementDate | date: "shortDate" }}</strong></div>
         <div class="kv-row"><span>Due</span><strong>{{ settlement.dueDate ? (settlement.dueDate | date: "shortDate") : "-" }}</strong></div>
         <div class="kv-row"><span>Total</span><strong>{{ money(settlement.totalAmount) }}</strong></div>
-        <button type="button" class="tab-action" (click)="downloadSettlementPdf()">Download PDF</button>
+        <div class="line-items" *ngIf="settlement.lineItems?.length">
+          <div class="line-item header">
+            <span>Description</span>
+            <span>Qty</span>
+            <span>Price</span>
+            <span>Amount</span>
+          </div>
+          <div class="line-item" *ngFor="let line of settlement.lineItems">
+            <span>{{ line.description || "-" }}</span>
+            <span>{{ line.qty || 0 }}</span>
+            <span>{{ money(line.price) }}</span>
+            <span>{{ money(line.amount) }}</span>
+          </div>
+        </div>
+        <div class="row-actions billing-actions">
+          <button type="button" class="tab-action" *ngIf="canMarkSettlementSent(settlement.status)" (click)="markSettlementSent()">Mark Sent</button>
+          <button type="button" class="tab-action" *ngIf="canRecordPayment(settlement.status, settlement.balanceDue, 'settlement')" (click)="recordSettlementPayment()">Record Payment</button>
+          <button type="button" class="tab-action" *ngIf="canCancel(settlement.status, 'settlement')" (click)="cancelSettlement()">Cancel</button>
+          <button type="button" class="tab-action" (click)="downloadSettlementPdf()">Download PDF</button>
+        </div>
       </ng-container>
     </div>
   </div>

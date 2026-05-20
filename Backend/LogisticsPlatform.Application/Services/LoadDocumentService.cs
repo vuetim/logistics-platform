@@ -2,6 +2,7 @@
 using LogisticsPlatform.Application.Interfaces.Repositories.Loads;
 using LogisticsPlatform.Application.Interfaces.Repositories.Users;
 using LogisticsPlatform.Application.Interfaces.Services.Loads;
+using LogisticsPlatform.Application.Interfaces.Services.Notifications;
 using LogisticsPlatform.Application.Interfaces.Services.Security;
 using LogisticsPlatform.Domain.Entities;
 using LogisticsPlatform.Domain.Enums;
@@ -17,17 +18,20 @@ namespace LogisticsPlatform.Application.Services
         private readonly ILoadRepository _loads;
         private readonly IUserRepository _users;
         private readonly IPermissionService _permission;
+        private readonly INotificationService _notifications;
 
         public LoadDocumentService(
             ILoadDocumentRepository documents,
             ILoadRepository loads,
             IUserRepository users,
-            IPermissionService permission)
+            IPermissionService permission,
+            INotificationService notifications)
         {
             _documents = documents;
             _loads = loads;
             _users = users;
             _permission = permission;
+            _notifications = notifications;
         }
 
         // UPLOAD DOCUMENT
@@ -59,6 +63,10 @@ namespace LogisticsPlatform.Application.Services
             }
 
             await _documents.SaveChangesAsync();
+            await _notifications.NotifyLoadDocumentEventAsync(
+                loadId,
+                userId,
+                $"{dto.DocumentType} document uploaded");
         }
 
         // VIEW DOCUMENTS (filtered)
@@ -96,9 +104,15 @@ namespace LogisticsPlatform.Application.Services
 
             var document = await _documents.GetByIdAsync(documentId)
                 ?? throw new Exception("Document not found");
+            var loadId = document.LoadId;
+            var documentType = document.DocumentType;
 
             await _documents.DeleteAsync(document);
             await _documents.SaveChangesAsync();
+            await _notifications.NotifyLoadDocumentEventAsync(
+                loadId,
+                userId,
+                $"{documentType} document deleted");
         }
     }
 }

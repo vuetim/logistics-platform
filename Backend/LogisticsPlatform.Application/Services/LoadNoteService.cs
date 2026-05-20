@@ -3,6 +3,7 @@ using LogisticsPlatform.Application.DTOs.Loads.LoadNote;
 using LogisticsPlatform.Application.Interfaces.Repositories.Loads;
 using LogisticsPlatform.Application.Interfaces.Repositories.Users;
 using LogisticsPlatform.Application.Interfaces.Services.Loads;
+using LogisticsPlatform.Application.Interfaces.Services.Notifications;
 using LogisticsPlatform.Application.Interfaces.Services.Security;
 using LogisticsPlatform.Domain.Entities;
 using LogisticsPlatform.Domain.Security;
@@ -14,15 +15,18 @@ namespace LogisticsPlatform.Application.Services
         private readonly ILoadNoteRepository _repo;
         private readonly IUserRepository _users;
         private readonly IPermissionService _permission;
+        private readonly INotificationService _notifications;
 
         public LoadNoteService(
             ILoadNoteRepository repo,
             IUserRepository users,
-            IPermissionService permission)
+            IPermissionService permission,
+            INotificationService notifications)
         {
             _repo = repo;
             _users = users;
             _permission = permission;
+            _notifications = notifications;
         }
 
         public async Task AddAsync(Guid loadId, CreateLoadNoteDto dto, Guid userId)
@@ -47,6 +51,7 @@ namespace LogisticsPlatform.Application.Services
             };
 
             await _repo.AddAsync(note);
+            await _notifications.NotifyLoadNoteAddedAsync(loadId, userId, dto.Message);
         }
 
         public async Task<List<LoadNoteDto>> GetByLoadAsync(Guid loadId, Guid userId)

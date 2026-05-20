@@ -4,7 +4,13 @@
       <h3>Stops</h3>
       <p>Execution stops copied from order routes or managed on the load.</p>
     </div>
-    <button class="tab-action" (click)="openCreate()">Add Stop</button>
+    <button class="tab-action" (click)="openCreate()" *ngIf="canEditStops()">Add Stop</button>
+  </div>
+  <div class="empty locked-note" *ngIf="isCompletedLoad() && !canEditStops()">
+    Load is completed. Stops are locked for operational integrity.
+  </div>
+  <div class="empty locked-note" *ngIf="isCompletedLoad() && canEditStops()">
+    Load is completed. Correction mode is available for this user.
   </div>
 
   <div class="editor-panel" *ngIf="editing">
@@ -66,12 +72,34 @@
         <input type="number" [(ngModel)]="form.flexMinutes" />
       </label>
       <label>
+        Time zone
+        <input [(ngModel)]="form.timeZone" />
+      </label>
+      <label>
+        Appointment status
+        <select [(ngModel)]="form.appointmentStatus">
+          <option *ngFor="let option of appointmentStatusOptions" [ngValue]="option.value">{{ option.label }}</option>
+        </select>
+      </label>
+      <label>
+        Confirmation #
+        <input [(ngModel)]="form.appointmentConfirmationNumber" />
+      </label>
+      <label>
         Appointment #
         <input [(ngModel)]="form.appointmentNumber" />
+      </label>
+      <label class="check-inline">
+        <input type="checkbox" [(ngModel)]="form.appointmentConfirmed" />
+        Confirmed
       </label>
       <label>
         Reference
         <input [(ngModel)]="form.stopReference" />
+      </label>
+      <label>
+        Stop PO numbers
+        <input [(ngModel)]="form.poNumbers" />
       </label>
       <label class="full">
         Notes
@@ -98,11 +126,15 @@
           <th>Revised</th>
           <th>Actual</th>
           <th>Appointment</th>
+          <th>Appt status</th>
+          <th>Time zone</th>
+          <th>POs</th>
           <th>Actions</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let s of stops">
+        <ng-container *ngFor="let s of stops">
+        <tr>
           <td>{{ s.sequence }}</td>
           <td>{{ stopTypeLabel(s.stopType) }}</td>
           <td><span class="badge">{{ statusLabel(s.status) }}</span></td>
@@ -115,17 +147,54 @@
           <td>{{ s.actualArrival ? (s.actualArrival | date: "short") : "-" }} -> {{ s.actualDeparture ? (s.actualDeparture | date: "short") : "-" }}</td>
           <td>{{ appointmentLabel(s.appointmentType) }}</td>
           <td>
+            <span class="badge">{{ appointmentStatusLabel(s.appointmentStatus) }}</span>
+            <span *ngIf="s.appointmentConfirmationNumber">{{ s.appointmentConfirmationNumber }}</span>
+          </td>
+          <td>{{ s.timeZone || "UTC" }}</td>
+          <td>{{ s.poNumbers || "-" }}</td>
+          <td>
             <div class="row-actions">
               <button *ngIf="canMarkEnroute(s)" (click)="mark(s.id, 'enroute')">Enroute</button>
               <button *ngIf="canMarkArrive(s)" (click)="mark(s.id, 'arrive')">Arrive</button>
               <button *ngIf="canMarkLoaded(s)" (click)="mark(s.id, 'loaded')">Loaded</button>
               <button *ngIf="canMarkUnloaded(s)" (click)="mark(s.id, 'unloaded')">Unloaded</button>
-              <button (click)="openEdit(s)">Edit</button>
-              <button (click)="deleteStop(s)">Delete</button>
-              <span class="muted" *ngIf="!canMarkEnroute(s) && !canMarkArrive(s) && !canMarkLoaded(s) && !canMarkUnloaded(s)">No action</span>
+              <button *ngIf="canViewServices()" (click)="toggleServices(s)">Services</button>
+              <button *ngIf="canEditStops()" (click)="openEdit(s)">Edit</button>
+              <button *ngIf="canEditStops()" (click)="deleteStop(s)">Delete</button>
+              <span class="muted" *ngIf="isCompletedLoad() && !canEditStops()">Locked</span>
+              <span class="muted" *ngIf="!isCompletedLoad() && !hasStopActions(s)">Status current</span>
             </div>
           </td>
         </tr>
+        <tr class="services-row" *ngIf="expandedStopId === s.id">
+          <td colspan="12">
+            <div class="stop-services">
+              <div class="stop-services-head">
+                <strong>Stop services</strong>
+                <span>Operational requirements for this pickup/delivery.</span>
+              </div>
+              <div class="service-list" *ngIf="servicesByStop[s.id]?.length; else noServices">
+                <div class="service-chip" *ngFor="let service of servicesByStop[s.id]">
+                  <span>{{ service.serviceValue }}</span>
+                  <small *ngIf="service.notes">{{ service.notes }}</small>
+                  <button *ngIf="canDeleteServices()" (click)="deleteService(s.id, service.id)">Remove</button>
+                </div>
+              </div>
+              <ng-template #noServices>
+                <div class="muted">No services recorded for this stop.</div>
+              </ng-template>
+              <div class="service-editor" *ngIf="canAddServices()">
+                <select [(ngModel)]="serviceForm.serviceValue">
+                  <option value="">Select service</option>
+                  <option *ngFor="let service of stopServiceOptions" [value]="service.label">{{ service.label }}</option>
+                </select>
+                <input [(ngModel)]="serviceForm.notes" placeholder="Notes" />
+                <button class="tab-action primary-action" (click)="addService(s)" [disabled]="!serviceForm.serviceValue">Add Service</button>
+              </div>
+            </div>
+          </td>
+        </tr>
+        </ng-container>
       </tbody>
     </table>
   </div>

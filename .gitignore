@@ -1,0 +1,18 @@
+# Local IDE/runtime state
+.vs/
+.vscode/
+
+# .NET local CLI/cache folders
+.dotnet/
+.dotnet-home/
+.dotnet-build-check/
+.nuget/
+
+# Build outputs
+bin/
+obj/
+
+# Frontend dependencies/build output
+node_modules/
+dist/
+.angular/

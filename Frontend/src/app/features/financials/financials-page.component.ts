@@ -5,6 +5,8 @@ import { RouterLink } from "@angular/router";
 import { forkJoin, Observable } from "rxjs";
 import { FinancialsService } from "../../data-access/financials/financials.service";
 import { CarrierSettlementDto, CustomerInvoiceDto } from "../../core/models/loads/load-details.dto";
+import { AuthFacade } from "../../core/auth/auth.facade";
+import { Permission } from "../../core/auth/permissions/permission.enum";
 
 @Component({
   selector: 'app-financials-page',
@@ -30,7 +32,10 @@ export class FinancialsPageComponent implements OnInit {
     paymentReference: string;
   };
 
-  constructor(private financialsService: FinancialsService) { }
+  constructor(
+    private financialsService: FinancialsService,
+    private auth: AuthFacade
+  ) { }
 
   ngOnInit() {
     this.load();
@@ -86,6 +91,20 @@ export class FinancialsPageComponent implements OnInit {
     };
   }
 
+  markInvoiceSent(invoice: CustomerInvoiceDto) {
+    this.financialsService.updateInvoiceStatus(invoice.id, 1).subscribe({
+      next: () => this.load(),
+      error: err => this.error = this.errorMessage(err)
+    });
+  }
+
+  cancelInvoice(invoice: CustomerInvoiceDto) {
+    this.financialsService.updateInvoiceStatus(invoice.id, 4).subscribe({
+      next: () => this.load(),
+      error: err => this.error = this.errorMessage(err)
+    });
+  }
+
   recordSettlementPayment(settlement: CarrierSettlementDto) {
     this.paymentModal = {
       kind: 'settlement',
@@ -97,6 +116,20 @@ export class FinancialsPageComponent implements OnInit {
       paidAt: this.todayInputValue(),
       paymentReference: settlement.paymentReference || ''
     };
+  }
+
+  markSettlementSent(settlement: CarrierSettlementDto) {
+    this.financialsService.updateSettlementStatus(settlement.id, 1).subscribe({
+      next: () => this.load(),
+      error: err => this.error = this.errorMessage(err)
+    });
+  }
+
+  cancelSettlement(settlement: CarrierSettlementDto) {
+    this.financialsService.updateSettlementStatus(settlement.id, 4).subscribe({
+      next: () => this.load(),
+      error: err => this.error = this.errorMessage(err)
+    });
   }
 
   closePaymentModal() {
@@ -160,6 +193,44 @@ export class FinancialsPageComponent implements OnInit {
     return this.statusClass(this.settlementStatusLabel(settlement));
   }
 
+  canMarkSent(status: number | string) {
+    return this.statusValue(status) === 0;
+  }
+
+  canCancel(status: number | string) {
+    const value = this.statusValue(status);
+    return value !== 2 && value !== 4;
+  }
+
+  canRecordPayment(status: number | string, balance?: number | null) {
+    const value = this.statusValue(status);
+    return value !== 2 && value !== 4 && Number(balance ?? 0) > 0;
+  }
+
+  canUpdateInvoiceStatus(status: number | string) {
+    return this.canUse(Permission.Financial_Invoice_UpdateStatus) && this.canMarkSent(status);
+  }
+
+  canCancelInvoice(status: number | string) {
+    return this.canUse(Permission.Financial_Invoice_UpdateStatus) && this.canCancel(status);
+  }
+
+  canRecordInvoicePayment(status: number | string, balance?: number | null) {
+    return this.canUse(Permission.Financial_Invoice_RecordPayment) && this.canRecordPayment(status, balance);
+  }
+
+  canUpdateSettlementStatus(status: number | string) {
+    return this.canUse(Permission.Financial_Settlement_UpdateStatus) && this.canMarkSent(status);
+  }
+
+  canCancelSettlement(status: number | string) {
+    return this.canUse(Permission.Financial_Settlement_UpdateStatus) && this.canCancel(status);
+  }
+
+  canRecordSettlementPayment(status: number | string, balance?: number | null) {
+    return this.canUse(Permission.Financial_Settlement_RecordPayment) && this.canRecordPayment(status, balance);
+  }
+
   private financialStatusLabel(value: unknown, labels: string[]) {
     if (typeof value === 'number') return labels[value] ?? String(value);
     const numeric = Number(value);
@@ -191,6 +262,19 @@ export class FinancialsPageComponent implements OnInit {
     return 'badge-indigo';
   }
 
+  private statusValue(status: number | string) {
+    if (typeof status === 'number') return status;
+    const numeric = Number(status);
+    if (!Number.isNaN(numeric)) return numeric;
+    const normalized = status.replace(/\s+/g, '').toLowerCase();
+    if (normalized === 'draft') return 0;
+    if (normalized === 'sent') return 1;
+    if (normalized === 'paid') return 2;
+    if (normalized === 'overdue' || normalized === 'disputed') return 3;
+    if (normalized === 'canceled' || normalized === 'cancelled') return 4;
+    return -1;
+  }
+
   private todayInputValue() {
     return new Date().toISOString().slice(0, 10);
   }
@@ -199,5 +283,9 @@ export class FinancialsPageComponent implements OnInit {
     if (!err?.error) return "Financials unavailable";
     if (typeof err.error === 'string') return err.error;
     return err.error.message || err.error.title || "Financials unavailable";
+  }
+
+  private canUse(permission: Permission) {
+    return this.auth.hasRole('Admin') || this.auth.hasPermission(permission);
   }
 }

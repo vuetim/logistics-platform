@@ -259,6 +259,11 @@
       [order]="o"
       (close)="onEditClose($event)"
     ></app-edit-order-modal>
+    <app-create-load-from-order-modal
+      *ngIf="showCreateLoadModal"
+      [order]="o"
+      (close)="onCreateLoadClose($event)"
+    ></app-create-load-from-order-modal>
     <button
       *ngIf="canCancel(o)"
       class="action-btn action-cancel"

@@ -35,6 +35,14 @@ export interface LoadExecutionDetailsDto {
   proNumber?: string | null;
   rateConfirmationNumber?: string | null;
   trackingNumber?: string | null;
+  distanceMiles?: number | null;
+  durationMinutes?: number | null;
+  encodedPolyline?: string | null;
+  lastKnownLatitude?: number | null;
+  lastKnownLongitude?: number | null;
+  lastKnownLocationAt?: string | null;
+  trackingProvider?: string | null;
+  trackingExternalId?: string | null;
   driverName?: string | null;
   driverPhone?: string | null;
   driverEmail?: string | null;
@@ -50,6 +58,10 @@ export interface LoadExecutionDetailsDto {
 export interface LoadOrderSnapshotDto {
   orderId: string;
   orderNumber: string;
+  primaryPONumber?: string | null;
+  primaryBolNumber?: string | null;
+  primaryProNumber?: string | null;
+  commodity?: string | null;
   orderType: OrderType;
   direction: OrderDirection;
   plannedPickupDate?: string | null;
@@ -69,6 +81,8 @@ export interface LoadOrderRouteSnapshotDto {
   plannedArrivalTo?: string | null;
   hasTime: boolean;
   copyToLoad: boolean;
+  timeZone?: string | null;
+  poNumbers?: string | null;
   notes?: string | null;
   isActive: boolean;
 }
@@ -85,12 +99,19 @@ export interface LoadStopDetailsDto {
   state: string;
   postalCode: string;
   country: string;
+  latitude?: number | null;
+  longitude?: number | null;
   plannedArrivalFrom?: string | null;
   plannedArrivalTo?: string | null;
   appointmentType: number;
   flexMinutes?: number | null;
+  timeZone?: string | null;
+  appointmentStatus?: number | string | null;
+  appointmentConfirmed?: boolean | null;
+  appointmentConfirmationNumber?: string | null;
   appointmentNumber?: string | null;
   stopReference?: string | null;
+  poNumbers?: string | null;
   revisedArrivalFrom?: string | null;
   revisedArrivalTo?: string | null;
   actualArrival?: string | null;
@@ -177,6 +198,79 @@ export interface LoadCostLineItemDto {
   isCustomer: boolean;
   isCarrier: boolean;
   notes?: string | null;
+}
+
+export interface LoadCarrierAssignmentDto {
+  id: string;
+  loadId: string;
+  carrierId: string;
+  carrierName: string;
+  offeredRate?: number | null;
+  currency?: string | null;
+  rateConfirmationNumber?: string | null;
+  status: number | string;
+  tenderMethod?: string | null;
+  tenderNotes?: string | null;
+  tenderExpiresAt?: string | null;
+  acceptedByName?: string | null;
+  acceptedByEmail?: string | null;
+  rejectedReason?: string | null;
+  tenderedAt: string;
+  acceptedAt?: string | null;
+  rejectedAt?: string | null;
+  isActive: boolean;
+}
+
+export interface OpenCarrierOfferDto {
+  assignmentId: string;
+  loadId: string;
+  loadNumber: string;
+  loadStatus: string;
+  customerName: string;
+  origin: string;
+  destination: string;
+  carrierId: string;
+  carrierName: string;
+  offeredRate?: number | null;
+  currency?: string | null;
+  rateConfirmationNumber?: string | null;
+  tenderMethod?: string | null;
+  tenderNotes?: string | null;
+  tenderedAt: string;
+  tenderExpiresAt?: string | null;
+}
+
+export interface LoadExceptionDto {
+  id: string;
+  loadId: string;
+  loadStopId?: string | null;
+  orderId?: string | null;
+  exceptionKey: string;
+  exceptionValue: string;
+  reasonKey?: string | null;
+  reasonValue?: string | null;
+  ediReasonCode?: string | null;
+  responsiblePartyKey?: string | null;
+  responsiblePartyValue?: string | null;
+  status: number | string;
+  description?: string | null;
+  resolutionNotes?: string | null;
+  affectedItemName?: string | null;
+  affectedItemReference?: string | null;
+  quantity?: number | null;
+  unit?: string | null;
+  occurredAt: string;
+  resolvedAt?: string | null;
+}
+
+export interface LoadStopServiceDto {
+  id: string;
+  loadStopId: string;
+  serviceKey: string;
+  serviceValue: string;
+  notes?: string | null;
+  isPickupService: boolean;
+  isDeliveryService: boolean;
 }
 
 export interface LoadNoteDto {
